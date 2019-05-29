@@ -1,95 +1,91 @@
 #include "common.h"
 #include "include.h"
 
-/*LCDÒº¾§±äÁ¿¶¨Òå*/
-Site_t site     = {0, 0};      //ÏÔÊ¾Í¼Ïñ×óÉÏ½ÇÎ»ÖÃ
-Size_t imgsize  = {CAMERA_W, CAMERA_H};     //Í¼Ïñ´óÐ¡
-Size_t size;                   //ÏÔÊ¾ÇøÓòÍ¼Ïñ´óÐ¡   
-         
-
+/*LCDæ¶²æ™¶å˜é‡å®šä¹‰*/
+Site_t site    = { 0, 0 };               //æ˜¾ç¤ºå›¾åƒå·¦ä¸Šè§’ä½ç½®
+Size_t imgsize = { CAMERA_W, CAMERA_H }; //å›¾åƒå¤§å°
+Size_t size;                             //æ˜¾ç¤ºåŒºåŸŸå›¾åƒå¤§å°
 
 void LCD_Init()
 {
-    LCD_init();   //ÏÔÊ¾ÆÁ³õÊ¼»¯  
-    LCD_str  (site,"Cam init ing",FCOLOUR,BCOLOUR);   //ÏÔÊ¾ÆÁÏÔÊ¾  £¨×óÉÏ½Ç×ø±ê£¬×Ö·û´®£¬×ÖÌåÑÕÉ«£¬±³¾°ÑÕÉ«£©
+    LCD_init();                                      //æ˜¾ç¤ºå±åˆå§‹åŒ–
+    LCD_str(site, "Cam init ing", FCOLOUR, BCOLOUR); //æ˜¾ç¤ºå±æ˜¾ç¤º  ï¼ˆå·¦ä¸Šè§’åæ ‡ï¼Œå­—ç¬¦ä¸²ï¼Œå­—ä½“é¢œè‰²ï¼ŒèƒŒæ™¯é¢œè‰²ï¼‰
 
-    size.H = CAMERA_H;    //¸ß      //£¨±íÊ¾È«ÆÁÏÔÊ¾£©
-    size.W = CAMERA_W;    //¿í
-  
-    LCD_str  (site,"Cam init OK!",FCOLOUR,BCOLOUR);   //ÏÔÊ¾ÆÁÏÔ
-    LCD_clear(RED);     //ÇåÆÁ £¨±³¾°ºìÉ«£©
+    size.H = CAMERA_H; //é«˜      //ï¼ˆè¡¨ç¤ºå…¨å±æ˜¾ç¤ºï¼‰
+    size.W = CAMERA_W; //å®½
+
+    LCD_str(site, "Cam init OK!", FCOLOUR, BCOLOUR); //æ˜¾ç¤ºå±æ˜¾
+    LCD_clear(RED);                                  //æ¸…å± ï¼ˆèƒŒæ™¯çº¢è‰²ï¼‰
 }
-
-
 
 void LCDDisplay(void)
 {
-   uint32 a,i;
-   Site_t site_point = {0,0};
- 
-   site.y =127-CAMERA_H;    //ÏÔÊ¾Í¼Ïñ×óÉÏ½ÇÎ»ÖÃµÄyÖá
-   site.x =127-CAMERA_W;
-   LCD_Img_Binary_Z(site, size, imgbuff, imgsize);//ºÚ°×ÉãÏñÍ·£¨ÏÔÊ¾Í¼Ïñ×óÉÏ½ÇÎ»ÖÃ£¬ÏÔÊ¾ÇøÓòÍ¼Ïñ´óÐ¡£¬¶¨Òå´æ´¢½ÓÊÕÍ¼ÏñµÄÊý×é£¬Í¼Ïñ´óÐ¡£©
+    uint32 a, i;
+    Site_t site_point = { 0, 0 };
 
-   //»­±ßÏßºÍÖÐÐÄÏß
-       for(i=CAMERA_H-1;i>2;i--)
-       {
-        site_point.y=i+127-CAMERA_H;
-         //ÓÒÏß
-        if(RightEdge[i]>79)RightEdge[i]=79;
-        if(RightEdge[i]<0)RightEdge[i]=0;
-        site_point.x=RightEdge[i]+127-CAMERA_W-2;      /////LeftEedg   rightEedg
+    site.y = 127 - CAMERA_H; //æ˜¾ç¤ºå›¾åƒå·¦ä¸Šè§’ä½ç½®çš„yè½´
+    site.x = 127 - CAMERA_W;
+    LCD_Img_Binary_Z(site, size, imgbuff, imgsize); //é»‘ç™½æ‘„åƒå¤´ï¼ˆæ˜¾ç¤ºå›¾åƒå·¦ä¸Šè§’ä½ç½®ï¼Œæ˜¾ç¤ºåŒºåŸŸå›¾åƒå¤§å°ï¼Œå®šä¹‰å­˜å‚¨æŽ¥æ”¶å›¾åƒçš„æ•°ç»„ï¼Œå›¾åƒå¤§å°ï¼‰
+
+    //ç”»è¾¹çº¿å’Œä¸­å¿ƒçº¿
+    for (i = CAMERA_H - 1; i > 2; i--)
+    {
+        site_point.y = i + 127 - CAMERA_H;
+        //å³çº¿
+        if (RightEdge[i] > 79)
+            RightEdge[i] = 79;
+        if (RightEdge[i] < 0)
+            RightEdge[i] = 0;
+        site_point.x = RightEdge[i] + 127 - CAMERA_W - 2; /////LeftEedg   rightEedg
         LCD_point(site_point, BRED);
-         
-        //×óÏß
-        if(LeftEdge[i]>79)LeftEdge[i]=79;
-        if(LeftEdge[i]<0)LeftEdge[i]=0;
-        site_point.x=LeftEdge[i]+127-CAMERA_W+2;
+
+        //å·¦çº¿
+        if (LeftEdge[i] > 79)
+            LeftEdge[i] = 79;
+        if (LeftEdge[i] < 0)
+            LeftEdge[i] = 0;
+        site_point.x = LeftEdge[i] + 127 - CAMERA_W + 2;
         LCD_point(site_point, BLUE);
-        
-         //Â·¾¶ÖÐÏß
-        site_point.x=MiddleLine[i]+127-CAMERA_W;
+
+        //è·¯å¾„ä¸­çº¿
+        site_point.x = MiddleLine[i] + 127 - CAMERA_W;
         LCD_point(site_point, RED);
-         //¾µÍ·ÖÐÐÄ
-         site_point.x=40+127-CAMERA_W;
-         LCD_point(site_point,YELLOW);
-            
-       }
-   
-   
-    site.x=0;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-    site.y=0;
-    LCD_str(site,"LastLine:",FCOLOUR,BCOLOUR);   //±äÁ¿Ãû
+        //é•œå¤´ä¸­å¿ƒ
+        site_point.x = 40 + 127 - CAMERA_W;
+        LCD_point(site_point, YELLOW);
+    }
 
-    site.x=48;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-    site.y=0; 
-    
-   a=( uint32)(LastLine);
-   LCD_num(site,abs(a), YELLOW,RED);
-   
-   site.x=0;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-   site.y=16;
-   LCD_str(site,"SpeedDropRow:",FCOLOUR,BCOLOUR);   //±äÁ¿Ãû
-   
-   site.x=64;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-   site.y=16; 
-   LCD_num(site,SpeedDropRow, YELLOW,RED);
-   
-   site.x=0;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-   site.y=32;
-   LCD_str(site,"AllLose:",FCOLOUR,BCOLOUR);   //±äÁ¿Ãû
-   
-   site.x=64;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-   site.y=32; 
-   LCD_num(site,AllLose, YELLOW,RED);
-   
-   site.x=0;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-   site.y=48;
-   LCD_str(site,"SpeedSet:",FCOLOUR,BCOLOUR);   //±äÁ¿Ãû
-   
-   site.x=64;//±äÁ¿ÏÔÊ¾ÐÐµØÖ·
-   site.y=48; 
-   LCD_num(site,SpeedSet, YELLOW,RED);
+    site.x = 0; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 0;
+    LCD_str(site, "LastLine:", FCOLOUR, BCOLOUR); //å˜é‡å
 
-     
+    site.x = 48; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 0;
+
+    a = (uint32)(LastLine);
+    LCD_num(site, abs(a), YELLOW, RED);
+
+    site.x = 0; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 16;
+    LCD_str(site, "SpeedDropRow:", FCOLOUR, BCOLOUR); //å˜é‡å
+
+    site.x = 64; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 16;
+    LCD_num(site, SpeedDropRow, YELLOW, RED);
+
+    site.x = 0; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 32;
+    LCD_str(site, "AllLose:", FCOLOUR, BCOLOUR); //å˜é‡å
+
+    site.x = 64; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 32;
+    LCD_num(site, AllLose, YELLOW, RED);
+
+    site.x = 0; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 48;
+    LCD_str(site, "SpeedSet:", FCOLOUR, BCOLOUR); //å˜é‡å
+
+    site.x = 64; //å˜é‡æ˜¾ç¤ºè¡Œåœ°å€
+    site.y = 48;
+    LCD_num(site, SpeedSet, YELLOW, RED);
 }

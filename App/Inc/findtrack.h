@@ -1,18 +1,18 @@
 #ifndef __FINDTRACK_H__
 #define __FINDTRACK_H__
 
-/*** ºê¶¨Òå ****/ 
+/*** å®å®šä¹‰ ****/ 
 
 #define Black_Point 0
 #define White_Point 255
-#define RowMax	    60	  //ĞĞÊı
-#define ColumnMax	80	  //ÁĞÊı
+#define RowMax	    60	  //è¡Œæ•°
+#define ColumnMax	80	  //åˆ—æ•°
 
 
-/*** Íâ²¿º¯Êı±äÁ¿ÉêÃ÷ ****/  
+/*** å¤–éƒ¨å‡½æ•°å˜é‡ç”³æ˜ ****/  
 
 
-extern uint8  img[CAMERA_H][CAMERA_W];//¶¨Òå´æ´¢½ÓÊÕÍ¼ÏñµÄÊı×é,CAMERA_H(59-0),CAMERA_W(0-79)
+extern uint8  img[CAMERA_H][CAMERA_W];//å®šä¹‰å­˜å‚¨æ¥æ”¶å›¾åƒçš„æ•°ç»„,CAMERA_H(59-0),CAMERA_W(0-79)
 
 extern uint8 imgbuff[CAMERA_SIZE];
 extern int   AllLose;
@@ -39,7 +39,7 @@ extern  unsigned char OpenLoopExitRepairFlagR;
 extern  unsigned char RightInflectionPointFlag;
 extern  unsigned char LeftInflectionPointFlag;
 
-/*** º¯ÊıÉùÃ÷ ****/    
+/*** å‡½æ•°å£°æ˜ ****/    
 
 void FindInflectionPoint();
 extern void SearchCenterBlackline(void);

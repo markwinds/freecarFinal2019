@@ -2,496 +2,418 @@
 #include "include.h"
 
 /*********define for CrossConduct**********/
-unsigned char  CrossFlag  = 0;//Ê®×Ö±êÖ¾
-unsigned char  LastCrossFlag  = 0;
-unsigned char  LastLastCrossFlag  = 0;
-unsigned char  CrossNumberFalg=0;
-unsigned char  CloseLoopFlag=0;
+unsigned char CrossFlag         = 0; //åå­—æ ‡å¿—
+unsigned char LastCrossFlag     = 0;
+unsigned char LastLastCrossFlag = 0;
+unsigned char CrossNumberFalg   = 0;
+unsigned char CloseLoopFlag     = 0;
 
 /*********define for RecognitionObstacle**********/
-unsigned char  ObstacleLfetRowStart=0;
-unsigned char  ObstacleLfetColStart=0;
-unsigned char  ObstacleLfetOkFlag=0;
-unsigned char  ObstacleRightRowStart=0;
-unsigned char  ObstacleRightColStart=0;
-unsigned char  ObstacleRightOkFlag=0;
+unsigned char ObstacleLfetRowStart  = 0;
+unsigned char ObstacleLfetColStart  = 0;
+unsigned char ObstacleLfetOkFlag    = 0;
+unsigned char ObstacleRightRowStart = 0;
+unsigned char ObstacleRightColStart = 0;
+unsigned char ObstacleRightOkFlag   = 0;
 
-
-//¶ÔÊ®×Ö½øĞĞÊ¶±ğºÍ½øĞĞÌØÊâ´¦Àí      
+//å¯¹åå­—è¿›è¡Œè¯†åˆ«å’Œè¿›è¡Œç‰¹æ®Šå¤„ç†
 void NormalCrossConduct(void)
-{       
-     unsigned char i;
- 
-     LastLastCrossFlag=LastCrossFlag;//¼ÇÂ¼ÉÏÉÏ´ÎÊÇ·ñÊÇÊ®×Ö
-     LastCrossFlag=CrossFlag;//¼ÇÂ¼ÉÏÒ»´ÎÊÇ·ñÊÇÊ®×Ö
-     CrossFlag=0;//ÇåÁã
-     
-     
-   if((AllLose>=15))//×óÓÒÍ¬Ê±¶ªÏß 
-      {
-             CrossFlag=1;//±ê¼ÇÊ®×Ö    
-      }
-      if(CrossFlag)     
-       { 
-         
-         
-       if((BlackEndM>=BlackEndL)&&(BlackEndM>=BlackEndR))//ÖĞ¼ä°×Ïß×î¶à 
-       {
-         for(i=58;i>20;i--)     
-         {
-          MiddleLine[i]=40;//Ö±×ß    
-         }   
-       }            
-       else if((BlackEndL>BlackEndM)&&(BlackEndL>BlackEndR))//¿´µ½×ó±ß°×µÄ×î¶à£¬³µÌåÆ«ÓÒÁË£¬Íù×óÅÜ  
-       {
-          for(i=58;i>20;i--)    
-          {        
-                  MiddleLine[i]=30; 
-          }  
-       }          
-       else if((BlackEndR>BlackEndM)&&(BlackEndR>BlackEndL))//¿´µ½ÓÒ±ß°×µÄ×î¶à£¬³µÌåÆ«×óÁË£¬ÍùÓÒÅÜ
-       {
-         for(i=58;i>20;i--)     
-         { 
-             
-              MiddleLine[i]=50;    
-          }  
-         }
-       }
-     
-   
-     IsOrNotCrossLoop();
+{
+    unsigned char i;
 
+    LastLastCrossFlag = LastCrossFlag; //è®°å½•ä¸Šä¸Šæ¬¡æ˜¯å¦æ˜¯åå­—
+    LastCrossFlag     = CrossFlag;     //è®°å½•ä¸Šä¸€æ¬¡æ˜¯å¦æ˜¯åå­—
+    CrossFlag         = 0;             //æ¸…é›¶
+
+    if ((AllLose >= 15)) //å·¦å³åŒæ—¶ä¸¢çº¿
+    {
+        CrossFlag = 1; //æ ‡è®°åå­—
+    }
+    if (CrossFlag)
+    {
+
+        if ((BlackEndM >= BlackEndL) && (BlackEndM >= BlackEndR)) //ä¸­é—´ç™½çº¿æœ€å¤š
+        {
+            for (i = 58; i > 20; i--)
+            {
+                MiddleLine[i] = 40; //ç›´èµ°
+            }
+        }
+        else if ((BlackEndL > BlackEndM) && (BlackEndL > BlackEndR)) //çœ‹åˆ°å·¦è¾¹ç™½çš„æœ€å¤šï¼Œè½¦ä½“åå³äº†ï¼Œå¾€å·¦è·‘
+        {
+            for (i = 58; i > 20; i--)
+            {
+                MiddleLine[i] = 30;
+            }
+        }
+        else if ((BlackEndR > BlackEndM) && (BlackEndR > BlackEndL)) //çœ‹åˆ°å³è¾¹ç™½çš„æœ€å¤šï¼Œè½¦ä½“åå·¦äº†ï¼Œå¾€å³è·‘
+        {
+            for (i = 58; i > 20; i--)
+            {
+
+                MiddleLine[i] = 50;
+            }
+        }
+    }
+
+    IsOrNotCrossLoop();
 }
 
-//ÅĞ¶ÏÊÇ²»ÊÇ½øÈ¥ÁËÊ®×Ö»Ø»·£¬Èç¹û£¬ÔòÒª¹Ø±Õ»·µÀÊ¶±ğ£¬·ñÔòĞ±³öÊ®×ÖÊÇ£¬»áÎóÅĞ³É»·µÀ
+//åˆ¤æ–­æ˜¯ä¸æ˜¯è¿›å»äº†åå­—å›ç¯ï¼Œå¦‚æœï¼Œåˆ™è¦å…³é—­ç¯é“è¯†åˆ«ï¼Œå¦åˆ™æ–œå‡ºåå­—æ˜¯ï¼Œä¼šè¯¯åˆ¤æˆç¯é“
 
 void IsOrNotCrossLoop()
 {
-  
-  static char CrossLoopErrorNum=0;
-  static unsigned char CloseLoopNum=0;
-  static unsigned char CrossErrorClose=0;//¼ÇÂ¼¶à¾ÃÃ»ÓĞÓöµ½Æ«²î´óÓÚ10
-  unsigned char  ErrorCloseFlag=0;
-  
-  ErrorCloseFlag=0;
- 
-   if(LastLastCrossFlag&&LastCrossFlag&&CrossFlag==0)//Ç°Á½´ÎÊÇÊ®×Ö£¬±¾´Î²»ÊÇÊ®×Ö
-    {
-      
-      CrossNumberFalg++;//¼ÇÂ¼£¬´ú±íÒÑ¾­½øÈëÁËÊ®×Ö
-      
-    
-      
-    }
-   
-   if(CrossNumberFalg==1)
-   {
-       CrossErrorClose++;
-       
-       if(CrossErrorClose>8)
-       {
-           ErrorCloseFlag=1;
-           CrossErrorClose=0;
-       
-       }
-     
-          if(ABS(Error)>=10&&!ErrorCloseFlag&&LastLine>=20)//±ÜÃâÊ®×Ö½ÓÖ±µÀ£¬¹Ø±ÕÁË»·µÀ
-          {
-              CrossLoopErrorNum++;//Á¬Ğø¼ÇÂ¼Æ«´óÓÚ10
-          
-          }
-          else
-          {
-            CrossLoopErrorNum=0;
-          
-          }
-          
-          
-           if(CrossLoopErrorNum>=4&&CloseLoopFlag==0)//Á¬Ğø4´ÎÆ«²î´óÓÚ10
-         {
-           CloseLoopFlag=1;//¹ØµôÔ²»·´¦Àí
-           CrossLoopErrorNum=0;
-        }
-   }
-   
-  
-   
-   if(CloseLoopFlag)//¿ªÊ¼¼ÆËã¹Ø±ÕÁË»·µÀ´¦ÀíµÄÊ±¼ä
-   {
-       
-      CloseLoopNum++;
-      gpio_set   (PTB19, 1);
 
-      if(CloseLoopNum>=100)//Èç¹ûÊ±¼äÌ«³¤»¹Ã»Óöµ½Ê®×Ö³ö¿Ú£¬Ç¿ÖÆ´ò¿ª»·µÀ
-      {
-         CloseLoopFlag=0;
-         CloseLoopNum=0;
-         LastLastCrossFlag=0;
-         LastCrossFlag=0;
-         CrossNumberFalg=0;//¿ªÔ²»·´¦Àí
-         gpio_set   (PTB19, 0);
-      }
-      
-   }
-   
-   if(CrossNumberFalg>=2&&CloseLoopFlag)
-   {
-     CloseLoopFlag=0;//¿ªÔ²»·´¦Àí
-     LastLastCrossFlag=0;
-     LastCrossFlag=0;
-     CrossNumberFalg=0;
-     CloseLoopNum=0;
-     gpio_set   (PTB19, 0);
-   }
+    static char          CrossLoopErrorNum = 0;
+    static unsigned char CloseLoopNum      = 0;
+    static unsigned char CrossErrorClose   = 0; //è®°å½•å¤šä¹…æ²¡æœ‰é‡åˆ°åå·®å¤§äº10
+    unsigned char        ErrorCloseFlag    = 0;
+
+    ErrorCloseFlag = 0;
+
+    if (LastLastCrossFlag && LastCrossFlag && CrossFlag == 0) //å‰ä¸¤æ¬¡æ˜¯åå­—ï¼Œæœ¬æ¬¡ä¸æ˜¯åå­—
+    {
+
+        CrossNumberFalg++; //è®°å½•ï¼Œä»£è¡¨å·²ç»è¿›å…¥äº†åå­—
+    }
+
+    if (CrossNumberFalg == 1)
+    {
+        CrossErrorClose++;
+
+        if (CrossErrorClose > 8)
+        {
+            ErrorCloseFlag  = 1;
+            CrossErrorClose = 0;
+        }
+
+        if (ABS(Error) >= 10 && !ErrorCloseFlag && LastLine >= 20) //é¿å…åå­—æ¥ç›´é“ï¼Œå…³é—­äº†ç¯é“
+        {
+            CrossLoopErrorNum++; //è¿ç»­è®°å½•åå¤§äº10
+        }
+        else
+        {
+            CrossLoopErrorNum = 0;
+        }
+
+        if (CrossLoopErrorNum >= 4 && CloseLoopFlag == 0) //è¿ç»­4æ¬¡åå·®å¤§äº10
+        {
+            CloseLoopFlag     = 1; //å…³æ‰åœ†ç¯å¤„ç†
+            CrossLoopErrorNum = 0;
+        }
+    }
+
+    if (CloseLoopFlag) //å¼€å§‹è®¡ç®—å…³é—­äº†ç¯é“å¤„ç†çš„æ—¶é—´
+    {
+
+        CloseLoopNum++;
+        gpio_set(PTB19, 1);
+
+        if (CloseLoopNum >= 100) //å¦‚æœæ—¶é—´å¤ªé•¿è¿˜æ²¡é‡åˆ°åå­—å‡ºå£ï¼Œå¼ºåˆ¶æ‰“å¼€ç¯é“
+        {
+            CloseLoopFlag     = 0;
+            CloseLoopNum      = 0;
+            LastLastCrossFlag = 0;
+            LastCrossFlag     = 0;
+            CrossNumberFalg   = 0; //å¼€åœ†ç¯å¤„ç†
+            gpio_set(PTB19, 0);
+        }
+    }
+
+    if (CrossNumberFalg >= 2 && CloseLoopFlag)
+    {
+        CloseLoopFlag     = 0; //å¼€åœ†ç¯å¤„ç†
+        LastLastCrossFlag = 0;
+        LastCrossFlag     = 0;
+        CrossNumberFalg   = 0;
+        CloseLoopNum      = 0;
+        gpio_set(PTB19, 0);
+    }
 }
 
+#if ObstacleOpen //å¦‚æœå¼€å¯äº†éšœç¢è¯†åˆ«
 
-#if ObstacleOpen  //Èç¹û¿ªÆôÁËÕÏ°­Ê¶±ğ
-
-//ÕÏ°­Ê¶±ğ
+//éšœç¢è¯†åˆ«
 
 void RecognitionObstacle(void)
 {
-  int i,j;
-  static unsigned char ObstacleLfetRowNum=0;
-  static unsigned char ObstacleLfetNum=0;
-  unsigned char  ObstacleLeftFlag=0;
-  unsigned char ObstacleLeftLFlag=0;
-  static unsigned char ScanColStartLeft=0;//É¨ÃèµÄÆğÊ¼ÁĞ
-  static unsigned char ScanColEndLeft=0;//É¨ÃèµÄÖÕÖ¹ÁĞ
-  
-  static unsigned char ObstacleRightRowNum=0;
-  static unsigned char ObstacleRightNum=0;
-  unsigned char   ObstacleRightFlag=0;
-  unsigned char  ObstacleRightRFlag=0;
-  static unsigned char ScanColStartRight=0;//É¨ÃèµÄÆğÊ¼ÁĞ
-  static unsigned char ScanColEndRight=0;//É¨ÃèµÄÖÕÖ¹ÁĞ
-  
-  
-  ScanColStartLeft=0;
-  ScanColEndLeft=0;
-  ObstacleLeftFlag=0;
-  ObstacleLeftLFlag=0;
-  ObstacleLfetRowStart=0;
-  ObstacleLfetColStart=0;
-  ObstacleLfetRowNum=0;
-  
-  ScanColStartRight=0;
-  ScanColEndRight=0;
-  ObstacleRightFlag=0;
-  ObstacleRightRFlag=0;
-  ObstacleRightRowStart=0;
-  ObstacleRightColStart=0;
-  ObstacleRightRowNum=0;
-     //ObstacleLfetOkFlag=0;
-  
-  if(ABS(Error)<=6&&AllLose<=1&&LastLine<=12&&!CrossFlag&&LoopRightControlFlag==0&&LoopLeftControlFlag==0&&LeftLose<4&&RightLose<=4)
-  
-  {
-    for(i=58;i>20;i--)
+    int                  i, j;
+    static unsigned char ObstacleLfetRowNum = 0;
+    static unsigned char ObstacleLfetNum    = 0;
+    unsigned char        ObstacleLeftFlag   = 0;
+    unsigned char        ObstacleLeftLFlag  = 0;
+    static unsigned char ScanColStartLeft   = 0; //æ‰«æçš„èµ·å§‹åˆ—
+    static unsigned char ScanColEndLeft     = 0; //æ‰«æçš„ç»ˆæ­¢åˆ—
+
+    static unsigned char ObstacleRightRowNum = 0;
+    static unsigned char ObstacleRightNum    = 0;
+    unsigned char        ObstacleRightFlag   = 0;
+    unsigned char        ObstacleRightRFlag  = 0;
+    static unsigned char ScanColStartRight   = 0; //æ‰«æçš„èµ·å§‹åˆ—
+    static unsigned char ScanColEndRight     = 0; //æ‰«æçš„ç»ˆæ­¢åˆ—
+
+    ScanColStartLeft     = 0;
+    ScanColEndLeft       = 0;
+    ObstacleLeftFlag     = 0;
+    ObstacleLeftLFlag    = 0;
+    ObstacleLfetRowStart = 0;
+    ObstacleLfetColStart = 0;
+    ObstacleLfetRowNum   = 0;
+
+    ScanColStartRight     = 0;
+    ScanColEndRight       = 0;
+    ObstacleRightFlag     = 0;
+    ObstacleRightRFlag    = 0;
+    ObstacleRightRowStart = 0;
+    ObstacleRightColStart = 0;
+    ObstacleRightRowNum   = 0;
+    //ObstacleLfetOkFlag=0;
+
+    if (ABS(Error) <= 6 && AllLose <= 1 && LastLine <= 12 && !CrossFlag && LoopRightControlFlag == 0 && LoopLeftControlFlag == 0 && LeftLose < 4 && RightLose <= 4)
+
     {
-      if(LeftEdge[i]!=0)//Èç¹ûµ±ĞĞµÄ×ó±ßÏß´æÔÚ
-      {
-        if(ABS(LeftEdge[i+1]-LeftEdge[i])>=3)//×ó±ß½çÌø±ä
+        for (i = 58; i > 20; i--)
         {
-          
-          if(LeftEdge[i+1]!=0)
-          {
-            ScanColStartLeft=LeftEdge[i+1];//ÓÃÇ°Ò»ĞĞ×÷ÎªÉ¨ÃèµÄÆğÊ¼ÁĞ
-          
-          }
-          
-          else
-          {
-          
-            ScanColStartLeft=LeftEdge[56];
-          
-          }
-          
+            if (LeftEdge[i] != 0) //å¦‚æœå½“è¡Œçš„å·¦è¾¹çº¿å­˜åœ¨
+            {
+                if (ABS(LeftEdge[i + 1] - LeftEdge[i]) >= 3) //å·¦è¾¹ç•Œè·³å˜
+                {
+
+                    if (LeftEdge[i + 1] != 0)
+                    {
+                        ScanColStartLeft = LeftEdge[i + 1]; //ç”¨å‰ä¸€è¡Œä½œä¸ºæ‰«æçš„èµ·å§‹åˆ—
+                    }
+
+                    else
+                    {
+
+                        ScanColStartLeft = LeftEdge[56];
+                    }
+                }
+
+                else
+                {
+
+                    ScanColStartLeft = LeftEdge[i];
+                }
+            }
+
+            else //å¦‚æœå½“è¡Œå·¦è¾¹çº¿ä¸å­˜åœ¨
+            {
+                ScanColStartLeft = LeftEdge[i + 1]; //ç”¨å‰ä¸€è¡Œä½œä¸ºæ‰«æçš„èµ·å§‹åˆ—
+            }
+
+            ScanColEndLeft = MiddleLine[i];
+
+            for (j = ScanColStartLeft; j < ScanColEndLeft; j++) //å¾€å·¦è¾¹å¯»æ‰¾éšœç¢ç‰©
+            {
+                if (img[i][j] == White_Point && img[i][j + 1] == Black_Point) //æ‰¾åˆ°äº†è·³å˜
+                {
+                    ObstacleLeftFlag = 1;
+
+                    break;
+                }
+            }
+
+            unsigned char jj = j + 1;
+
+            if (ObstacleLeftFlag)
+            {
+
+                while (jj < ScanColEndLeft)
+                {
+                    if (img[i][jj] == Black_Point && img[i][jj + 1] == White_Point) //æ‰¾åˆ°åˆä¸€ä¸ªè·³å˜
+                    {
+                        ObstacleLeftLFlag = 1;
+
+                        break; //é€€å‡ºwhile
+                    }
+
+                    jj++;
+                }
+            }
+
+            if (ObstacleLeftLFlag && ObstacleLeftFlag)
+            {
+
+                ObstacleLfetRowNum++;
+
+                if (ObstacleLfetRowNum == 1)
+                {
+                    ObstacleLfetRowStart = i;
+                    ObstacleLfetColStart = j + 1;
+                    //ObstacleLfetRowNum=0;
+                }
+            }
         }
-        
+
+        if (ObstacleLfetRowNum >= 4 && ObstacleLeftLFlag && ObstacleLeftFlag) //å¤§äº4è¡Œæ»¡è¶³æ¡ä»¶ï¼Œè®¤å®šè¿™æ˜¯å·¦è¾¹æœ‰éšœç¢
+        {
+
+            ObstacleLfetNum++;
+
+            if (ObstacleLfetNum >= 3)
+            {
+
+                ObstacleLfetOkFlag = 1;
+                ObstacleLfetNum    = 0;
+                ObstacleLfetRowNum = 0;
+                gpio_set(PTB19, 1);
+            }
+        }
         else
         {
-          
-          ScanColStartLeft=LeftEdge[i];
-        
+            // ObstacleLfetOkFlag=0;
+            ObstacleLfetNum = 0;
+            gpio_set(PTB19, 0);
         }
-      
-      }
-      
-      else//Èç¹ûµ±ĞĞ×ó±ßÏß²»´æÔÚ
-      {
-         ScanColStartLeft=LeftEdge[i+1];//ÓÃÇ°Ò»ĞĞ×÷ÎªÉ¨ÃèµÄÆğÊ¼ÁĞ
-      }
-      
-      
-        ScanColEndLeft=MiddleLine[i];
-      
-       for(j=ScanColStartLeft;j<ScanColEndLeft;j++)//Íù×ó±ßÑ°ÕÒÕÏ°­Îï
-       {
-            if(img[i][j]==White_Point&&img[i][j+1]==Black_Point)//ÕÒµ½ÁËÌø±ä
-            {
-               ObstacleLeftFlag=1;
-              
-               break;
 
+        //å³è¾¹éšœç¢
+
+        if (!ObstacleLfetOkFlag) //å¦‚æœæ²¡æœ‰æ‰¾åˆ°å·¦è¾¹éšœç¢ç‰©ï¼Œå†å¯»æ‰¾å³è¾¹æœ‰æ²¡æœ‰éšœç¢ç‰©
+        {
+
+            for (i = 58; i > 20; i--)
+            {
+                if (RightEdge[i] != 80) //å¦‚æœå½“è¡Œçš„å³è¾¹çº¿å­˜åœ¨
+                {
+                    if (ABS(RightEdge[i + 1] - RightEdge[i]) >= 3) //å³è¾¹ç•Œè·³å˜
+                    {
+
+                        if (RightEdge[i + 1] != 80)
+                        {
+                            ScanColStartRight = RightEdge[i + 1]; //ç”¨å‰ä¸€è¡Œä½œä¸ºæ‰«æçš„èµ·å§‹åˆ—
+                        }
+
+                        else
+                        {
+
+                            ScanColStartRight = RightEdge[56];
+                        }
+                    }
+
+                    else
+                    {
+
+                        ScanColStartRight = RightEdge[i];
+                    }
+                }
+
+                else //å¦‚æœå½“è¡Œå·¦è¾¹çº¿ä¸å­˜åœ¨
+                {
+                    ScanColStartRight = RightEdge[i + 1]; //ç”¨å‰ä¸€è¡Œä½œä¸ºæ‰«æçš„èµ·å§‹åˆ—
+                }
+
+                ScanColEndRight = MiddleLine[i];
+
+                for (j = ScanColStartRight; j > ScanColEndRight; j--) //å¾€å·¦è¾¹å¯»æ‰¾éšœç¢ç‰©
+                {
+                    if (img[i][j] == White_Point && img[i][j - 1] == Black_Point) //æ‰¾åˆ°äº†è·³å˜
+                    {
+                        ObstacleRightFlag = 1;
+
+                        break;
+                    }
+                }
+
+                unsigned char jj = j - 1;
+
+                if (ObstacleRightFlag)
+                {
+
+                    while (jj > ScanColEndRight)
+                    {
+                        if (img[i][jj] == Black_Point && img[i][jj - 1] == White_Point) //æ‰¾åˆ°åˆä¸€ä¸ªè·³å˜
+                        {
+                            ObstacleRightRFlag = 1;
+
+                            break; //é€€å‡ºwhile
+                        }
+
+                        jj--;
+                    }
+                }
+
+                if (ObstacleRightFlag && ObstacleRightRFlag)
+                {
+
+                    ObstacleRightRowNum++;
+
+                    if (ObstacleRightRowNum == 1)
+                    {
+                        ObstacleLfetRowStart = i;
+                        ObstacleLfetColStart = j + 1;
+                        //ObstacleLfetRowNum=0;
+                    }
+                }
             }
- 
-       }
-       
-       unsigned char jj=j+1;
-       
-       if(ObstacleLeftFlag)
-       {
-       
-         while(jj<ScanColEndLeft)
-         {
-            if(img[i][jj]==Black_Point&&img[i][jj+1]==White_Point)//ÕÒµ½ÓÖÒ»¸öÌø±ä
-            {
-                ObstacleLeftLFlag=1;
-                
-                break;//ÍË³öwhile
-             }
-            
-            jj++;
-          
-          }
-       
-         
-       }
-     
-     if(ObstacleLeftLFlag&&ObstacleLeftFlag)
-     {
-      
-        ObstacleLfetRowNum++;
-        
-        if(ObstacleLfetRowNum==1)
-        {
-           ObstacleLfetRowStart=i;
-           ObstacleLfetColStart=j+1;
-           //ObstacleLfetRowNum=0;
-        }
-     }
-     
-     
-    }
- 
-    if(ObstacleLfetRowNum>=4&&ObstacleLeftLFlag&&ObstacleLeftFlag)//´óÓÚ4ĞĞÂú×ãÌõ¼ş£¬ÈÏ¶¨ÕâÊÇ×ó±ßÓĞÕÏ°­
-    {
-      
-        ObstacleLfetNum++;
-       
-       if(ObstacleLfetNum>=3)
-       {
-         
-        ObstacleLfetOkFlag=1;
-        ObstacleLfetNum=0;
-        ObstacleLfetRowNum=0;
-        gpio_set (PTB19,1);
-       
-       }
-    }
-    else
-    {
-      // ObstacleLfetOkFlag=0;
-       ObstacleLfetNum=0;
-       gpio_set (PTB19, 0);
-       
-    }
-    
-  
-    //ÓÒ±ßÕÏ°­ 
-    
-  if(!ObstacleLfetOkFlag)  //Èç¹ûÃ»ÓĞÕÒµ½×ó±ßÕÏ°­Îï£¬ÔÙÑ°ÕÒÓÒ±ßÓĞÃ»ÓĞÕÏ°­Îï
-  {
-  
-    
-    for(i=58;i>20;i--)
-    {
-      if(RightEdge[i]!=80)//Èç¹ûµ±ĞĞµÄÓÒ±ßÏß´æÔÚ
-      {
-        if(ABS(RightEdge[i+1]-RightEdge[i])>=3)//ÓÒ±ß½çÌø±ä
-        {
-          
-          if(RightEdge[i+1]!=80)
-          {
-            ScanColStartRight=RightEdge[i+1];//ÓÃÇ°Ò»ĞĞ×÷ÎªÉ¨ÃèµÄÆğÊ¼ÁĞ
-          
-          }
-          
-          else
-          {
-          
-            ScanColStartRight=RightEdge[56];
-          
-          }
-          
-        }
-        
-        else
-        {
-          
-          ScanColStartRight=RightEdge[i];
-        
-        }
-      
-      }
-      
-      else//Èç¹ûµ±ĞĞ×ó±ßÏß²»´æÔÚ
-      {
-         ScanColStartRight=RightEdge[i+1];//ÓÃÇ°Ò»ĞĞ×÷ÎªÉ¨ÃèµÄÆğÊ¼ÁĞ
-      }
-      
-      
-        ScanColEndRight=MiddleLine[i];
-      
-       for(j=ScanColStartRight;j>ScanColEndRight;j--)//Íù×ó±ßÑ°ÕÒÕÏ°­Îï
-       {
-            if(img[i][j]==White_Point&&img[i][j-1]==Black_Point)//ÕÒµ½ÁËÌø±ä
-            {
-               ObstacleRightFlag=1;
-              
-               break;
 
+            if (ObstacleRightRowNum >= 4 && ObstacleRightFlag && ObstacleRightRFlag) //å¤§äº4è¡Œæ»¡è¶³æ¡ä»¶ï¼Œè®¤å®šè¿™æ˜¯å·¦è¾¹æœ‰éšœç¢
+            {
+
+                ObstacleRightNum++;
+
+                if (ObstacleRightNum >= 3)
+                {
+
+                    ObstacleRightOkFlag = 1;
+                    ObstacleRightNum    = 0;
+                    ObstacleRightRowNum = 0;
+                    gpio_set(PTB19, 1);
+                }
             }
- 
-       }
-       
-       unsigned char jj=j-1;
-       
-       if(ObstacleRightFlag)
-       {
-       
-         while(jj>ScanColEndRight)
-         {
-            if(img[i][jj]==Black_Point&&img[i][jj-1]==White_Point)//ÕÒµ½ÓÖÒ»¸öÌø±ä
+            else
             {
-                ObstacleRightRFlag=1;
-                
-                break;//ÍË³öwhile
-             }
-            
-            jj--;
-          
-          }
-       
-         
-       }
-     
-     if(ObstacleRightFlag&&ObstacleRightRFlag)
-     {
-      
-        ObstacleRightRowNum++;
-        
-        if(ObstacleRightRowNum==1)
-        {
-           ObstacleLfetRowStart=i;
-           ObstacleLfetColStart=j+1;
-           //ObstacleLfetRowNum=0;
+                // ObstacleLfetOkFlag=0;
+                ObstacleRightNum = 0;
+                gpio_set(PTB19, 0);
+            }
         }
-     }
-     
-     
-    }
- 
-    if(ObstacleRightRowNum>=4&&ObstacleRightFlag&&ObstacleRightRFlag)//´óÓÚ4ĞĞÂú×ãÌõ¼ş£¬ÈÏ¶¨ÕâÊÇ×ó±ßÓĞÕÏ°­
-    {
-      
-        ObstacleRightNum++;
-       
-       if(ObstacleRightNum>=3)
-       {
-         
-        ObstacleRightOkFlag=1;
-        ObstacleRightNum=0;
-        ObstacleRightRowNum=0;
-        gpio_set (PTB19,1);
-       
-       }
-    }
-    else
-    {
-      // ObstacleLfetOkFlag=0;
-       ObstacleRightNum=0;
-       gpio_set (PTB19, 0);
-       
-    }
-   
-      
     }
 
-
-  }
-    
-      
-
-
-  ObstacleRepair();
-  
+    ObstacleRepair();
 }
 
-
-
-//ÕÏ°­Îï±ßÏß´¦Àí
+//éšœç¢ç‰©è¾¹çº¿å¤„ç†
 
 void ObstacleRepair()
 {
-    int i;
-    static unsigned char ObstacleLfetControlDelay=0;
+    int                  i;
+    static unsigned char ObstacleLfetControlDelay = 0;
 
-   if(ObstacleLfetOkFlag&&!ObstacleRightOkFlag)
-   {
-      for(i=59;i>=LastLine;i--)
-      {
-      
-        MiddleLine[i]=(int)(RightEdge[i]-Width[i]*0.2);
+    if (ObstacleLfetOkFlag && !ObstacleRightOkFlag)
+    {
+        for (i = 59; i >= LastLine; i--)
+        {
 
-      }
-      
-      ObstacleLfetControlDelay++;
-      
-      if(ObstacleLfetControlDelay>=20)
-      {
-         ObstacleLfetControlDelay=0;
-         ObstacleLfetOkFlag=0;
-      }
-      
-   
-   }
-   
-   if(ObstacleRightOkFlag&&!ObstacleLfetOkFlag)
-   {
-      for(i=59;i>=LastLine;i--)
-      {
-      
-        MiddleLine[i]=(int)(LeftEdge[i]+Width[i]*0.2);
+            MiddleLine[i] = (int)(RightEdge[i] - Width[i] * 0.2);
+        }
 
-      }
-      
-      ObstacleLfetControlDelay++;
-      
-      if(ObstacleLfetControlDelay>=20)
-      {
-         ObstacleLfetControlDelay=0;
-         ObstacleRightOkFlag=0;
-      }
-      
-   
-   }
+        ObstacleLfetControlDelay++;
 
+        if (ObstacleLfetControlDelay >= 20)
+        {
+            ObstacleLfetControlDelay = 0;
+            ObstacleLfetOkFlag       = 0;
+        }
+    }
+
+    if (ObstacleRightOkFlag && !ObstacleLfetOkFlag)
+    {
+        for (i = 59; i >= LastLine; i--)
+        {
+
+            MiddleLine[i] = (int)(LeftEdge[i] + Width[i] * 0.2);
+        }
+
+        ObstacleLfetControlDelay++;
+
+        if (ObstacleLfetControlDelay >= 20)
+        {
+            ObstacleLfetControlDelay = 0;
+            ObstacleRightOkFlag      = 0;
+        }
+    }
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
