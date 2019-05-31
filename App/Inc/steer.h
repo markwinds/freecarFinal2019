@@ -1,19 +1,19 @@
 #ifndef __STEER_H__
 #define __SYEER_H__
 
-#define S3010_FTM   FTM1       //FTM1Ä£¿é
-#define S3010_CH    FTM_CH0   //Í¨µÀºÅPTA8
-#define S3010_HZ    50       //¶æ»úµÄÆµÂÊ
+#define S3010_FTM   FTM1       //FTM1æ¨¡å—
+#define S3010_CH    FTM_CH0   //é€šé“å·PTA8
+#define S3010_HZ    50       //èˆµæœºçš„é¢‘ç‡
 
-#define SteerMax 565     //¶æ»ú×î´óÖµ
-#define SteerMin  405    //¶æ»úÖĞÖµ
-#define SteerMidle 480   //¶æ»ú×îĞ¡Öµ
+#define SteerMax 745     //èˆµæœºæœ€å¤§å€¼
+#define SteerMin  575    //èˆµæœºæœ€å°å€¼
+#define SteerMidle 653   //èˆµæœºä¸­å€¼
 
 extern float  LastError;
 extern float  Error;
 
 
-void SteerInit(void);//¶æ»ú³õÊ¼»¯
+void SteerInit(void);//èˆµæœºåˆå§‹åŒ–
 void CalculateError(void);
 extern void SteerControl(void);
 

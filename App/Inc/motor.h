@@ -1,8 +1,8 @@
 #ifndef __MOTOR_H__
 #define __MOTOR_H__
 
-#define  MotorControlPeriod   8     //µç»ú¿ØÖÆÖµ¸üÐÂÖÜÆÚ
-#define  SteetControlPeriod   20    //¶æ»ú¿ØÖÆÖÜÆÚ
+#define  MotorControlPeriod   8     //ç”µæœºæŽ§åˆ¶å€¼æ›´æ–°å‘¨æœŸ
+#define  SteetControlPeriod   20    //èˆµæœºæŽ§åˆ¶å‘¨æœŸ
 
 extern  int32 GetRightMotorPules;
 extern  int32 GetLeftMotorPules;
@@ -10,7 +10,7 @@ extern  float OutData[4];
 extern  float Error;
 extern  float AvaliableLines;
 extern  int   BlackEndM ; 
-extern  int   MiddleLine[RowMax+1];//ÖÐÏß
+extern  int   MiddleLine[RowMax+1];//ä¸­çº¿
 extern  int   BlackEndMR;
 extern  int   BlackEndML;
 extern float  SteerPwmAdd;

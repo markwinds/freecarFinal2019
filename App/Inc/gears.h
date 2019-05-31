@@ -9,9 +9,9 @@ enum swich_state
 
 enum gears
 {
-  low_grade,//µÍµµ
-  medium_grade,//ÖÐµµ
-   top_grade,//¸ßµµ
+  low_grade,//ä½Žæ¡£
+  medium_grade,//ä¸­æ¡£
+   top_grade,//é«˜æ¡£
 };
 
 extern enum gears gears_speed;

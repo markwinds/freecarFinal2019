@@ -4,208 +4,223 @@
 
 /*********define for SteerControl**********/
 
-float  KP=0.0;//¶æ»ú·½Ïò±ÈÀıÏµÊı£¬Ó°Ïì¶æ»úµÄ´ò½Ç·¶Î§
-float  KD=16.4;//10//7.5//¶æ»ú·½ÏòÎ¢·ÖÏµÊı,Ó°Ïì¶æ»úµÄ´ò½Ç·´Ó¦
-float  SteerPwmAdd=0.0;//¶æ»úpwmÔöÁ¿
-float  Error;//Æ«²îÖµ
-float  LastError;//ÉÏ´ÎµÄÆ«²î
-float  WeightSum=0;
-float  CenterMeanValue=0;
-float  CenterSum=0;
-float  J=0.0290;//µ÷½ÚpºÍÆ«²îµÄ¹ØÏµ£¬Ô½´ó£¬×÷ÓÃÔ½Ç¿
-float  BasicP=3.0; //»ù±¾µÄPÖµ
-uint32 SteerPwm=0,LastSteerSwm=0;//¶æ»úµÄpwmÖµºÍÉÏ´Î¶æ»úµÄpwmÖµ
+float  KP          = 0.0;  //èˆµæœºæ–¹å‘æ¯”ä¾‹ç³»æ•°ï¼Œå½±å“èˆµæœºçš„æ‰“è§’èŒƒå›´
+float  KD          = 16.4; //10//7.5//èˆµæœºæ–¹å‘å¾®åˆ†ç³»æ•°,å½±å“èˆµæœºçš„æ‰“è§’ååº”
+float  SteerPwmAdd = 0.0;  //èˆµæœºpwmå¢é‡
+float  Error;              //åå·®å€¼
+float  LastError;          //ä¸Šæ¬¡çš„åå·®
+float  WeightSum       = 0;
+float  CenterMeanValue = 0;
+float  CenterSum       = 0;
+float  J               = 0.0290;       //è°ƒèŠ‚på’Œåå·®çš„å…³ç³»ï¼Œè¶Šå¤§ï¼Œä½œç”¨è¶Šå¼º
+float  BasicP          = 3.0;          //åŸºæœ¬çš„På€¼
+uint32 SteerPwm = 0, LastSteerSwm = 0; //èˆµæœºçš„pwmå€¼å’Œä¸Šæ¬¡èˆµæœºçš„pwmå€¼
 
-//¼ÓÈ¨Æ½¾ù£¬È¨ÖµµÄÑ¡È¡
- #if 1
-float Weight[60]={ 
-                    0,0,0,0,0,0,0,0,0,0,     //0-9ĞĞ£¬»ù±¾ÓÃ²»µ½
-                    0,0,0,0,0,0,2,2,2,2,  //0-19ĞĞ£¬»ù±¾ÓÃ²»µ½
-                   
-                   1.8,1.8,1.8,1.8,1.8,1.3,1.3,1.3,1.3,1.3,//20-29ĞĞ
+//åŠ æƒå¹³å‡ï¼Œæƒå€¼çš„é€‰å–
+#if 1
+float Weight[60] = {
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0, //0-9è¡Œï¼ŒåŸºæœ¬ç”¨ä¸åˆ°
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    2,
+    2,
+    2, //0-19è¡Œï¼ŒåŸºæœ¬ç”¨ä¸åˆ°
 
-                   //1.05,1.05,1.05,1.05,1.05,2,2,2,2,2,
-                    
-                   2,2,2,2,2,2.0,2.0,2.5,2.5,2.5,//30-39ĞĞ
-            
-                   2.1,2.1,2.1,2.1,2.1,2,1,2,1,2,//40-49ĞĞ
-                  1,0,0,0,0,};//×î½üÊ®ĞĞ*///²»Ñ¹Ïß£¬ÓÃÓÚÍäµÀ
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3, //20-29è¡Œ
+
+    //1.05,1.05,1.05,1.05,1.05,2,2,2,2,2,
+
+    2,
+    2,
+    2,
+    2,
+    2,
+    2.0,
+    2.0,
+    2.5,
+    2.5,
+    2.5, //30-39è¡Œ
+
+    2.1,
+    2.1,
+    2.1,
+    2.1,
+    2.1,
+    2,
+    1,
+    2,
+    1,
+    2, //40-49è¡Œ
+    1,
+    0,
+    0,
+    0,
+    0,
+}; //æœ€è¿‘åè¡Œ*///ä¸å‹çº¿ï¼Œç”¨äºå¼¯é“
 #endif
 
 #if 0
 
 float Weight[60]={ 
-                     0,0,0,0,0,0,0,0,0,0,              //0-9ĞĞ£¬»ù±¾ÓÃ²»µ½
+                     0,0,0,0,0,0,0,0,0,0,              //0-9è¡Œï¼ŒåŸºæœ¬ç”¨ä¸åˆ°
                     
-                     0,0,0,0,0,1.5,1,1.5,1,             //0-19ĞĞ£¬»ù±¾ÓÃ²»µ½
+                     0,0,0,0,0,1.5,1,1.5,1,             //0-19è¡Œï¼ŒåŸºæœ¬ç”¨ä¸åˆ°
                   
-                     2.5,1,2.2,1,2.5,1,2,2,1,2,            //20-29ĞĞ
+                     2.5,1,2.2,1,2.5,1,2,2,1,2,            //20-29è¡Œ
                     
-                     1,3,2,2,1,2,1,2,2,1,              //30-39ĞĞ
+                     1,3,2,2,1,2,1,2,2,1,              //30-39è¡Œ
 
-                     3,1,2,3,3,2,3,1,1,             //40-49ĞĞ
+                     3,1,2,3,3,2,3,1,1,             //40-49è¡Œ
                    
-                     1,1,1,1,1,2,1,1,0,0,};          //×î½üÊ®ĞĞ
-
-
-
+                     1,1,1,1,1,2,1,1,0,0,};          //æœ€è¿‘åè¡Œ
 
 #endif
 
-
-
-
 /****************************************************** 
- *º¯ÊıÃû£ºSteerInit
+ *å‡½æ•°åï¼šSteerInit
  *
- *¹¦ÄÜ£º¶æ»ú³õÊ¼»¯
+ *åŠŸèƒ½ï¼šèˆµæœºåˆå§‹åŒ–
  * 
- * Èë¿Ú²ÎÊı£ºÎŞ
+ * å…¥å£å‚æ•°ï¼šæ— 
  * 
- *·µ»Ø²ÎÊı£ºÎŞ
+ *è¿”å›å‚æ•°ï¼šæ— 
  *
- * ×÷Õß£ºXGL
+ * ä½œè€…ï¼šXGL
  * 
- * ÈÕÆÚ£º2016-3-01(ÒÑ²âÊÔ)
+ * æ—¥æœŸï¼š2016-3-01(å·²æµ‹è¯•)
  *******************************************************/
 
-
-void SteerInit(void)//¶æ»ú³õÊ¼»¯
+void SteerInit(void) //èˆµæœºåˆå§‹åŒ–
 
 {
-  
-    ftm_pwm_init(FTM1, FTM_CH0,50, SteerMidle);
-}
 
+    ftm_pwm_init(FTM0, FTM_CH6, 50, SteerMidle);
+}
 
 #if 1
 
-
-
 /****************************************************** 
- *º¯ÊıÃû£ºCalculateError
+ *å‡½æ•°åï¼šCalculateError
  *
- *¹¦ÄÜ£º¼ÆËãÎó²î
+ *åŠŸèƒ½ï¼šè®¡ç®—è¯¯å·®
  * 
- * Èë¿Ú²ÎÊı£ºÎŞ
+ * å…¥å£å‚æ•°ï¼šæ— 
  * 
- *·µ»Ø²ÎÊı£ºÎŞ
+ *è¿”å›å‚æ•°ï¼šæ— 
  *
- * ×÷Õß£ºXGL
+ * ä½œè€…ï¼šXGL
  * 
- * ÈÕÆÚ£º2016-3-01(ÒÑ²âÊÔ)
+ * æ—¥æœŸï¼š2016-3-01(å·²æµ‹è¯•)
  *******************************************************/
-
 
 void CalculateError(void)
 
 {
-  
-            int i;
-            
-            CenterSum=0;
-            
-            CenterMeanValue=0;
-            
-            WeightSum=0;   
-           
-            
-      for(i=57;i>LastLine;i--)
-        
-      {      
-             CenterSum+=MiddleLine[i]*Weight[i];
-            
-             WeightSum+=Weight[i];       
-       }
-      
-       if(WeightSum!=0)
-         
-       {
-             CenterMeanValue=(CenterSum/WeightSum);//Ëã³ö¼ÓÈ¨Æ½¾ùºóÖĞÏßµÄÖµ
-           
-        }
-            
-             LastError=Error;
-      
-             Error=(40-CenterMeanValue);// Ò»³¡Í¼ÏñÆ«²îÖµ 
-             
-             if(Error>=30.0)//Æ«²îÏŞ·ù
-                
-               Error=30.0;
-             
-             if(Error<=-30.0)
-               
-               Error=-30.0; 
-             
-            KP=BasicP+(Error* Error)*J;//¶¯Ì¬¶ş´ÎpÄ£ĞÍ
-             
-             if(KP>=11) KP=11;//pÖµÏŞ·ù
-             
-             
-             
-             
+
+    int i;
+
+    CenterSum = 0;
+
+    CenterMeanValue = 0;
+
+    WeightSum = 0;
+
+    for (i = 57; i > LastLine; i--)
+    {
+        CenterSum += MiddleLine[i] * Weight[i];
+
+        WeightSum += Weight[i];
+    }
+
+    if (WeightSum != 0)
+
+    {
+        CenterMeanValue = (CenterSum / WeightSum); //ç®—å‡ºåŠ æƒå¹³å‡åä¸­çº¿çš„å€¼
+    }
+
+    LastError = Error;
+
+    Error = (40 - CenterMeanValue); // ä¸€åœºå›¾åƒåå·®å€¼
+
+    if (Error >= 30.0) //åå·®é™å¹…
+
+        Error = 30.0;
+
+    if (Error <= -30.0)
+
+        Error = -30.0;
+
+    KP = BasicP + (Error * Error) * J; //åŠ¨æ€äºŒæ¬¡pæ¨¡å‹
+
+    if (KP >= 11)
+        KP = 11; //på€¼é™å¹…
 }
-                     
-#endif                
-     
 
-
+#endif
 
 /****************************************************** 
- *º¯ÊıÃû£ºSteerControl
+ *å‡½æ•°åï¼šSteerControl
  *
- *¹¦ÄÜ£º¶æ»ú¿ØÖÆ
+ *åŠŸèƒ½ï¼šèˆµæœºæ§åˆ¶
  * 
- * Èë¿Ú²ÎÊı£ºÎŞ
+ * å…¥å£å‚æ•°ï¼šæ— 
  * 
- *·µ»Ø²ÎÊı£ºÎŞ
+ *è¿”å›å‚æ•°ï¼šæ— 
  *
- * ×÷Õß£ºXGL
+ * ä½œè€…ï¼šXGL
  * 
- * ÈÕÆÚ£º2016-3-01(ÒÑ²âÊÔ)
+ * æ—¥æœŸï¼š2016-3-01(å·²æµ‹è¯•)
  *******************************************************/
-
-
 
 void SteerControl(void)
 {
-    
-        CalculateError(); 
-        
-   
-       SteerPwmAdd=(KP*Error)+KD*(Error-LastError);//¶æ»úµÄpd¿ØÖÆÆ÷
-       
-        if(SteerPwmAdd>=120)
-          
-           SteerPwmAdd=120;
-        
-        if(SteerPwmAdd<=-120)
-          
-           SteerPwmAdd=-120;
-            
-        SteerPwm=(uint32)(SteerPwmAdd+SteerMidle);
-        
-          
-        if(SteerPwm>=SteerMax)//ÏŞ·ù
-         
-              SteerPwm=SteerMax;
-       
-        if(SteerPwm<=SteerMin)
-          
-              SteerPwm=SteerMin;
-          
-           ftm_pwm_duty(FTM1,FTM_CH0,SteerPwm);//¶æ»úpwm¸üĞÂ
-           
-           LastSteerSwm=SteerPwm;//¼ÇÂ¼pwmÖµ
-                    
+
+    CalculateError();
+
+    SteerPwmAdd = (KP * Error) + KD * (Error - LastError); //èˆµæœºçš„pdæ§åˆ¶å™¨
+
+    if (SteerPwmAdd >= 120)
+
+        SteerPwmAdd = 120;
+
+    if (SteerPwmAdd <= -120)
+
+        SteerPwmAdd = -120;
+
+    SteerPwm = (uint32)(SteerPwmAdd * 7 / 10 + SteerMidle);
+
+    if (SteerPwm >= SteerMax) //é™å¹…
+
+        SteerPwm = SteerMax;
+
+    if (SteerPwm <= SteerMin)
+
+        SteerPwm = SteerMin;
+
+    ftm_pwm_duty(FTM0, FTM_CH6, SteerPwm); //èˆµæœºpwmæ›´æ–°
+
+    LastSteerSwm = SteerPwm; //è®°å½•pwmå€¼
 }
-
-
-
-
-
-
-
-
-
-

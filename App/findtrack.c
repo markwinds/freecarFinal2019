@@ -1,7 +1,6 @@
-
-#include "findtrack.h"
 #include "common.h"
 #include "include.h"
+#include "findtrack.h"
 
 /*********define for SearchCenterBlackline**********/
 
@@ -118,6 +117,7 @@ void SetInitVal()
 //外部调用
 void SearchCenterBlackline(void)
 {
+    uint8 debugMark, Auxiliary = 0;
     int16 i        = 0;
     int16 j        = 0;
     uint8 jj       = 0;
@@ -136,6 +136,7 @@ void SearchCenterBlackline(void)
     SetInitVal();
     for (i = RowMax - 1; i >= 50; i--) //首先找前十行，全行扫描
     {
+        debugMark = 0;
         // 扫左端点
         if (i == RowMax - 1) //首行就以图像中心作为扫描起点
         {
@@ -238,10 +239,12 @@ void SearchCenterBlackline(void)
     }
     for (i = 49; i > 0; i--) //查找剩余行
     {
+        debugMark = 1;
         if (LeftEdge[i + 1] != 0 && RightEdge[i + 1] != ColumnMax) //上一行两边都找到 启用边沿扫描
         {
-            j  = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //先找左边界
-            jj = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
+            Auxiliary = 0;
+            j         = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //先找左边界
+            jj        = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
             while (j >= jj)
             {
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -266,8 +269,9 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i + 1] != 0 && RightEdge[i + 1] == ColumnMax) //上一行只找到左边界
         {
-            j  = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //左边界用边沿扫描
-            jj = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
+            Auxiliary = 1;
+            j         = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //左边界用边沿扫描
+            jj        = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
             while (j >= jj)
             {
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -294,8 +298,9 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i + 1] == 0 && RightEdge[i + 1] != ColumnMax) //上一行只找到右边界
         {
-            j  = ((RightEdge[i + 1] - 10) <= 1) ? 1 : (RightEdge[i + 1] - 10); //边缘追踪找右边界
-            jj = ((RightEdge[i + 1] + 5) >= ColumnMax - 2) ? ColumnMax - 2 : (RightEdge[i + 1] + 5);
+            Auxiliary = 2;
+            j         = ((RightEdge[i + 1] - 10) <= 1) ? 1 : (RightEdge[i + 1] - 10); //边缘追踪找右边界
+            jj        = ((RightEdge[i + 1] + 5) >= ColumnMax - 2) ? ColumnMax - 2 : (RightEdge[i + 1] + 5);
             while (j <= jj)
             {
                 if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
@@ -322,7 +327,8 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i + 1] == 0 && RightEdge[i + 1] == ColumnMax) //上一行没找到边界，可能是十字或者环形
         {
-            j = MiddleLine[i + 1]; //找全行找左边界
+            Auxiliary = 3;
+            j         = MiddleLine[i + 1]; //找全行找左边界
             while (j >= 1)
             {
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -344,14 +350,18 @@ void SearchCenterBlackline(void)
             }
         }
 
+        debugMark = 2;
+        Auxiliary = 0;
         if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //不满足畸变
         {
+            Auxiliary     = 1;
             MiddleLine[i] = MiddleLine[i + 1]; //用上一行
         }
         else
         {
             if (LeftEdge[i] != 0 && RightEdge[i] != ColumnMax) // 两边都不丟线
             {
+                Auxiliary     = 2;
                 MiddleLine[i] = (LeftEdge[i] + RightEdge[i]) / 2;
 
                 //对斜出十字进行纠正
@@ -389,6 +399,7 @@ void SearchCenterBlackline(void)
             }
             else if (LeftEdge[i] != 0 && RightEdge[i] == ColumnMax) // find left
             {
+                Auxiliary = 3;
                 RightLose++;
 
                 if (LeftEdge[i + 1] != 0)
@@ -402,6 +413,7 @@ void SearchCenterBlackline(void)
             }
             else if (LeftEdge[i] == 0 && RightEdge[i] != ColumnMax) // find right 左丟线
             {
+                Auxiliary = 4;
                 LeftLose++;
 
                 if (RightEdge[i + 1] != ColumnMax)
@@ -415,6 +427,7 @@ void SearchCenterBlackline(void)
             }
             else if (LeftEdge[i] == 0 && RightEdge[i] == ColumnMax) //两边丢线
             {
+                Auxiliary = 5;
                 WhiteNum++;
                 AllLose++;
 
@@ -426,6 +439,8 @@ void SearchCenterBlackline(void)
             }
         }
 
+        debugMark = 3;
+        Auxiliary = 0;
         if (i == 0)
         {
             AvaliableLines = 60;

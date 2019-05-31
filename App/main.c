@@ -21,6 +21,8 @@ void HardWare_Init(void)
     set_vector_handler(DMA0_VECTORn, DMA0_IRQHandler);   //设置 DMA0 的中断服务函数为 PORTA_IRQHandler
 
 #if 1
+    ftm_quad_init(FTM1);                             //FTM1  PTA8 （ PTA9 ）正交解码初始化
+    ftm_quad_clean(FTM1);                            //计数寄存器清零
     ftm_quad_init(FTM2);                             //FTM2  PTA10 （ PTA11 ）正交解码初始化
     ftm_quad_clean(FTM2);                            //计数寄存器清零
     lptmr_pulse_init(LPT0_ALT2, 0xffff, LPT_Rising); //PTA19
@@ -44,7 +46,7 @@ void HardWare_Init(void)
     DialSwitchInit(); //拨码开关初始化
 
 #endif
-    gpio_init(PTB19, GPO, 0); //蜂鸣器初始化
+    gpio_init(PTD6, GPO, 0); //蜂鸣器初始化
 
     SteerInit(); //舵机初始化
 
@@ -69,7 +71,7 @@ void main(void)
         GetBlackEndParam(); //获取黑线截止行
         SearchCenterBlackline();
         LoopFlag = 0; //环路清标志
-
+#if LoopOpen
         if (MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && CloseLoopFlag == 0) //进了环道或者十字，关掉圆环处理
         {
             FindInflectionPoint(); //寻找拐点
@@ -82,6 +84,7 @@ void main(void)
         {
             LoopExitRepair(); //出口处理
         }
+#endif
         if (LoopRightControlFlag == 0 && LoopLeftControlFlag == 0 && MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && LoopFlag == 0)
         {
             NormalCrossConduct();
@@ -94,11 +97,7 @@ void main(void)
 
         SteerControl();
         MotorControl();
-        if (DialSwitch_1)
-        {
-
-            LCDDisplay(); //液晶显示
-        }
+        //LCDDisplay(); //液晶显示
     }
 }
 

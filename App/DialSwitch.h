@@ -4,15 +4,12 @@
 #include "common.h"
 #include "include.h"
 
-#define OpenDialSwitch 1  //ÆôÓÃ²¦Âë¿ª¹Ø¹¦ÄÜ
+#define OpenDialSwitch 1  //å¯ç”¨æ‹¨ç å¼€å…³åŠŸèƒ½
 
-#define  DialSwitch_1    gpio_get(PTD9 )
-#define  DialSwitch_2    gpio_get(PTD10)
-#define  DialSwitch_3    gpio_get(PTD8 )
-#define  DialSwitch_4    gpio_get(PTD11)
-#define  DialSwitch_5    gpio_get(PTD12)
-#define  DialSwitch_6    gpio_get(PTD13)
-#define  DialSwitch_7    gpio_get(PTD14)
+#define  DialSwitch_1    gpio_get(PTA10)
+#define  DialSwitch_2    gpio_get(PTA12)
+#define  DialSwitch_3    gpio_get(PTA14)
+#define  DialSwitch_4    gpio_get(PTA16)
 
 extern void DialSwitchInit(void);
 

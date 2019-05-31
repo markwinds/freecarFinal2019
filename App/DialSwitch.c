@@ -1,22 +1,21 @@
 #include "common.h"
 #include "include.h"
 
-
-
-#if  OpenDialSwitch
-
+#if OpenDialSwitch
 
 void DialSwitchInit(void)
 {
-  //Õ˘…œ≤®¡À «0£¨≤ª≤®µƒ ±∫Ú «1
-     gpio_init(PTD9, GPI,0);//1
-     gpio_init(PTD10,GPI,0);//2
-     gpio_init(PTD8,GPI,0);//3
-     gpio_init(PTD11,GPI,0);//4
-     
-     gpio_init(PTD12,GPI,0);//5
-     gpio_init(PTD13,GPI,0);//6
-     gpio_init(PTD14,GPI,0);//7   
+    //ÂæÄ‰∏äÊ≥¢‰∫ÜÊòØ0Ôºå‰∏çÊ≥¢ÁöÑÊó∂ÂÄôÊòØ1
+    // gpio_init(PTA10, GPI, 0); //1
+    gpio_init(PTA12, GPI, 0); //2
+    gpio_init(PTA14, GPI, 0); //3
+    gpio_init(PTA16, GPI, 0); //4
+
+    gpio_init(PTD10, GPI, 0); //5‰∏ä
+    gpio_init(PTD11, GPI, 0); //6Â∑¶
+    gpio_init(PTD12, GPI, 0); //7‰∏≠
+    gpio_init(PTD13, GPI, 0); //8Âè≥
+    gpio_init(PTD14, GPI, 0); //9‰∏ã
 }
 
 #endif
