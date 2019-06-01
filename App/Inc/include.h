@@ -51,5 +51,8 @@
 #include   "LcdDisplay.h"
 #include  "TrackType.h"
 
+#include   "LCDUI.h"
+#include   "picture.h"
+#include   "set_value.h"
 
 #endif  //__INCLUDE_H__

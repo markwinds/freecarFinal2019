@@ -12,6 +12,11 @@ void PIT0_IRQHandler();
 void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
+Screen_Data mydata[] = {
+    { "speed", &(SpeedSet), 1, 45 },
+    { "end", NULL, 1202, 0 }
+};
+
 void HardWare_Init(void)
 {
     DisableInterrupts;
@@ -52,10 +57,8 @@ void HardWare_Init(void)
 
     MotorInit(); //电机初始化
 
-    if (DialSwitch_1)
-    {
-        LCD_Init(); // LCD_ST7735R 液晶初始化,不能初始化在摄像头前面
-    }
+    LCD_Init(); // LCD_ST7735R 液晶初始化,不能初始化在摄像头前面
+    screen_data = mydata;
     EnableInterrupts; //使能总中断
 }
 
@@ -95,9 +98,16 @@ void main(void)
         RecognitionObstacle();
 #endif
 
-        SteerControl();
-        MotorControl();
-        //LCDDisplay(); //液晶显示
+        if (SpeSwitch)
+        {
+            SteerControl();
+            MotorControl();
+        }
+
+        if (LCDSwitch)
+        {
+            LCDDisplay(); //液晶显示
+        }
     }
 }
 
