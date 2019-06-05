@@ -13,7 +13,16 @@ void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
 Screen_Data mydata[] = {
-    { "speed", &(SpeedSet), 1, 45 },
+    { "speed", { .l = &(SpeedSet) }, 1, 45 },
+    { "end", NULL, 1202, 0 }
+};
+
+int         block          = 0;
+Screen_Data debug_window[] = {
+    { "    ", { .i = NULL }, 1, 0 },
+    { "speed", { .l = &(SpeedSet) }, 1, 0 },
+    { "speeds", { .l = &(GetLeftMotorPules) }, 1, 0 },
+    { "speedls", { .l = &(GetRightMotorPules) }, 1, 0 },
     { "end", NULL, 1202, 0 }
 };
 
@@ -58,13 +67,17 @@ void HardWare_Init(void)
     MotorInit(); //电机初始化
 
     LCD_Init(); // LCD_ST7735R 液晶初始化,不能初始化在摄像头前面
+
     screen_data = mydata;
+    dvarious    = debug_window;
+    UI_INIT();
+
     EnableInterrupts; //使能总中断
 }
 
 void main(void)
 {
-
+    uint8 lcd_count = 0;
     HardWare_Init();
 
     while (1)
@@ -98,17 +111,50 @@ void main(void)
         RecognitionObstacle();
 #endif
 
-        if (SpeSwitch)
+        if (getSwitch(motorSW))
         {
-            SteerControl();
             MotorControl();
         }
-
-        if (LCDSwitch)
+        else
         {
-            LCDDisplay(); //液晶显示
+            SpeedSet = 0;
+            ftm_pwm_duty(FTM3, FTM_CH0, 0);
+            ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,左电机
+        }
+
+        if (getSwitch(steerSW))
+        {
+            SteerControl();
+        }
+        else
+        {
+            ftm_pwm_duty(FTM0, FTM_CH6, SteerMidle); //舵机pwm更新
+        }
+
+        if (getSwitch(mainShowSW))
+        {
+            if (lcd_count > 32)
+            {
+                if (getSwitch(lcdSW))
+                {
+                    LCDDisplay(); //液晶显示
+                }
+                if (getSwitch(adjustSW))
+                {
+                    updateadjustUI();
+                }
+            }
+            if (lcd_count > 32)
+            {
+                lcd_count = 0;
+            }
+            else
+            {
+                lcd_count++;
+            }
         }
     }
+
 }
 
 void PORTA_IRQHandler()

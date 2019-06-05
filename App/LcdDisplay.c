@@ -23,8 +23,8 @@ void LCDDisplay(void)
     uint32 a, i;
     Site_t site_point = { 0, 0 };
 
-    site.y = 127 - CAMERA_H; //显示图像左上角位置的y轴
-    site.x = 127 - CAMERA_W;
+    site.y = 128 - CAMERA_H; //显示图像左上角位置的y轴
+    site.x = 128 - CAMERA_W;
     LCD_Img_Binary_Z(site, size, imgbuff, imgsize); //黑白摄像头（显示图像左上角位置，显示区域图像大小，定义存储接收图像的数组，图像大小）
 
     //画边线和中心线
@@ -54,7 +54,7 @@ void LCDDisplay(void)
         site_point.x = 40 + 127 - CAMERA_W;
         LCD_point(site_point, YELLOW);
     }
-
+    /*
     site.x = 0; //变量显示行地址
     site.y = 0;
     LCD_str(site, "LastLine:", FCOLOUR, BCOLOUR); //变量名
@@ -87,5 +87,5 @@ void LCDDisplay(void)
 
     site.x = 64; //变量显示行地址
     site.y = 48;
-    LCD_num(site, SpeedSet, YELLOW, RED);
+    LCD_num(site, SpeedSet, YELLOW, RED);*/
 }

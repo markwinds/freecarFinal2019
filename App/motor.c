@@ -148,7 +148,7 @@ void GetTargetSpeed(void)
         }
     }
 
-    else if (!DialSwitch_2) //二号拨码开关往上波
+    else if (1) //二号拨码开关往上波
     {
         SpeedSet = 45;
         SpeedP   = 40.0;   //50.0;40

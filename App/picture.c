@@ -383,7 +383,7 @@ void writeUIParameterToFlash()
 		if (screen_data[i].ip >= 0)
 		{
 			flash_write(SECTOR_FOR_UI_COUNT, screen_data[i].ip * PICTURE_NUM_PER_SECTOR * 2,
-						(FLASH_WRITE_TYPE)(*(screen_data[i].data_value)));
+						(FLASH_WRITE_TYPE)(*(screen_data[i].data_value.i)));
 		}
 		i++;
 	}
@@ -396,7 +396,7 @@ void readUIParameterFromFlash()
 	{
 		if (screen_data[i].ip >= 0)
 		{
-			*(screen_data[i].data_value) = (int)flash_read(SECTOR_FOR_UI_COUNT,
+			*(screen_data[i].data_value.i) = (int)flash_read(SECTOR_FOR_UI_COUNT,
 														   screen_data[i].ip * PICTURE_NUM_PER_SECTOR * 2,
 														   FLASH_WRITE_TYPE);
 		}

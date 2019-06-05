@@ -6,26 +6,37 @@
 uint8 key_on = 0;
 //float motor_go = 10;	//在显示状态下控制电机是否转动的变量
 int    colour[MAX_OPTION]; //0元素也保存有有效数据
-Site_t tem_site_str[]  = { 0, 0, 0, 20, 0, 40, 0, 60, 0, 80, 0, 100 };
-Site_t tem_site_data[] = { 60, 0, 60, 20, 60, 40, 60, 60, 60, 80, 60, 100 };
-int    page            = 1; //lcd当前所在页
-int    current_row     = 0; //当前所在行
+Site_t tem_site_str[]      = { 0, 0, 0, 20, 0, 40, 0, 60, 0, 80, 0, 100 };
+Site_t tem_site_data[]     = { 60, 0, 60, 20, 60, 40, 60, 60, 60, 80, 60, 100 };
+int    page                = 1; //lcd当前所在页
+int    current_row         = 0; //当前所在行
+uint8  is_chose_for_adjust = 0;
 
 int zbt        = 0;
 int test_speed = 2000;
 
-Screen_Data* screen_data;
-Lcd_State*   p_current_state = &imgbuff_show;
+Screen_Data *screen_data, *dvarious;
 
-uint8 LCDSwitch = 0;
-uint8 SpeSwitch = 0;
+Lcd_State* p_current_state = &imgbuff_show;
 
+/*---------------------------------------------临时变量----------------------------------------------*/
+uint8        AllSwitch;
+uint8        amount_of_dvarious;
+int8         ePadjust = -1;
+Screen_Data *iPadjust, *now_adjust[3];
 /*---------------------------------------------imgbuff_show状态的功能函数----------------------------------------------*/
 
 Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
 {
     //closeCamera();
+    if (ePadjust != -1)
+    {
+        iPadjust = now_adjust[ePadjust];
+        return &various_adjust;
+    }
     LCD_clear(WHITE);
+    ePadjust = -1;
+    setMode(pageMOD);
     return &wait_middle;
 }
 
@@ -42,7 +53,14 @@ Lcd_State* imgbuffShowToShowDealedPicture(Lcd_State* pThis) //上
     // {
     //     return pThis;
     // }
-    LCDSwitch = 1 - LCDSwitch;
+    if (ePadjust == -1)
+    {
+        ePadjust = 2;
+    }
+    else
+    {
+        ePadjust--;
+    }
     return pThis;
 }
 
@@ -59,13 +77,23 @@ Lcd_State* imgbuffShowToReadPicture(Lcd_State* pThis) //下
     // {
     //     return pThis;
     // }
-    SpeSwitch = 1 - SpeSwitch;
+    //return &various_adjust;
+    if (ePadjust < 2)
+    {
+        ePadjust++;
+    }
+    else
+    {
+        ePadjust = -1;
+    }
     return pThis;
 }
 
 Lcd_State* takePhoto(Lcd_State* pThis) //左
 {
     //writePictureToFlash();
+    //inverseSwitch(lcdSW);
+    inverseSwitch(lcdSW);
     return pThis;
 }
 
@@ -73,15 +101,60 @@ Lcd_State* imgbuffShowToSetVaule(Lcd_State* pThis) //右
 {
     //showFlowValue();
     //return &set_value;
+    ePadjust = -1;
+    return pThis;
+}
+/*---------------------------------------------dubug_adjusted状态的功能函数----------------------------------------------*/
+Lcd_State* beginToAdjust(Lcd_State* pThis) //中
+{
+    //closeCamera();
+    now_adjust[ePadjust] = iPadjust;
+    iPadjust             = NULL;
+    return &imgbuff_show;
+}
+
+Lcd_State* upChose(Lcd_State* pThis) //上
+{
+    iPadjust = NULL;
+    return &imgbuff_show;
+}
+
+Lcd_State* downChose(Lcd_State* pThis) //down
+{
+    iPadjust = NULL;
+    return &imgbuff_show;
+}
+
+Lcd_State* addValue(Lcd_State* pThis) //左
+{
+
+    if (iPadjust != dvarious)
+    {
+        iPadjust--;
+    }
+    else
+    {
+        iPadjust = &dvarious[amount_of_dvarious - 1];
+    }
     return pThis;
 }
 
+Lcd_State* decValue(Lcd_State* pThis) //右
+{
+    iPadjust++;
+    if (strcmp(iPadjust->data_name, "end") == 0)
+    {
+        iPadjust = dvarious;
+    }
+    return pThis;
+}
 /*---------------------------------------------show_dealed_picture状态的功能函数----------------------------------------------*/
 
 Lcd_State* showDealedPictureToImgbuffShow(Lcd_State* pThis) //中
 {
     LCD_clear(WHITE);
-    openCamera();
+    //openCamera();
+    setMode(iniMOD);
     return &imgbuff_show;
 }
 
@@ -155,7 +228,8 @@ Lcd_State* readNextPicture(Lcd_State* pThis) //右
 Lcd_State* waitMiddleToImgbuffShow(Lcd_State* pThis) //中
 {
     LCD_clear(WHITE);
-    openCamera();
+    //openCamera();
+    setMode(iniMOD);
     return &imgbuff_show;
 }
 
@@ -269,17 +343,17 @@ Lcd_State* dataDown(Lcd_State* pThis) //左
         if (0 == strcmp(screen_data[tempId].data_name, "flash")) //写flash操作
         {
             writeUIParameterToFlash();
-            *(screen_data[tempId].data_value) += screen_data[tempId].icrement;
+            *(screen_data[tempId].data_value.i) += screen_data[tempId].icrement;
         }
         else //不是控制flash的变量
         {
             if (screen_data[tempId].icrement == 99)
             {
-                *(screen_data[tempId].data_value) *= -1;
+                *(screen_data[tempId].data_value.i) *= -1;
             }
             else
             {
-                *(screen_data[tempId].data_value) -= screen_data[tempId].icrement;
+                *(screen_data[tempId].data_value.i) -= screen_data[tempId].icrement;
             }
         }
     }
@@ -300,17 +374,17 @@ Lcd_State* dataUp(Lcd_State* pThis) //右
         if (0 == strcmp(screen_data[tempId].data_name, "flash")) //写flash操作
         {
             writeUIParameterToFlash();
-            *(screen_data[tempId].data_value) += screen_data[tempId].icrement;
+            *(screen_data[tempId].data_value.i) += screen_data[tempId].icrement;
         }
         else
         {
             if (screen_data[tempId].icrement == 99)
             {
-                *(screen_data[tempId].data_value) *= -1;
+                *(screen_data[tempId].data_value.i) *= -1;
             }
             else
             {
-                *(screen_data[tempId].data_value) += screen_data[tempId].icrement;
+                *(screen_data[tempId].data_value.i) += screen_data[tempId].icrement;
             }
         }
     }
@@ -395,7 +469,16 @@ void PORTD_IRQHandler()
     // {
     // 	flash_Picture();
     // }
-    key_on = 1; //记录有按键按下
+
+    if (getSwitch(updateSW))
+    {
+        updateUI();
+    }
+    else
+    {
+        key_on = 1; //记录有按键按下
+        updateadjustUI();
+    }
 }
 
 /*---------------------------------------------UI初始化和更新----------------------------------------------*/
@@ -426,19 +509,71 @@ void updateUI()
         if (99 == screen_data[m + i].icrement)
         {
             LCD_str(tem_site_str[i], (uint8*)(screen_data[m + i].data_name), BLACK, colour[m + i]); //记得回来改颜色
-            LCD_str(tem_site_data[i], (uint8*)((*(screen_data[m + i].data_value) < 0) ? "ON" : "OFF"), BLACK, WHITE);
+            LCD_str(tem_site_data[i], (uint8*)((*(screen_data[m + i].data_value.i) < 0) ? "ON" : "OFF"), BLACK, WHITE);
         }
         else
         {
             LCD_str(tem_site_str[i], (uint8*)(screen_data[m + i].data_name), BLACK, colour[m + i]); //记得回来改颜色
-            LCD_numf(tem_site_data[i], (float)(*(screen_data[m + i].data_value)), BLACK, WHITE);
+            LCD_numf(tem_site_data[i], (float)(*(screen_data[m + i].data_value.i)), BLACK, WHITE);
         }
+    }
+}
+
+void updateadjustUI()
+{
+    int    i        = 0;
+    Site_t tem_site = { 0, 0 };
+    Size_t tem_size = { 127, 68 };
+    uint16 fcolor = BLACK, bcolor = WHITE;
+    if (key_on == 0)
+    {
+        tem_site.x = 64;
+        tem_size.W = 63;
+    }
+    else
+        key_on = 0;
+    LCD_rectangle(tem_site, tem_size, WHITE);
+    for (i = tem_site.y = 0; i < 3; i++)
+    {
+
+        if (ePadjust == i)
+        {
+            bcolor = GREEN;
+        }
+        if (now_adjust[i] != NULL)
+        {
+            tem_site.x = 0;
+            LCD_str(tem_site, (uint8*)(now_adjust[i]->data_name), fcolor, bcolor);
+            tem_site.x = 64;
+            if (now_adjust[i]->data_value.i != NULL)
+                LCD_numf(tem_site, (float)(*(now_adjust[i]->data_value.l)), fcolor, WHITE);
+        }
+        if (ePadjust == i && iPadjust != NULL)
+        {
+            tem_site.y += 5;
+            tem_site.x = 5;
+            LCD_str(tem_site, (uint8*)(iPadjust->data_name), fcolor, BLUE);
+            tem_site.y -= 5;
+        }
+        fcolor = BLACK;
+        bcolor = WHITE;
+        tem_site.y += 20;
     }
 }
 
 void UI_INIT()
 {
     int i = 0;
+    setMode(iniMOD);
+    for (i = 0; i < 3; i++)
+    {
+        now_adjust[i] = dvarious;
+    }
+    for (amount_of_dvarious = 0; amount_of_dvarious < 201; amount_of_dvarious++)
+    {
+        if (0 == strcmp(dvarious[amount_of_dvarious].data_name, "end"))
+            break;
+    }
 
     for (i = 0; i < MAX_OPTION; i++)
     {
@@ -453,9 +588,29 @@ void UI_INIT()
     port_init(PTD7, ALT1 | IRQ_FALLING | PULLUP);  //flash按键
     enable_irq(PORTD_IRQn);                        //使能d对应的端口也就是按键的port
     set_vector_handler(PORTD_VECTORn, PORTD_IRQHandler);
-    initFlashs();
+    //initFlashs();
 }
-
+/*----------------------------------------状态控制---------------------------------------*/
+uint8 getSwitch(enum bitControl bit)
+{
+    return (AllSwitch & (1 << bit)) ? 1 : 0;
+}
+void setMode(enum modeControl mod)
+{
+    AllSwitch = (uint8)mod;
+}
+void setSwitch(enum bitControl bit)
+{
+    AllSwitch |= (1 << bit);
+}
+void clearSwitch(enum bitControl bit)
+{
+    AllSwitch &= ~(1 << bit);
+}
+void inverseSwitch(enum bitControl bit)
+{
+    AllSwitch ^= (1 << bit);
+}
 /*----------------------------------------各种状态下对应的5个建的操作---------------------------------------*/
 
 Lcd_State imgbuff_show = {
@@ -464,6 +619,14 @@ Lcd_State imgbuff_show = {
     imgbuffShowToReadPicture,       //下
     takePhoto,                      //左
     imgbuffShowToSetVaule           //右
+};
+//调整debug用的显示变量
+Lcd_State various_adjust = {
+    beginToAdjust, //中
+    upChose,       //上 进入显示
+    downChose,     //下
+    addValue,      //左
+    decValue       //右
 };
 //显示处理过的图像
 Lcd_State show_dealed_picture = {
