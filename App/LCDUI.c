@@ -29,14 +29,23 @@ Screen_Data *iPadjust, *now_adjust[3];
 Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
 {
     //closeCamera();
-    if (ePadjust != -1)
+    if (ePadjust == 3)
+    {
+        setMode(runMOD);
+        disable_irq(PORTD_IRQn);
+    }
+    else if (ePadjust != -1)
     {
         iPadjust = now_adjust[ePadjust];
         return &various_adjust;
     }
-    LCD_clear(WHITE);
-    ePadjust = -1;
-    setMode(pageMOD);
+    else
+    {
+        LCD_clear(WHITE);
+        ePadjust = -1;
+        setMode(pageMOD);
+    }
+
     return &wait_middle;
 }
 
@@ -101,7 +110,10 @@ Lcd_State* imgbuffShowToSetVaule(Lcd_State* pThis) //右
 {
     //showFlowValue();
     //return &set_value;
-    ePadjust = -1;
+    if (ePadjust == -1)
+        ePadjust = 3;
+    else
+        ePadjust = -1;
     return pThis;
 }
 /*---------------------------------------------dubug_adjusted状态的功能函数----------------------------------------------*/
@@ -559,6 +571,11 @@ void updateadjustUI()
         bcolor = WHITE;
         tem_site.y += 20;
     }
+    tem_site.x = 0;
+    tem_site.y += 20;
+    if (ePadjust == 3)
+        bcolor = GREEN;
+    LCD_str(tem_site, (uint8*)("RUN!"), fcolor, bcolor);
 }
 
 void UI_INIT()
@@ -589,6 +606,27 @@ void UI_INIT()
     enable_irq(PORTD_IRQn);                        //使能d对应的端口也就是按键的port
     set_vector_handler(PORTD_VECTORn, PORTD_IRQHandler);
     //initFlashs();
+}
+/*---------------------------------------------辅助函数----------------------------------------------*/
+void DiyDataPrintf(Site_t tem_site, Screen_Data* da, int16 fcolor, int16 bcolor)
+{
+    switch (da->ip)
+    {
+        case 0: //NULL
+            break;
+        case 1: //long
+            LCD_numf(tem_site, (float)(*(da->data_value.l)), fcolor, bcolor);
+            break;
+        case 2: //float
+            LCD_numf(tem_site, (float)(*(da->data_value.f)), fcolor, bcolor);
+            break;
+        case 3: // int
+            LCD_numf(tem_site, (float)(*(da->data_value.i)), fcolor, bcolor);
+            break;
+        case 4: //uint8
+            LCD_numf(tem_site, (float)(*(da->data_value.c)), fcolor, bcolor);
+            break;
+    }
 }
 /*----------------------------------------状态控制---------------------------------------*/
 uint8 getSwitch(enum bitControl bit)

@@ -6,6 +6,8 @@
 
 extern  int32 GetRightMotorPules;
 extern  int32 GetLeftMotorPules;
+extern  int32 LeftMotorPulseAccumulate;
+extern  int32 RightMotorPulseAccumulate;
 extern  float OutData[4];
 extern  float Error;
 extern  float AvaliableLines;

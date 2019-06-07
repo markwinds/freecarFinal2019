@@ -27,6 +27,7 @@ typedef struct Screen_Data //传参结构体,ui显示数据的结构体
 		int *i;
 		long *l;
 		float *f;
+		uint8 *c;
 	}data_value;
 	int icrement;	//参数累加数 如果是99就是on\off
 	int ip;			 //是否存放入flash的标志位,为负数时表示该参数不写入flash，为正数时表示存储扇区的偏移地址

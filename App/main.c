@@ -13,17 +13,17 @@ void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
 Screen_Data mydata[] = {
-    { "speed", { .l = &(SpeedSet) }, 1, 45 },
-    { "end", NULL, 1202, 0 }
+    { "speed", { .l = &(SpeedSet) }, 1, 1 },
+    { "end", NULL, 0, 0 }
 };
 
 int         block          = 0;
 Screen_Data debug_window[] = {
-    { "    ", { .i = NULL }, 1, 0 },
-    { "speed", { .l = &(SpeedSet) }, 1, 0 },
-    { "speeds", { .l = &(GetLeftMotorPules) }, 1, 0 },
-    { "speedls", { .l = &(GetRightMotorPules) }, 1, 0 },
-    { "end", NULL, 1202, 0 }
+    { "    ", NULL, 0, 0 },
+    { "speed", { .l = &(SpeedSet) }, 0, 1 },
+    { "Lpulse", { .i = &(GetLeftMotorPules) }, 0, 3 },
+    { "Rpulse", { .i = &(GetRightMotorPules) }, 0, 3 },
+    { "end", NULL, 0, 0 }
 };
 
 void HardWare_Init(void)
@@ -35,12 +35,12 @@ void HardWare_Init(void)
     set_vector_handler(DMA0_VECTORn, DMA0_IRQHandler);   //设置 DMA0 的中断服务函数为 PORTA_IRQHandler
 
 #if 1
-    ftm_quad_init(FTM1);                             //FTM1  PTA8 （ PTA9 ）正交解码初始化
-    ftm_quad_clean(FTM1);                            //计数寄存器清零
-    ftm_quad_init(FTM2);                             //FTM2  PTA10 （ PTA11 ）正交解码初始化
-    ftm_quad_clean(FTM2);                            //计数寄存器清零
-    lptmr_pulse_init(LPT0_ALT2, 0xffff, LPT_Rising); //PTA19
-    lptmr_pulse_clean();
+    ftm_quad_init(FTM1);  //FTM1  PTA8 （ PTA9 ）正交解码初始化
+    ftm_quad_clean(FTM1); //计数寄存器清零
+    ftm_quad_init(FTM2);  //FTM2  PTA10 （ PTA11 ）正交解码初始化
+    ftm_quad_clean(FTM2); //计数寄存器清零
+    //lptmr_pulse_init(LPT0_ALT2, 0xffff, LPT_Rising); //PTA19
+    // lptmr_pulse_clean();
 #endif
 
 #if 1
@@ -117,7 +117,7 @@ void main(void)
         }
         else
         {
-            SpeedSet = 0;
+            //SpeedSet = 0;
             ftm_pwm_duty(FTM3, FTM_CH0, 0);
             ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,左电机
         }
@@ -154,7 +154,6 @@ void main(void)
             }
         }
     }
-
 }
 
 void PORTA_IRQHandler()

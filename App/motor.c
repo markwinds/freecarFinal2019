@@ -62,8 +62,8 @@ void MotorInit(void)
 void SpeedGet(void)
 
 {
-    NumPulselptmr = lptmr_pulse_get();
-    lptmr_pulse_clean();                       //计数寄存器清零
+    NumPulselptmr = ftm_quad_get(FTM1);
+    ftm_quad_clean(FTM1);                      //计数寄存器清零 测出来1100转10cm...v/88 = (m/s);(v/0.8)*100/1100/10
     LeftMotorPulseAccumulate += NumPulselptmr; //把每一次PIT定时时间的脉冲数累加到脉冲总数变量pulse_period_L
 
     NumPulseFTM = ftm_quad_get(FTM2);         //取寄存器的值
@@ -88,8 +88,8 @@ void PIT0_IRQHandler()
 
     {
 
-        GetRightMotorPules = -RightMotorPulseAccumulate; //保持好这次测得的总数，10ms一共测得的脉冲
-        GetLeftMotorPules  = LeftMotorPulseAccumulate;
+        GetRightMotorPules = RightMotorPulseAccumulate; //保持好这次测得的总数，10ms一共测得的脉冲
+        GetLeftMotorPules  = -LeftMotorPulseAccumulate;
 
         TimerCnt8ms = 0; //清零
 
@@ -150,7 +150,7 @@ void GetTargetSpeed(void)
 
     else if (1) //二号拨码开关往上波
     {
-        SpeedSet = 45;
+        SpeedSet = 225;
         SpeedP   = 40.0;   //50.0;40
         SpeedI   = 0.0006; //16.0;50,0.0006
         SpeedD   = 10.0;   //1.3,10.0
@@ -162,15 +162,15 @@ void GetTargetSpeed(void)
 
             Differential_P = 0.0180;                                                  //调差速，调太大会跳轮
             LSpeedSet      = (int32)(SpeedSet - (Differential_P * Error * SpeedSet)); //左轮差速
-            if (LSpeedSet <= 20)
-                LSpeedSet = 20;
-            if (LSpeedSet >= 80)
-                LSpeedSet = 80;
+            if (LSpeedSet <= 100)
+                LSpeedSet = 100;
+            if (LSpeedSet >= 300)
+                LSpeedSet = 300;
             RSpeedSet = (int32)(SpeedSet + (Differential_P * Error * SpeedSet)); //右轮差速
-            if (RSpeedSet <= 20)
-                RSpeedSet = 20;
-            if (RSpeedSet >= 80)
-                RSpeedSet = 80;
+            if (RSpeedSet <= 100)
+                RSpeedSet = 100;
+            if (RSpeedSet >= 300)
+                RSpeedSet = 300;
         }
         else
         {
@@ -186,9 +186,10 @@ void GetTargetSpeed(void)
 
 void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
 {
-    SpeedPerErrorL  = SpeedLastErrorL;
-    SpeedLastErrorL = SpeedErrorL;
-    SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules;
+    SpeedPerErrorL  = SpeedLastErrorL;                     //上上次
+    SpeedLastErrorL = SpeedErrorL;                         //上次
+    SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
+
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;
@@ -204,14 +205,34 @@ void MotorControl(void)
     MotorPwmRight = (int)(MotorPwmR);
     MotorPwmL += (SpeedP + SpeedI + SpeedD) * SpeedErrorL - (SpeedP + 2 * SpeedD) * SpeedLastErrorL + SpeedD * SpeedPerErrorL;
     MotorPwmLeft = (int)(MotorPwmL);
-    if (MotorPwmLeft <= 0)
-        MotorPwmLeft = 0;
-    if (MotorPwmLeft >= 990)
-        MotorPwmLeft = 990;
-    if (MotorPwmRight <= 0)
-        MotorPwmRight = 0;
-    if (MotorPwmRight >= 990)
-        MotorPwmRight = 990;
-    ftm_pwm_duty(FTM3, FTM_CH0, MotorPwmRight * 2);
-    ftm_pwm_duty(FTM3, FTM_CH2, MotorPwmLeft * 2); //PTC2,左电机
+    if (MotorPwmLeft <= -990)
+        MotorPwmLeft = -990;
+    else if (MotorPwmLeft >= 1990)
+        MotorPwmLeft = 1990;
+
+    if (MotorPwmRight <= -990)
+        MotorPwmRight = -990;
+    else if (MotorPwmRight >= 1990)
+        MotorPwmRight = 1990;
+
+    if (MotorPwmLeft > 0)
+    {
+        ftm_pwm_duty(FTM3, FTM_CH0, MotorPwmLeft * 2);
+        ftm_pwm_duty(FTM3, FTM_CH1, 0);
+    }
+    else
+    {
+        ftm_pwm_duty(FTM3, FTM_CH0, 0);
+        ftm_pwm_duty(FTM3, FTM_CH1, -MotorPwmLeft * 2);
+    }
+    if (MotorPwmRight > 0)
+    {
+        ftm_pwm_duty(FTM3, FTM_CH2, MotorPwmRight * 2); //PTC2,右电机
+        ftm_pwm_duty(FTM3, FTM_CH3, 0);                 //PTC2,右电机
+    }
+    else
+    {
+        ftm_pwm_duty(FTM3, FTM_CH2, 0);                  //PTC2,右电机
+        ftm_pwm_duty(FTM3, FTM_CH3, -MotorPwmRight * 2); //PTC2,右电机
+    }
 }

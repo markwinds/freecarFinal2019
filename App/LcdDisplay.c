@@ -15,7 +15,7 @@ void LCD_Init()
     size.W = CAMERA_W; //宽
 
     LCD_str(site, "Cam init OK!", FCOLOUR, BCOLOUR); //显示屏显
-    LCD_clear(RED);                                  //清屏 （背景红色）
+    LCD_clear(WHITE);                                //清屏 （背景红色）
 }
 
 void LCDDisplay(void)
