@@ -150,7 +150,7 @@ void GetTargetSpeed(void)
 
     else if (1) //二号拨码开关往上波
     {
-        SpeedSet = 225;
+        SpeedSet = 210;
         SpeedP   = 40.0;   //50.0;40
         SpeedI   = 0.0006; //16.0;50,0.0006
         SpeedD   = 10.0;   //1.3,10.0

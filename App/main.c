@@ -4,6 +4,9 @@
 uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
+int   temx, temy;
+float temf = 0.23;
+
 //函数声明
 void PORTA_IRQHandler();
 void DMA0_IRQHandler();
@@ -21,8 +24,15 @@ int         block          = 0;
 Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
     { "speed", { .l = &(SpeedSet) }, 0, 1 },
-    { "Lpulse", { .i = &(GetLeftMotorPules) }, 0, 3 },
-    { "Rpulse", { .i = &(GetRightMotorPules) }, 0, 3 },
+    { "Lpulse", { .l = &(GetLeftMotorPules) }, 0, 1 },
+    { "Rpulse", { .l = &(GetRightMotorPules) }, 0, 1 },
+    { "adcl", { .i = &(disgy_AD_val[0]) }, 0, 3 },
+    { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
+    { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
+    { "error", { .f = &(Error) }, 0, 2 },
+    { "bll", { .i = &(BlackEndL) }, 0, 3 },
+    { "blr", { .i = &(BlackEndR) }, 0, 3 },
+    { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "end", NULL, 0, 0 }
 };
 
@@ -60,7 +70,7 @@ void HardWare_Init(void)
     DialSwitchInit(); //拨码开关初始化
 
 #endif
-    gpio_init(PTD6, GPO, 0); //蜂鸣器初始化
+    gpio_init(PTD2, GPO, 0); //蜂鸣器初始化
 
     SteerInit(); //舵机初始化
 
@@ -72,46 +82,59 @@ void HardWare_Init(void)
     dvarious    = debug_window;
     UI_INIT();
 
+    adc_init(ADC0_DP0); //ADC初始化1
+    adc_init(ADC0_DP1); //ADC初始化2
+    adc_init(ADC0_DP3); //ADC初始化3
+    adc_init(ADC0_DM1); //ADC初始化4
+    adc_init(ADC1_DM1); //ADC初始化5
+    adc_init(ADC1_DP1); //ADC初始化6
+
     EnableInterrupts; //使能总中断
 }
 
 void main(void)
 {
+
     uint8 lcd_count = 0;
     HardWare_Init();
+    InitEM();
 
     while (1)
     {
-        camera_get_img(); //（耗时13.4ms）图像采集
-        img_extract(img, imgbuff);
-        GetBlackEndParam(); //获取黑线截止行
-        SearchCenterBlackline();
-        LoopFlag = 0; //环路清标志
+        if (getSwitch(cameraSW))
+        {                     //控制图像处理
+            camera_get_img(); //（耗时13.4ms）图像采集
+            img_extract(img, imgbuff);
+            GetBlackEndParam(); //获取黑线截止行
+            SearchCenterBlackline();
 #if LoopOpen
-        if (MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && CloseLoopFlag == 0) //进了环道或者十字，关掉圆环处理
-        {
-            FindInflectionPoint(); //寻找拐点
-            FindLoopExit();
-            LoopControl();
-            LoopRepair();
-        }
+            LoopFlag = 0; //环路清标志
 
-        if (MotivateLoopDlayFlagL || MotivateLoopDlayFlagR)
-        {
-            LoopExitRepair(); //出口处理
-        }
+            if (MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && CloseLoopFlag == 0) //进了环道或者十字，关掉圆环处理
+            {
+                FindInflectionPoint(); //寻找拐点
+                FindLoopExit();
+                LoopControl();
+                LoopRepair();
+            }
+
+            if (MotivateLoopDlayFlagL || MotivateLoopDlayFlagR)
+            {
+                LoopExitRepair(); //出口处理
+            }
 #endif
-        if (LoopRightControlFlag == 0 && LoopLeftControlFlag == 0 && MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && LoopFlag == 0)
-        {
-            NormalCrossConduct();
-        }
+            if (LoopRightControlFlag == 0 && LoopLeftControlFlag == 0 && MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && LoopFlag == 0)
+            {
+                NormalCrossConduct();
+            }
 
 #if ObstacleOpen //如果不需要避障碍，将这个宏定义置0即可
 
-        RecognitionObstacle();
+            RecognitionObstacle();
 #endif
+        }
 
-        if (getSwitch(motorSW))
+        if (getSwitch(motorSW)) //控制电机开关
         {
             MotorControl();
         }
@@ -122,7 +145,7 @@ void main(void)
             ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,左电机
         }
 
-        if (getSwitch(steerSW))
+        if (getSwitch(steerSW)) //控制舵机开关
         {
             SteerControl();
         }
@@ -131,8 +154,10 @@ void main(void)
             ftm_pwm_duty(FTM0, FTM_CH6, SteerMidle); //舵机pwm更新
         }
 
-        if (getSwitch(mainShowSW))
+        if (getSwitch(mainShowSW)) //控制DeBug显示
         {
+            //temx = ReadValue(ADC_LEFT);
+            //temy = ReadValue(ADC_RIGHT);
             if (lcd_count > 32)
             {
                 if (getSwitch(lcdSW))

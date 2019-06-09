@@ -54,5 +54,6 @@
 #include   "LCDUI.h"
 #include   "picture.h"
 #include   "set_value.h"
+#include   "electromagnetic.h"
 
 #endif  //__INCLUDE_H__

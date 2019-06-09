@@ -19,11 +19,12 @@ Screen_Data *screen_data, *dvarious;
 
 Lcd_State* p_current_state = &imgbuff_show;
 
-/*---------------------------------------------临时变量----------------------------------------------*/
+/*---------------------------------------------辅助变量----------------------------------------------*/
 uint8        AllSwitch;
 uint8        amount_of_dvarious;
-int8         ePadjust = -1;
+int8         ePadjust = -1, swP = 0, choseagain = 0;
 Screen_Data *iPadjust, *now_adjust[3];
+const char   swStr[5][7] = { " RUN! ", "Motor ", "Steer ", " Lcd  ", "Camera" };
 /*---------------------------------------------imgbuff_show状态的功能函数----------------------------------------------*/
 
 Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
@@ -31,8 +32,23 @@ Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
     //closeCamera();
     if (ePadjust == 3)
     {
-        setMode(runMOD);
-        disable_irq(PORTD_IRQn);
+        if (choseagain)
+        {
+            if (swP)
+            {
+                inverseSwitch(swP);
+            }
+            else
+            {
+                setMode(runMOD);
+                disable_irq(PORTD_IRQn);
+            }
+            choseagain = 0;
+        }
+        else
+            choseagain = 1;
+
+        return pThis;
     }
     else if (ePadjust != -1)
     {
@@ -102,7 +118,18 @@ Lcd_State* takePhoto(Lcd_State* pThis) //左
 {
     //writePictureToFlash();
     //inverseSwitch(lcdSW);
-    inverseSwitch(lcdSW);
+    //sinverseSwitch(lcdSW);
+    if (ePadjust == -1)
+        ePadjust = 3;
+    else if (ePadjust == 3)
+    {
+        swP++;
+        if (swP > 4)
+            swP = 0;
+    }
+    else
+        ePadjust = -1;
+    choseagain = 0;
     return pThis;
 }
 
@@ -112,8 +139,15 @@ Lcd_State* imgbuffShowToSetVaule(Lcd_State* pThis) //右
     //return &set_value;
     if (ePadjust == -1)
         ePadjust = 3;
+    else if (ePadjust == 3)
+    {
+        swP--;
+        if (swP < 0)
+            swP = 4;
+    }
     else
         ePadjust = -1;
+    choseagain = 0;
     return pThis;
 }
 /*---------------------------------------------dubug_adjusted状态的功能函数----------------------------------------------*/
@@ -557,8 +591,9 @@ void updateadjustUI()
             tem_site.x = 0;
             LCD_str(tem_site, (uint8*)(now_adjust[i]->data_name), fcolor, bcolor);
             tem_site.x = 64;
+            bcolor     = WHITE;
             if (now_adjust[i]->data_value.i != NULL)
-                LCD_numf(tem_site, (float)(*(now_adjust[i]->data_value.l)), fcolor, WHITE);
+                DiyDataPrintf(tem_site, now_adjust[i], fcolor, bcolor);
         }
         if (ePadjust == i && iPadjust != NULL)
         {
@@ -574,8 +609,17 @@ void updateadjustUI()
     tem_site.x = 0;
     tem_site.y += 20;
     if (ePadjust == 3)
-        bcolor = GREEN;
-    LCD_str(tem_site, (uint8*)("RUN!"), fcolor, bcolor);
+    {
+        if (swP == 0 || getSwitch(swP) == 0)
+        {
+            bcolor = YELLOW;
+        }
+        else if (getSwitch(swP) == 1)
+            bcolor = BLUE;
+        else
+            bcolor = GREEN;
+    }
+    LCD_str(tem_site, (uint8*)(swStr[swP]), fcolor, bcolor);
 }
 
 void UI_INIT()

@@ -20,7 +20,7 @@ void LCD_Init()
 
 void LCDDisplay(void)
 {
-    uint32 a, i;
+    uint32  i;
     Site_t site_point = { 0, 0 };
 
     site.y = 128 - CAMERA_H; //显示图像左上角位置的y轴

@@ -163,7 +163,8 @@ void CalculateError(void)
 
     LastError = Error;
 
-    Error = (40 - CenterMeanValue); // 一场图像偏差值
+    //Error = (40 - CenterMeanValue); // 一场图像偏差值
+    Error = ((disgy_AD_val[0] - disgy_AD_val[1]) >> 3) * ((128 - disgy_AD_val[2]) >> 3);
 
     if (Error >= 30.0) //偏差限幅
 
