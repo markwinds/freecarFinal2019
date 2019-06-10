@@ -1,3 +1,4 @@
+
 #include "common.h"
 #include "include.h"
 #include "findtrack.h"
@@ -53,6 +54,7 @@ unsigned int  StartRow                       = 0;
 unsigned int  StartCol                       = 0;
 unsigned char MilldleBlack                   = 0;
 unsigned int  LoopTop                        = 0;
+uint8         circluFlag                     = 0;
 unsigned int  LoopRightBorderLose            = 0;
 unsigned int  LoopLeftBorderLose             = 0;
 int           LoopBorttomFlag                = 0;
@@ -1287,6 +1289,105 @@ void LoopExitRepair()
             MotivateLoopDlayFlagL                  = 0;
             OpenLoopExitRepairFlagL                = 0;
             OpenLoopExitRepairFlagR                = 0;
+        }
+    }
+}
+
+/****************************以下是新添的函数****************************/
+uint8 circluTimeOutClearMark1, circluTimeOutClearMark2, circluTimeOutClearMark3;
+void  CircluSearch()
+{
+    if (circluFlag == 0)
+    {
+        if ((disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
+        {
+            circluFlag              = 1;
+            circluTimeOutClearMark1 = 0;
+        }
+    }
+    else if (circluFlag == 1)
+    {
+        int i;
+        for (i = 30; i > 20; i--)
+        {
+            if (img[i][0] == White_Point)
+            {
+                int j;
+                for (j = 0; j <= MiddleLine[i]; j++)
+                {
+                    if (img[i][j] == Black_Point)
+                    {
+                        break;
+                    }
+                }
+                if (j == MiddleLine[i] + 1)
+                {
+                    circluFlag              = 2; //左
+                    circluTimeOutClearMark2 = 0;
+                    break;
+                }
+            }
+            if (img[i][ColumnMax - 1] == White_Point)
+            {
+                int j;
+                for (j = ColumnMax - 1; j >= MiddleLine[i]; j--)
+                {
+                    if (img[i][j] == Black_Point)
+                    {
+                        break;
+                    }
+                }
+                if (j == MiddleLine[i] - 1)
+                {
+                    circluFlag              = 3;
+                    circluTimeOutClearMark3 = 0;
+                    break;
+                }
+            }
+        }
+    }
+    else if (circluFlag == 2)
+    {
+        if (disgy_AD_val[0] + disgy_AD_val[2] < 150 && BlackEndM < 40 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
+        {
+            circluTimeOutClearMark2++;
+            if (circluTimeOutClearMark2 > 8)
+            {
+                circluFlag = 4;
+            }
+        }
+    }
+    else if (circluFlag == 3)
+    {
+        if (disgy_AD_val[1] + disgy_AD_val[2] < 150 && BlackEndM < 40 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
+        {
+            circluTimeOutClearMark3++;
+            if (circluTimeOutClearMark3 > 8)
+            {
+                circluFlag = 5;
+            }
+        }
+    }
+    else if (circluFlag == 4 || circluFlag == 5)
+    {
+        if ((disgy_AD_val[0] > 95 || disgy_AD_val[1] > 95) && disgy_AD_val[2] > 115)
+        {
+            circluFlag += 2;
+        }
+    }
+    if (circluFlag == 1 || circluFlag == 6 || circluFlag == 7)
+    {
+        if (BlackEndM > 45 && (disgy_AD_val[0] + disgy_AD_val[1]) < 80)
+        {
+            circluTimeOutClearMark1++;
+            if (circluTimeOutClearMark1 > 8)
+            {
+                circluFlag = 0;
+            }
+        }
+        else
+        {
+            circluTimeOutClearMark1 = 0;
         }
     }
 }

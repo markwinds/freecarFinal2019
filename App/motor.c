@@ -106,7 +106,7 @@ void PIT0_IRQHandler()
 void GetTargetSpeed(void)
 {
 
-    if (0) //二号拨码开关不拨上去,动态速度
+    if (1) //二号拨码开关不拨上去,动态速度
     {
 
         LastSpeedDropRow = SpeedDropRow;
@@ -146,9 +146,11 @@ void GetTargetSpeed(void)
             LSpeedSet = SpeedSet;
             RSpeedSet = SpeedSet;
         }
+        LSpeedSet *= 5;
+        RSpeedSet *= 5;
     }
 
-    else if (1) //二号拨码开关往上波
+    else if (0) //二号拨码开关往上波
     {
         SpeedSet = 210;
         SpeedP   = 40.0;   //50.0;40

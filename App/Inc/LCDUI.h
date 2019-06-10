@@ -75,7 +75,7 @@ typedef enum bitControl
 typedef enum modeControl
 {
     iniMOD   = 0x21, // 0010 0001
-    runMOD   = 0x06, // 0000 0110
+    runMOD   = 0x16, // 0001 0110
     debugMOD = 0x39, // 0011 1001
     pageMOD  = 0x41, // 0100 0001
 }modeControl;

@@ -24,15 +24,16 @@ int         block          = 0;
 Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
     { "speed", { .l = &(SpeedSet) }, 0, 1 },
-    { "Lpulse", { .l = &(GetLeftMotorPules) }, 0, 1 },
-    { "Rpulse", { .l = &(GetRightMotorPules) }, 0, 1 },
+    { "error", { .f = &(Error) }, 0, 2 },
+    { "lerror", { .f = &(LastError) }, 0, 2 },
     { "adcl", { .i = &(disgy_AD_val[0]) }, 0, 3 },
     { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
     { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
-    { "error", { .f = &(Error) }, 0, 2 },
-    { "bll", { .i = &(BlackEndL) }, 0, 3 },
-    { "blr", { .i = &(BlackEndR) }, 0, 3 },
+    { "bll", { .i = &(BlackEndML) }, 0, 3 },
+    { "blr", { .i = &(BlackEndMR) }, 0, 3 },
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
+    { "cir", { .c = &(circluFlag) }, 0, 4 },
+    { "adcvr", { .i = &(temy) }, 0, 3 },
     { "end", NULL, 0, 0 }
 };
 
@@ -122,18 +123,50 @@ void main(void)
             {
                 LoopExitRepair(); //出口处理
             }
-#endif
             if (LoopRightControlFlag == 0 && LoopLeftControlFlag == 0 && MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && LoopFlag == 0)
             {
                 NormalCrossConduct();
             }
+#endif
 
 #if ObstacleOpen //如果不需要避障碍，将这个宏定义置0即可
 
             RecognitionObstacle();
 #endif
         }
+        /*
+        if (BlackEndM < 35 && BlackEndM > 28 && BlackEndML - BlackEndM < 3 && BlackEndM - BlackEndMR < 3 && BlackEndM >= BlackEndMR && BlackEndML >= BlackEndM && !DisconnectFlag)
+        {
+            DisconnectFlag = 1; //断路识别
+        }
+        else if (DisconnectFlag == 1 && BlackEndM < 10)
+        {
+            DisconnectFlag = 2;
+        }
+        else if (DisconnectFlag == 2 && BlackEndM > 40)
+        {
+            DisconnectFlag = 0;
+        }*/
 
+        /* if ((disgy_AD_val[0] > 95 || disgy_AD_val[1] > 95) && disgy_AD_val[2] > 95)
+        {
+            uint8 a, b;
+            a = adc_once(ADC0_DP0, ADC_10bit);
+            b = adc_once(ADC0_DM1, ADC_10bit);
+            if (a > 100 && a > b)
+            {
+                //左环
+                temx = 1;
+            }
+            else if (b > 100 && b > a)
+            {
+                //右环
+                temy = 1;
+            }
+        }*/
+        //temx = adc_once(ADC0_DP0, ADC_10bit);
+        //temy = adc_once(ADC0_DM1, ADC_10bit);
+        CircluSearch();
         if (getSwitch(motorSW)) //控制电机开关
         {
             MotorControl();

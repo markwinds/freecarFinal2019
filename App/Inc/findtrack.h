@@ -27,6 +27,7 @@ extern int   Width[RowMax+1];
 extern int   LeftLose;
 extern int   RightLose ;
 extern unsigned char LoopFlag;
+extern uint8 circluFlag;
 
 extern  unsigned char LoopRightControlFlag;
 extern  unsigned char LoopLeftControlFlag;

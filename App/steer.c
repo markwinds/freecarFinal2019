@@ -147,7 +147,7 @@ void CalculateError(void)
     CenterMeanValue = 0;
 
     WeightSum = 0;
-
+    LastError = Error;
     for (i = 57; i > LastLine; i--)
     {
         CenterSum += MiddleLine[i] * Weight[i];
@@ -155,16 +155,69 @@ void CalculateError(void)
         WeightSum += Weight[i];
     }
 
-    if (WeightSum != 0)
+    if (WeightSum > 1)
 
     {
         CenterMeanValue = (CenterSum / WeightSum); //算出加权平均后中线的值
     }
 
-    LastError = Error;
+    if (BlackEndM < 20 || BlackEndML < 20 || BlackEndM < 20)
+    {
+        Error = (1.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1])) * ((128 - disgy_AD_val[2]));
+    }
+    else
+    {
 
-    //Error = (40 - CenterMeanValue); // 一场图像偏差值
-    Error = ((disgy_AD_val[0] - disgy_AD_val[1]) >> 3) * ((128 - disgy_AD_val[2]) >> 3);
+        Error = (40 - CenterMeanValue); // 一场图像偏差值
+    }
+
+    if (circluFlag == 2)
+    {
+        //Error += ((dis_AD_val[1] + dis_AD_val[0]) / 12);
+        if (Error < 5)
+        {
+            Error = 11;
+        }
+    }
+    else if (circluFlag == 3)
+    {
+        // Error -= ((dis_AD_val[1] + dis_AD_val[0]) / 13);
+        if (Error > -5)
+        {
+            Error = -11;
+        }
+    }
+    else if (circluFlag == 4)
+    {
+
+        if (Error < 5 && BlackEndM < 40)
+        {
+            Error = 15;
+        }
+        if (Error < 9)
+        {
+            Error = 9;
+        }
+    }
+    else if (circluFlag == 5)
+    {
+        if (Error > -5 && BlackEndM < 40)
+        {
+            Error = -16;
+        }
+        if (Error > -9)
+        {
+            Error = -9;
+        }
+    }
+    else if (circluFlag == 6)
+    {
+        Error /= 2;
+    }
+    else if (circluFlag == 7)
+    {
+        Error /= 2;
+    }
 
     if (Error >= 30.0) //偏差限幅
 
