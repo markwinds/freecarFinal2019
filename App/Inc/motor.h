@@ -18,8 +18,10 @@ extern  int   BlackEndML;
 extern float  SteerPwmAdd;
 extern int ChangeFlag;
 extern int SpeedDropRow;
-extern  int32 SpeedSet;
+extern  int32 MySpeedSet;
 extern void MotorInit(void);
+extern int  LK_jishi_flag;
+extern uint8 go;
 
 void CalculateMotorSpeedError(float LeftMotorTarget,float RightMotorTarget);
 

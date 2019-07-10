@@ -10,9 +10,10 @@ int32 RightMotorPulseAccumulate;
 int32 LeftMotorPulseAccumulate;
 int32 GetRightMotorPules, GetLeftMotorPules; //获得的一次脉冲总数（用于PID电机的数据处理）
 
-int32 LSpeedSet = 0; //60;//2.5M/S
-int32 RSpeedSet = 0;
-int32 SpeedSet  = 0;
+int32 LSpeedSet  = 0; //60;//2.5M/S
+int32 RSpeedSet  = 0;
+int32 SpeedSet   = 0;
+int32 MySpeedSet = 10;
 
 float SpeedErrorL = 0;
 float SpeedErrorR = 0;
@@ -71,7 +72,9 @@ void SpeedGet(void)
     RightMotorPulseAccumulate += NumPulseFTM; //单相脉冲    （正交解码测脉冲）右轮
 }
 
-void PIT0_IRQHandler()
+int   LK_jishi_flag, LK_jishi;
+uint8 runrunrun = 0, go;
+void  PIT0_IRQHandler()
 {
 
     static uint16 TimerCnt8ms = 0;
@@ -95,6 +98,45 @@ void PIT0_IRQHandler()
 
         RightMotorPulseAccumulate = 0; //累加值清零，
         LeftMotorPulseAccumulate  = 0;
+        if (LK_jishi != 2000 && getSwitch(motorSW))
+        {
+            if (LK_jishi_flag == 0) //准备延迟检测起跑线
+            {
+
+                LK_jishi++;
+            }
+            if (LK_jishi == 300) //起步延时1.5秒
+            {
+                go = 1; //小车前进
+            }
+            if (LK_jishi >= 800) //延迟2000*5ms后（10s）检测起跑线
+            {
+                LK_jishi_flag = 1;
+                LK_jishi      = 2000;
+            }
+        }
+        else
+        {
+            if (!dis_AD_val[0] && !dis_AD_val[1] && !dis_AD_val[2])
+            {
+
+                if (runrunrun > 120)
+                {
+                    go = 0;
+                }
+                else
+                {
+                    runrunrun++;
+                }
+            }
+            else
+            {
+                if (runrunrun > 0)
+                    runrunrun--;
+                if (!runrunrun)
+                    go = 1;
+            }
+        }
     }
 
     enable_irq(PIT0_IRQn); //使能中断
@@ -130,12 +172,12 @@ void GetTargetSpeed(void)
         if (ABS(Error) >= 10) //偏差大于某个值才进行差速
         {
             Differential_P = (float)(30.0 / ((60 - (LastLine + 4)) * (60 - (LastLine + 4)))); //30
-            LSpeedSet      = (int32)(SpeedSet - (Differential_P * Error * SpeedSet));         //左轮差速
+            LSpeedSet      = (int32)(SpeedSet - (Differential_P * Error * SpeedSet / 4));     //左轮差速
             if (LSpeedSet <= 5)
                 LSpeedSet = 5;
             if (LSpeedSet >= 110)
                 LSpeedSet = 110;
-            RSpeedSet = (int32)(SpeedSet + (Differential_P * Error * SpeedSet)); //右轮差速
+            RSpeedSet = (int32)(SpeedSet + (Differential_P * Error * SpeedSet / 4)); //右轮差速
             if (RSpeedSet <= 5)
                 RSpeedSet = 5;
             if (RSpeedSet >= 110)
@@ -146,15 +188,20 @@ void GetTargetSpeed(void)
             LSpeedSet = SpeedSet;
             RSpeedSet = SpeedSet;
         }
-        LSpeedSet *= 5;
-        RSpeedSet *= 5;
+        LSpeedSet = (LSpeedSet >> 1) * MySpeedSet;
+        RSpeedSet = (RSpeedSet >> 1) * MySpeedSet;
+        if (!go || star_lineflag)
+        {
+            LSpeedSet = 0;
+            RSpeedSet = 0;
+        }
     }
 
     else if (0) //二号拨码开关往上波
     {
         SpeedSet = 210;
         SpeedP   = 40.0;   //50.0;40
-        SpeedI   = 0.0006; //16.0;50,0.0006
+        SpeedI   = 0.0009; //16.0;50,0.0006
         SpeedD   = 10.0;   //1.3,10.0
 
         if (ABS(Error) >= 10)

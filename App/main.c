@@ -16,24 +16,26 @@ void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
 Screen_Data mydata[] = {
-    { "speed", { .l = &(SpeedSet) }, 1, 1 },
+    { "speed", { .l = &(MySpeedSet) }, 1.0, 1 },
+    { "KP", { .f = &(BasicP) }, 0.1, 2 },
+    { "KD", { .f = &(KD) }, 0.01, 2 },
     { "end", NULL, 0, 0 }
 };
 
 int         block          = 0;
 Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
-    { "speed", { .l = &(SpeedSet) }, 0, 1 },
+    //{ "speed", { .l = &(SpeedSet) }, 0, 1 },
     { "error", { .f = &(Error) }, 0, 2 },
-    { "lerror", { .f = &(LastError) }, 0, 2 },
     { "adcl", { .i = &(disgy_AD_val[0]) }, 0, 3 },
     { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
     { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
     { "bll", { .i = &(BlackEndML) }, 0, 3 },
     { "blr", { .i = &(BlackEndMR) }, 0, 3 },
+    { "blll", { .i = &(BlackEndL) }, 0, 3 },
+    { "blrr", { .i = &(BlackEndR) }, 0, 3 },
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "cir", { .c = &(circluFlag) }, 0, 4 },
-    { "adcvr", { .i = &(temy) }, 0, 3 },
     { "end", NULL, 0, 0 }
 };
 
@@ -167,15 +169,13 @@ void main(void)
         //temx = adc_once(ADC0_DP0, ADC_10bit);
         //temy = adc_once(ADC0_DM1, ADC_10bit);
         CircluSearch();
-        if (getSwitch(motorSW)) //控制电机开关
+        if (LK_jishi_flag)
+        {
+            star_line_judg();
+        }
+        if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
         {
             MotorControl();
-        }
-        else
-        {
-            //SpeedSet = 0;
-            ftm_pwm_duty(FTM3, FTM_CH0, 0);
-            ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,左电机
         }
 
         if (getSwitch(steerSW)) //控制舵机开关

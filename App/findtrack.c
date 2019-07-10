@@ -98,6 +98,7 @@ unsigned char BreakStartLFlag                = 0;
 unsigned char BreakStartR                    = 0;
 unsigned char BreakStartRFlag                = 0;
 
+uint8 JudgeConnect(uint8, uint8);
 //设置中线，左线，右线的初始化值
 //设置每一行对应的赛道宽度
 //本文件内不调用
@@ -1294,12 +1295,13 @@ void LoopExitRepair()
 }
 
 /****************************以下是新添的函数****************************/
+char  aMark;
 uint8 circluTimeOutClearMark1, circluTimeOutClearMark2, circluTimeOutClearMark3;
 void  CircluSearch()
 {
     if (circluFlag == 0)
     {
-        if ((disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
+        if (disgy_AD_val[2] > 95 || (disgy_AD_val[0] + disgy_AD_val[1]) > 95) //(disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
         {
             circluFlag              = 1;
             circluTimeOutClearMark1 = 0;
@@ -1348,36 +1350,128 @@ void  CircluSearch()
     }
     else if (circluFlag == 2)
     {
-        if (disgy_AD_val[0] + disgy_AD_val[2] < 150 && BlackEndM < 40 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
+        int i;
+        for (i = 20; i < 35; i++)
+        {
+            if (img[5][i] == White_Point)
+            {
+                break;
+            }
+        }
+        aMark = (i - 20) / 2 + 4;
+        if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
         {
             circluTimeOutClearMark2++;
             if (circluTimeOutClearMark2 > 8)
             {
-                circluFlag = 4;
+                circluFlag = 6;
             }
         }
     }
     else if (circluFlag == 3)
     {
-        if (disgy_AD_val[1] + disgy_AD_val[2] < 150 && BlackEndM < 40 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
+        int i;
+        for (i = 20; i < 35; i++)
+        {
+            if (img[RowMax - 5][i] == White_Point)
+            {
+                break;
+            }
+        }
+        aMark = -((i - 20) / 2 + 8.5);
+        if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;
             if (circluTimeOutClearMark3 > 8)
             {
-                circluFlag = 5;
+                circluFlag = 7;
             }
         }
     }
-    else if (circluFlag == 4 || circluFlag == 5)
+    else if (circluFlag == 4)
     {
-        if ((disgy_AD_val[0] > 95 || disgy_AD_val[1] > 95) && disgy_AD_val[2] > 115)
+        if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
+        {
+            circluTimeOutClearMark2++;
+            if (circluTimeOutClearMark2 > 8)
+            {
+                circluFlag = 6;
+            }
+        }
+    }
+    else if (circluFlag == 5)
+    {
+        if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
+        {
+            circluTimeOutClearMark3++;
+            if (circluTimeOutClearMark3 > 8)
+            {
+                circluFlag = 7;
+            }
+        }
+    }
+    else if (circluFlag == 6)
+    {
+        // if (BlackEndM <= 40 && BlackEndM >= 37 && (BlackEndM - BlackEndR) < 3 && (BlackEndL - BlackEndM) < 3 && BlackEndM > BlackEndR && BlackEndL > BlackEndM)
+        // {
+        //     circluFlag = 8;
+        // }
+        uint8 i, j;
+        for (i = 8; i < 20; i++)
+        {
+            if (img[i][ColumnMax - 1] == White_Point)
+            {
+                for (j = 8; j < 30; j++)
+                {
+                    if (img[j][0] == White_Point)
+                    {
+                        if (JudgeConnect(j + 3, i))
+                        {
+                            circluFlag = 8;
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    else if (circluFlag == 7)
+    {
+        // if (BlackEndM <= 40 && BlackEndM >= 37 && (BlackEndM - BlackEndL) < 3 && (BlackEndR - BlackEndM) < 3 && BlackEndM < BlackEndR && BlackEndL < BlackEndM)
+        // {
+        //     circluFlag = 9;
+        // }
+        int i, j;
+        for (i = 8; i < 20; i++)
+        {
+            if (img[i][0] == White_Point)
+            {
+                for (j = 8; j < 30; j++)
+                {
+                    if (img[j][ColumnMax - 1] == White_Point)
+                    {
+                        if (JudgeConnect(i, j + 3))
+                        {
+                            circluFlag = 9;
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    else if (circluFlag == 8 || circluFlag == 9)
+    {
+        if ((disgy_AD_val[2] + disgy_AD_val[1] + disgy_AD_val[0]) > 100)
         {
             circluFlag += 2;
         }
     }
-    if (circluFlag == 1 || circluFlag == 6 || circluFlag == 7)
+    if (circluFlag == 1 || circluFlag == 10 || circluFlag == 11)
     {
-        if (BlackEndM > 45 && (disgy_AD_val[0] + disgy_AD_val[1]) < 80)
+        if (disgy_AD_val[2] < 95 && (disgy_AD_val[0] + disgy_AD_val[1]) < 95)
         {
             circluTimeOutClearMark1++;
             if (circluTimeOutClearMark1 > 8)
@@ -1390,4 +1484,43 @@ void  CircluSearch()
             circluTimeOutClearMark1 = 0;
         }
     }
+}
+uint8 star_lineflag = 0;
+void  star_line_judg() //起跑线检测
+{
+    int kk, bai_flag = 0, hei_flag = 0, heibai_flag = 0, baihei_flag = 0;
+    for (kk = 5; kk <= 72; kk++)
+    {
+        if (img[45][kk] > 0)
+            bai_flag = 1;
+        else if (bai_flag && img[45][kk] == 0)
+        {
+            baihei_flag++;
+            bai_flag = 0;
+        }
+
+        if (img[45][kk] == 0)
+            hei_flag = 1;
+        else if (hei_flag && img[45][kk] > 0)
+        {
+            heibai_flag++;
+            hei_flag = 0;
+        }
+    }
+    if (baihei_flag >= 4 && heibai_flag >= 4 && baihei_flag - heibai_flag <= 2)
+        star_lineflag = 1;
+}
+uint8 JudgeConnect(uint8 left, uint8 right)
+{
+    float e = (right - left) / ColumnMax, val = left;
+    uint8 i;
+    for (i = 0; i < ColumnMax; i++)
+    {
+        if (img[(int)val][i] == Black_Point)
+        {
+            return 0;
+        }
+        val += e;
+    }
+    return 1;
 }

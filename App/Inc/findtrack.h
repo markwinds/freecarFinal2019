@@ -28,6 +28,7 @@ extern int   LeftLose;
 extern int   RightLose ;
 extern unsigned char LoopFlag;
 extern uint8 circluFlag;
+extern char aMark;
 
 extern  unsigned char LoopRightControlFlag;
 extern  unsigned char LoopLeftControlFlag;
@@ -39,6 +40,7 @@ extern  unsigned char OpenLoopExitRepairFlagL;
 extern  unsigned char OpenLoopExitRepairFlagR;
 extern  unsigned char RightInflectionPointFlag;
 extern  unsigned char LeftInflectionPointFlag;
+extern uint8 star_lineflag;
 
 /*** 函数声明 ****/    
 
@@ -55,4 +57,7 @@ extern  void LoopControl();
 extern  void LoopRepair();
 
 extern  void LoopExitRepair();
+
+extern void  CircluSearch();
+extern void star_line_judg() ;
 #endif

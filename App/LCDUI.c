@@ -25,6 +25,8 @@ uint8        amount_of_dvarious;
 int8         ePadjust = -1, swP = 0, choseagain = 0;
 Screen_Data *iPadjust, *now_adjust[3];
 const char   swStr[5][7] = { " RUN! ", "Motor ", "Steer ", " Lcd  ", "Camera" };
+
+uint8 roost = 1;
 /*---------------------------------------------imgbuff_show状态的功能函数----------------------------------------------*/
 
 Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
@@ -351,8 +353,12 @@ Lcd_State* gotoBefore(Lcd_State* pThis) //上 跳转到上一个参数
         colour[6 * (page - 1) + current_row - 1] = GREEN;
         return pThis;
     }
-    else
-        return pThis;
+    else if (WHITE == colour[6 * (page - 1) + current_row - 1]) //只有在未选中的情况下才进行操作
+    {
+        if (roost < 6)
+            roost++;
+    }
+    return pThis;
 }
 
 Lcd_State* gotoNext(Lcd_State* pThis) //下 跳转到下一个参数
@@ -377,8 +383,12 @@ Lcd_State* gotoNext(Lcd_State* pThis) //下 跳转到下一个参数
         colour[6 * (page - 1) + current_row - 1] = GREEN;
         return pThis;
     }
-    else
-        return pThis;
+    else if (WHITE == colour[6 * (page - 1) + current_row - 1]) //只有在未选中的情况下才进行操作
+    {
+        if (roost > 1)
+            roost--;
+    }
+    return pThis;
 }
 
 Lcd_State* dataDown(Lcd_State* pThis) //左
@@ -399,7 +409,19 @@ Lcd_State* dataDown(Lcd_State* pThis) //左
             }
             else
             {
-                *(screen_data[tempId].data_value.i) -= screen_data[tempId].icrement;
+                switch (screen_data[tempId].ip)
+                {
+                    case 1:
+                    case 3:
+                        *(screen_data[tempId].data_value.i) -= screen_data[tempId].icrement * roost;
+                        break;
+                    case 2:
+                        *(screen_data[tempId].data_value.f) -= screen_data[tempId].icrement * roost;
+                        break;
+                    case 4:
+                        *(screen_data[tempId].data_value.c) -= screen_data[tempId].icrement * roost;
+                        break;
+                }
             }
         }
     }
@@ -430,7 +452,20 @@ Lcd_State* dataUp(Lcd_State* pThis) //右
             }
             else
             {
-                *(screen_data[tempId].data_value.i) += screen_data[tempId].icrement;
+                //*(screen_data[tempId].data_value.i) += screen_data[tempId].icrement * roost;
+                switch (screen_data[tempId].ip)
+                {
+                    case 1:
+                    case 3:
+                        *(screen_data[tempId].data_value.i) += screen_data[tempId].icrement * roost;
+                        break;
+                    case 2:
+                        *(screen_data[tempId].data_value.f) += screen_data[tempId].icrement * roost;
+                        break;
+                    case 4:
+                        *(screen_data[tempId].data_value.c) += screen_data[tempId].icrement * roost;
+                        break;
+                }
             }
         }
     }
@@ -560,7 +595,8 @@ void updateUI()
         else
         {
             LCD_str(tem_site_str[i], (uint8*)(screen_data[m + i].data_name), BLACK, colour[m + i]); //记得回来改颜色
-            LCD_numf(tem_site_data[i], (float)(*(screen_data[m + i].data_value.i)), BLACK, WHITE);
+            DiyDataPrintf(tem_site_data[i], &screen_data[m + i], BLACK, WHITE);
+            //LCD_numf(tem_site_data[i], (float)(*(screen_data[m + i].data_value.i)), BLACK, WHITE);
         }
     }
 }

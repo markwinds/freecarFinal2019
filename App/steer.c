@@ -4,16 +4,16 @@
 
 /*********define for SteerControl**********/
 
-float  KP          = 0.0;  //舵机方向比例系数，影响舵机的打角范围
-float  KD          = 16.4; //10//7.5//舵机方向微分系数,影响舵机的打角反应
-float  SteerPwmAdd = 0.0;  //舵机pwm增量
-float  Error;              //偏差值
-float  LastError;          //上次的偏差
+float  KP          = 0.0; //舵机方向比例系数，影响舵机的打角范围
+float  KD          = 1.0; //10//7.5//16.4//舵机方向微分系数,影响舵机的打角反应
+float  SteerPwmAdd = 0.0; //舵机pwm增量
+float  Error;             //偏差值
+float  LastError;         //上次的偏差
 float  WeightSum       = 0;
 float  CenterMeanValue = 0;
 float  CenterSum       = 0;
 float  J               = 0.0290;       //调节p和偏差的关系，越大，作用越强
-float  BasicP          = 3.0;          //基本的P值
+float  BasicP          = 3.3;          //基本的P值
 uint32 SteerPwm = 0, LastSteerSwm = 0; //舵机的pwm值和上次舵机的pwm值
 
 //加权平均，权值的选取
@@ -139,7 +139,7 @@ void SteerInit(void) //舵机初始化
 void CalculateError(void)
 
 {
-
+    //右是负的，左是正的
     int i;
 
     CenterSum = 0;
@@ -161,64 +161,140 @@ void CalculateError(void)
         CenterMeanValue = (CenterSum / WeightSum); //算出加权平均后中线的值
     }
 
-    if (BlackEndM < 20 || BlackEndML < 20 || BlackEndM < 20)
+    if (BlackEndM < 10 || BlackEndML < 20 || BlackEndM < 10)
     {
-        Error = (1.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1])) * ((128 - disgy_AD_val[2]));
+        // Error = (1.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1])) * ((128 - disgy_AD_val[2]));
+        Error = (60 - disgy_AD_val[2]) * (dis_AD_val[0] - dis_AD_val[1]) / 16.0;
     }
     else
     {
 
         Error = (40 - CenterMeanValue); // 一场图像偏差值
     }
+    switch (circluFlag)
+    {
+        case 2:
+            if (Error < aMark)
+            {
+                Error = aMark;
+            }
+            // else if (Error > 8)
+            // {
+            //     circluFlag = 4;
+            // }
+            break;
+        case 3:
+            if (Error > aMark)
+            {
+                Error = aMark;
+            }
+            // else if (Error < -8)
+            // {
+            //     circluFlag = 5;
+            // }
+            break;
+        case 4:
+            if (Error < 1)
+            {
+                Error = 11;
+            }
+            break;
+        case 5:
+            if (Error > -1)
+            {
+                Error = -11;
+            }
+            break;
+        case 6:
+            if (Error < 0)
+            {
 
+                circluFlag = 8;
+            }
+            break;
+        case 7:
+            if (Error > 0)
+            {
+
+                circluFlag = 9;
+            }
+            break;
+        case 8:
+            if (Error < 47 - BlackEndM)
+            {
+                Error = 47 - BlackEndM;
+            }
+            break;
+        case 9:
+            if (Error > BlackEndM - 45)
+            {
+                Error = BlackEndM - 45;
+            }
+            break;
+        case 10:
+            Error /= 2;
+            break;
+        case 11:
+            Error /= 3;
+            break;
+    }
+    /* 
     if (circluFlag == 2)
     {
         //Error += ((dis_AD_val[1] + dis_AD_val[0]) / 12);
-        if (Error < 5)
+        if (Error < 6)
         {
             Error = 11;
+        }
+        // else if (Error < 5.5)
+        // {
+        //     Error = 8;
+        // }
+        else
+        {
+            circluFlag = 4;
         }
     }
     else if (circluFlag == 3)
     {
         // Error -= ((dis_AD_val[1] + dis_AD_val[0]) / 13);
-        if (Error > -5)
+        if (Error > -6)
         {
             Error = -11;
         }
-    }
-    else if (circluFlag == 4)
-    {
-
-        if (Error < 5 && BlackEndM < 40)
+        // else if (Error > -5.5)
+        // {
+        //     Error = -8;
+        // }
+        else
         {
-            Error = 15;
-        }
-        if (Error < 9)
-        {
-            Error = 9;
-        }
-    }
-    else if (circluFlag == 5)
-    {
-        if (Error > -5 && BlackEndM < 40)
-        {
-            Error = -16;
-        }
-        if (Error > -9)
-        {
-            Error = -9;
+            circluFlag = 5;
         }
     }
     else if (circluFlag == 6)
     {
-        Error /= 2;
+
+        if (Error < 4 && BlackEndM < 40)
+        {
+            Error = 15;
+        }
     }
     else if (circluFlag == 7)
     {
+        if (Error > -4 && BlackEndM < 40)
+        {
+            Error = -16;
+        }
+    }
+    else if (circluFlag == 8)
+    {
         Error /= 2;
     }
-
+    else if (circluFlag == 9)
+    {
+        Error /= 2;
+    }
+    */
     if (Error >= 30.0) //偏差限幅
 
         Error = 30.0;
@@ -254,7 +330,7 @@ void SteerControl(void)
 
     CalculateError();
 
-    SteerPwmAdd = (KP * Error) + KD * (Error - LastError); //舵机的pd控制器
+    SteerPwmAdd = (KP * Error) + KP * KD * (Error - LastError); //舵机的pd控制器
 
     if (SteerPwmAdd >= 120)
 

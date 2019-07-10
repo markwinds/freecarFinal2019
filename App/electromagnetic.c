@@ -122,3 +122,5 @@ int GetMedian(uint8* tree, int id, int l, int r, int c)
     else
         return GetMedian(tree, rc, mid + 1, r, c - tree[lc]);
 }
+
+/* */
