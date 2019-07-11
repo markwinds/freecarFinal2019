@@ -138,6 +138,7 @@ void SteerInit(void) //舵机初始化
 float eError;
 uint8 espped        = 0;
 uint8 breakLoadFlag = 0;
+int32 eleSpeed      = 8;
 void  CalculateError(void)
 
 {
@@ -163,26 +164,29 @@ void  CalculateError(void)
         CenterMeanValue = (CenterSum / WeightSum); //算出加权平均后中线的值
     }
 
-    eError = ((60 - disgy_AD_val[2]) * (60 - disgy_AD_val[2]) / 225.0) * (dis_AD_val[0] - dis_AD_val[1]);
-    Error  = (40 - CenterMeanValue); // 一场图像偏差值
+    //eError = ((60 - disgy_AD_val[2]) / 8.0) * (dis_AD_val[0] - dis_AD_val[1]);
+    //eError = getSteerPwmFromADCError();
+    Error = (40 - CenterMeanValue); // 一场图像偏差值
     if (!breakLoadFlag && !circluFlag)
     {
-        if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (((eError > 0 && Error < 0) || (Error > 0 && eError < 0)) && abs(Error - eError) > 2 && BlackEndM < 20))
+        if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10)
         {
             breakLoadFlag = 1;
-            MySpeedSet -= 6;
+            eleSpeed += MySpeedSet;
+            MySpeedSet = eleSpeed - MySpeedSet;
+            eleSpeed -= MySpeedSet;
         }
     }
     else if (breakLoadFlag == 1 && BlackEndM > 30)
     {
         breakLoadFlag = 0;
-        MySpeedSet += 6;
+        eleSpeed += MySpeedSet;
+        MySpeedSet = eleSpeed - MySpeedSet;
+        eleSpeed -= MySpeedSet;
     }
     if (breakLoadFlag)
     {
-        if (eError < -1)
-            Error = -eError;
-        Error = eError;
+        Error = -getSteerPwmFromADCError();
     }
 
     switch (circluFlag)

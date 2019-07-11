@@ -5,6 +5,7 @@ uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
 int   temx, temy;
+int32 zbttem;
 float temf = 0.23;
 
 //函数声明
@@ -15,26 +16,30 @@ void PIT0_IRQHandler();
 void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
-Screen_Data mydata[] = {
+Screen_Data mydata[] = { //
     { "speed", { .l = &(MySpeedSet) }, 1.0, 1 },
+    { "eleSpe", { .l = &(eleSpeed) }, 1.0, 1 },
     { "KP", { .f = &(BasicP) }, 0.1, 2 },
     { "KD", { .f = &(KD) }, 0.01, 2 },
-    { "-reSpeed", { .f = &(errorspeed) }, 0.1, 2 },
+    { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
+
     { "end", NULL, 0, 0 }
 };
 
 int         block          = 0;
 Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
-    //{ "speed", { .l = &(SpeedSet) }, 0, 1 },
+    //{ "speed", { .l = &(SpeedSet) }, 0, 1 },ADC_normal_vaule
     { "error", { .f = &(Error) }, 0, 2 },
     { "adcl", { .i = &(disgy_AD_val[0]) }, 0, 3 },
     { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
     { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
+    { "zbtadc", { .l = &(ADC_normal_vaule[0]) }, 0, 1 },
     { "bll", { .i = &(BlackEndML) }, 0, 3 },
     { "blr", { .i = &(BlackEndMR) }, 0, 3 },
     { "blll", { .i = &(BlackEndL) }, 0, 3 },
     { "blrr", { .i = &(BlackEndR) }, 0, 3 },
+    { "zbter", { .l = &(ADC_max_vaule[0]) }, 0, 1 },
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "cir", { .c = &(circluFlag) }, 0, 4 },
     { "end", NULL, 0, 0 }
@@ -98,6 +103,8 @@ void HardWare_Init(void)
 
 void main(void)
 {
+    initMotorSteer();
+    initADC();
 
     uint8 lcd_count = 0;
     HardWare_Init();
@@ -105,6 +112,7 @@ void main(void)
 
     while (1)
     {
+        //zbttem = getSteerPwmFromADCError();
         if (getSwitch(cameraSW))
         {                     //控制图像处理
             camera_get_img(); //（耗时13.4ms）图像采集
