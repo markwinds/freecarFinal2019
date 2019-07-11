@@ -46,6 +46,7 @@ int MotorPwmLeft  = 0;
 
 float LeftMotorPwmAdd  = 0;
 float RightMotorPwmAdd = 0;
+float errorspeed       = 4;
 
 void MotorInit(void)
 {
@@ -171,13 +172,13 @@ void GetTargetSpeed(void)
 
         if (ABS(Error) >= 10) //偏差大于某个值才进行差速
         {
-            Differential_P = (float)(30.0 / ((60 - (LastLine + 4)) * (60 - (LastLine + 4)))); //30
-            LSpeedSet      = (int32)(SpeedSet - (Differential_P * Error * SpeedSet / 4));     //左轮差速
+            Differential_P = (float)(30.0 / ((60 - (LastLine + 4)) * (60 - (LastLine + 4))));      //30
+            LSpeedSet      = (int32)(SpeedSet - (Differential_P * Error * SpeedSet / errorspeed)); //左轮差速
             if (LSpeedSet <= 5)
                 LSpeedSet = 5;
             if (LSpeedSet >= 110)
                 LSpeedSet = 110;
-            RSpeedSet = (int32)(SpeedSet + (Differential_P * Error * SpeedSet / 4)); //右轮差速
+            RSpeedSet = (int32)(SpeedSet + (Differential_P * Error * SpeedSet / errorspeed)); //右轮差速
             if (RSpeedSet <= 5)
                 RSpeedSet = 5;
             if (RSpeedSet >= 110)

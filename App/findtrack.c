@@ -1378,7 +1378,7 @@ void  CircluSearch()
                 break;
             }
         }
-        aMark = -((i - 20) / 2 + 8.5);
+        aMark = -((i - 20) / 2 + 9.5);
         if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;

@@ -22,6 +22,7 @@ extern  int32 MySpeedSet;
 extern void MotorInit(void);
 extern int  LK_jishi_flag;
 extern uint8 go;
+extern float errorspeed;
 
 void CalculateMotorSpeedError(float LeftMotorTarget,float RightMotorTarget);
 

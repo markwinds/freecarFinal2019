@@ -19,6 +19,7 @@ Screen_Data mydata[] = {
     { "speed", { .l = &(MySpeedSet) }, 1.0, 1 },
     { "KP", { .f = &(BasicP) }, 0.1, 2 },
     { "KD", { .f = &(KD) }, 0.01, 2 },
+    { "-reSpeed", { .f = &(errorspeed) }, 0.1, 2 },
     { "end", NULL, 0, 0 }
 };
 
@@ -169,10 +170,11 @@ void main(void)
         //temx = adc_once(ADC0_DP0, ADC_10bit);
         //temy = adc_once(ADC0_DM1, ADC_10bit);
         CircluSearch();
-        if (LK_jishi_flag)
+        if (LK_jishi_flag && BlackEndM > 10)
         {
             star_line_judg();
         }
+
         if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
         {
             MotorControl();

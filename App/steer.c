@@ -135,8 +135,10 @@ void SteerInit(void) //舵机初始化
  * 
  * 日期：2016-3-01(已测试)
  *******************************************************/
-
-void CalculateError(void)
+float eError;
+uint8 espped        = 0;
+uint8 breakLoadFlag = 0;
+void  CalculateError(void)
 
 {
     //右是负的，左是正的
@@ -161,16 +163,28 @@ void CalculateError(void)
         CenterMeanValue = (CenterSum / WeightSum); //算出加权平均后中线的值
     }
 
-    if (BlackEndM < 10 || BlackEndML < 20 || BlackEndM < 10)
+    eError = ((60 - disgy_AD_val[2]) * (60 - disgy_AD_val[2]) / 225.0) * (dis_AD_val[0] - dis_AD_val[1]);
+    Error  = (40 - CenterMeanValue); // 一场图像偏差值
+    if (!breakLoadFlag && !circluFlag)
     {
-        // Error = (1.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1])) * ((128 - disgy_AD_val[2]));
-        Error = (60 - disgy_AD_val[2]) * (dis_AD_val[0] - dis_AD_val[1]) / 16.0;
+        if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (((eError > 0 && Error < 0) || (Error > 0 && eError < 0)) && abs(Error - eError) > 2 && BlackEndM < 20))
+        {
+            breakLoadFlag = 1;
+            MySpeedSet -= 6;
+        }
     }
-    else
+    else if (breakLoadFlag == 1 && BlackEndM > 30)
     {
+        breakLoadFlag = 0;
+        MySpeedSet += 6;
+    }
+    if (breakLoadFlag)
+    {
+        if (eError < -1)
+            Error = -eError;
+        Error = eError;
+    }
 
-        Error = (40 - CenterMeanValue); // 一场图像偏差值
-    }
     switch (circluFlag)
     {
         case 2:
@@ -226,16 +240,16 @@ void CalculateError(void)
             }
             break;
         case 9:
-            if (Error > BlackEndM - 45)
+            if (Error > BlackEndM - 47)
             {
-                Error = BlackEndM - 45;
+                Error = BlackEndM - 47;
             }
             break;
         case 10:
             Error /= 2;
             break;
         case 11:
-            Error /= 3;
+            Error /= 2;
             break;
     }
     /* 
