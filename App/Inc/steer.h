@@ -13,6 +13,7 @@ extern float  LastError;
 extern float  Error;
 extern float  KD;  //舵机方向比例系数，影响舵机的打角范围
 extern float  BasicP; //10//7.5//舵机方向微分系数,影响舵机的打角反应
+extern uint8 breakLoadFlag;
 void SteerInit(void);//舵机初始化
 void CalculateError(void);
 extern void SteerControl(void);

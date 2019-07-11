@@ -1,6 +1,8 @@
 #ifndef __INCLUDE_H__
 #define __INCLUDE_H__
-
+#pragma diag_suppress = Pe1665
+#pragma diag_suppress = Ta023
+#pragma diag_suppress = Ta022
 #include  "common.h"
 
 /*
@@ -24,6 +26,12 @@
 #include  "MK60_sdhc.h"     //SDHC
 #include  "MK60_usb.h"      //usb
 
+#include "motor_steer.h"       //电机、舵机
+#include "algorithms.h"        //算法
+#include "adc.h"               //电磁采集
+#include "pid.h"               //pid控制
+#include "buzzer.h"            //蜂鸣器
+#include "road_state.h"        //判断当前的路况
 
 #include  "VCAN_LED.H"          //LED
 #include  "VCAN_KEY.H"          //KEY
@@ -55,5 +63,9 @@
 #include   "picture.h"
 #include   "set_value.h"
 #include   "electromagnetic.h"
+
+
+
+
 
 #endif  //__INCLUDE_H__
