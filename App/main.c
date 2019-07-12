@@ -34,13 +34,14 @@ Screen_Data debug_window[] = {
     { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
     { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
     { "zbtadc", { .l = &(ADC_normal_vaule[0]) }, 0, 1 },
+    { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "bll", { .i = &(BlackEndML) }, 0, 3 },
     { "blr", { .i = &(BlackEndMR) }, 0, 3 },
     { "blll", { .i = &(BlackEndL) }, 0, 3 },
     { "blrr", { .i = &(BlackEndR) }, 0, 3 },
     { "zbter", { .l = &(ADC_max_vaule[0]) }, 0, 1 },
-    { "blm", { .i = &(BlackEndM) }, 0, 3 },
-    { "cir", { .c = &(circluFlag) }, 0, 4 },
+    { "cir", { .c = &(circluFlag) }, 0, 4 }, //breakLoadFlag
+    { "bre", { .c = &(breakLoadFlag) }, 0, 4 },
     { "end", NULL, 0, 0 }
 };
 
@@ -117,6 +118,7 @@ void main(void)
             DELAY_MS(300);
             setSteer(50);
             DELAY_MS(300);
+            out_road = 0;
         }
         if (getSwitch(cameraSW))
         {                     //控制图像处理

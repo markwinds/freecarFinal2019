@@ -141,8 +141,8 @@ void SteerInit(void) //舵机初始化
  *******************************************************/
 float eError;
 uint8 espped        = 0;
-uint8 breakLoadFlag = 0;
-int32 eleSpeed      = 8;
+uint8 breakLoadFlag = 0, breakcout = 0;
+int32 eleSpeed = 8;
 void  CalculateError(void)
 {
     //右是负的，左是正的
@@ -174,10 +174,16 @@ void  CalculateError(void)
     {
         if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10)
         {
-            breakLoadFlag = 1;
-            eleSpeed += MySpeedSet;
-            MySpeedSet = eleSpeed - MySpeedSet;
-            eleSpeed -= MySpeedSet;
+            if (breakcout > 5)
+            {
+                breakLoadFlag = 1;
+                eleSpeed += MySpeedSet;
+                MySpeedSet = eleSpeed - MySpeedSet;
+                eleSpeed -= MySpeedSet;
+                breakcout = 0;
+            }
+            else
+                breakcout++;
         }
     }
     else if (breakLoadFlag == 1 && BlackEndM > 30)

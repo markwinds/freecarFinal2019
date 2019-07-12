@@ -31,7 +31,7 @@ typedef struct Screen_Data //传参结构体,ui显示数据的结构体
         uint8* c;
     } data_value;
     float icrement; //参数累加数 如果是99就是on\off
-    int ip;       //是否存放入flash的标志位,为负数时表示该参数不写入flash，为正数时表示存储扇区的偏移地址
+    int   ip;       //是否存放入flash的标志位,为负数时表示该参数不写入flash，为正数时表示存储扇区的偏移地址
 } Screen_Data;
 
 //输入的是当前的状态，返回的是操作后的状态
@@ -70,7 +70,8 @@ typedef enum bitControl
     cameraSW = 4,
     adjustSW = 5,
     updateSW = 6,
-}bitControl;
+    zbtSW    = 7,
+} bitControl;
 
 typedef enum modeControl
 {
@@ -78,7 +79,9 @@ typedef enum modeControl
     runMOD   = 0x16, // 0001 0110
     debugMOD = 0x39, // 0011 1001
     pageMOD  = 0x41, // 0100 0001
-}modeControl;
+    ZVTmod   = 0X80; // 1000 0000
+}
+modeControl;
 /*--------------------------------------------------函数--------------------------------------------------*/
 
 /*普通函数*/
@@ -88,7 +91,7 @@ void        updateadjustUI();
 extern void flash_In();
 extern void flash_Out();
 
-void DiyDataPrintf(Site_t, Screen_Data* , int16 , int16 );
+void DiyDataPrintf(Site_t, Screen_Data*, int16, int16);
 
 //inspect
 extern uint8 getSwitch(enum bitControl);
@@ -99,7 +102,7 @@ extern void  inverseSwitch(enum bitControl);
 
 /*--------------------------------------------------变量--------------------------------------------------*/
 
-extern int test_speed;
+extern int   test_speed;
 extern uint8 roost;
 
 #endif
