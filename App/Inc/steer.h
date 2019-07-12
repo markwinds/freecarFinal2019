@@ -5,13 +5,13 @@
 #define S3010_CH FTM_CH0 //通道号PTA8
 #define S3010_HZ 50      //舵机的频率
 
-#define SteerMax 745   //舵机最大值
-#define SteerMin 575   //舵机最小值
-#define SteerMidle 655 //舵机中值
-
 extern int judge_road_black_num;
 extern int judge_road_black_state;
 extern int out_road;
+
+#define SteerMax 965   //舵机最大值
+#define SteerMin 765   //舵机最小值
+#define SteerMidle 868 //舵机中值
 
 extern float LastError;
 extern float Error;

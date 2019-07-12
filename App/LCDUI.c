@@ -6,6 +6,7 @@ Lcd_State* gotoShowADCValue()
 {
     setMode(ADCMOD);
     //choseagain = 0;
+    LCD_clear(WHITE);
     return &show_ADC_value;
 }
 
@@ -341,9 +342,9 @@ Lcd_State* turnBack(Lcd_State* pThis) //右 向后翻页
 
 Lcd_State* showADCVauleToImgbuffShow(Lcd_State* pThis)
 {
-    LCD_clear(WHITE);
     //openCamera();
     setMode(iniMOD);
+    LCD_clear(WHITE);
     return &imgbuff_show;
 }
 
@@ -611,7 +612,7 @@ void PORTD_IRQHandler()
     {
         updateUI();
     }
-    else
+    else if (!getSwitch(ADCSW))
     {
         key_on = 1; //记录有按键按下
         updateadjustUI();

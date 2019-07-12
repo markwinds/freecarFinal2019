@@ -156,7 +156,7 @@ void updateADCVaule()
         last_ADC_normal_vaule[j] = ADC_normal_vaule[j];
         ADC_true_vaule[j]        = sum[j] >> 3;
         int32 min                = ADC_max_vaule[j] / 20;
-        ADC_normal_vaule[j]      = 1000 * (ADC_true_vaule[j] - min) / (1000 - min);
+        ADC_normal_vaule[j]      = 1000 * (ADC_true_vaule[j] - min) / (ADC_max_vaule[j] - min);
         ADC_normal_vaule[j]      = ADC_normal_vaule[j] < 1 ? 1 : ADC_normal_vaule[j];
     }
     if (ADC_normal_vaule[0] > ADC_middle_max)

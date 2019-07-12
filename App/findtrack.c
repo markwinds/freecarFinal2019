@@ -98,6 +98,8 @@ unsigned char BreakStartLFlag                = 0;
 unsigned char BreakStartR                    = 0;
 unsigned char BreakStartRFlag                = 0;
 
+uint8 circlulose;
+
 uint8 JudgeConnect(uint8, uint8);
 //设置中线，左线，右线的初始化值
 //设置每一行对应的赛道宽度
@@ -126,10 +128,11 @@ void SearchCenterBlackline(void)
     uint8 jj       = 0;
     uint8 WhiteNum = 0;
 
-    LeftLose  = 0; //变量清零
-    RightLose = 0;
-    AllLose   = 0;
-    WhiteNum  = 0;
+    LeftLose   = 0; //变量清零
+    RightLose  = 0;
+    AllLose    = 0;
+    circlulose = 0;
+    WhiteNum   = 0;
 
     MiddleLine[RowMax] = ColumnMax / 2; //第60行
     LeftEdge[RowMax]   = 0;
@@ -355,8 +358,20 @@ void SearchCenterBlackline(void)
 
         debugMark = 2;
         Auxiliary = 0;
+        if (i < 35 && i > 25)
+        {
+            if (circlulose & 1 && LeftEdge[i] < 5)
+            {
+                circlulose++;
+            }
+            if (!(circlulose & 1) && RightEdge[i] > ColumnMax - 6)
+            {
+                circlulose++;
+            }
+        }
         if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //不满足畸变
         {
+
             Auxiliary     = 1;
             MiddleLine[i] = MiddleLine[i + 1]; //用上一行
         }
@@ -1296,7 +1311,7 @@ void LoopExitRepair()
 
 /****************************以下是新添的函数****************************/
 char  aMark;
-uint8 circluTimeOutClearMark1, circluTimeOutClearMark2, circluTimeOutClearMark3;
+uint8 circluTimeOutClearMark1, circluTimeOutClearMark2, circluTimeOutClearMark3, circluTimeOutClearMark4;
 void  CircluSearch()
 {
     if (circluFlag == 0)
@@ -1351,14 +1366,14 @@ void  CircluSearch()
     else if (circluFlag == 2)
     {
         int i;
-        for (i = 20; i < 35; i++)
+        for (i = 15; i < 35; i++)
         {
-            if (img[5][i] == White_Point)
+            if (img[i][5] == White_Point)
             {
                 break;
             }
         }
-        aMark = (i - 20) / 2 + 4;
+        aMark = (i - 15) / 2 + 6;
         if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
         {
             circluTimeOutClearMark2++;
@@ -1371,14 +1386,14 @@ void  CircluSearch()
     else if (circluFlag == 3)
     {
         int i;
-        for (i = 20; i < 35; i++)
+        for (i = 15; i < 35; i++)
         {
-            if (img[RowMax - 6][i] == White_Point)
+            if (img[i][ColumnMax - 6] == White_Point)
             {
                 break;
             }
         }
-        aMark = (char)(-((i - 20) / 2 + 9));
+        aMark = (char)(-((i - 15) / 2 + 4));
         if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;
@@ -1395,7 +1410,8 @@ void  CircluSearch()
             circluTimeOutClearMark2++;
             if (circluTimeOutClearMark2 > 8)
             {
-                circluFlag = 6;
+                circluTimeOutClearMark4 = 0;
+                circluFlag              = 6;
             }
         }
     }
@@ -1406,7 +1422,8 @@ void  CircluSearch()
             circluTimeOutClearMark3++;
             if (circluTimeOutClearMark3 > 8)
             {
-                circluFlag = 7;
+                circluTimeOutClearMark4 = 0;
+                circluFlag              = 7;
             }
         }
     }
@@ -1474,7 +1491,7 @@ void  CircluSearch()
         if (disgy_AD_val[2] < 95 && (disgy_AD_val[0] + disgy_AD_val[1]) < 95)
         {
             circluTimeOutClearMark1++;
-            if (circluTimeOutClearMark1 > 8)
+            if (circluTimeOutClearMark1 > 15)
             {
                 circluFlag = 0;
             }

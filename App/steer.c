@@ -195,13 +195,13 @@ void  CalculateError(void)
     }
     if (breakLoadFlag)
     {
-        if (judge_road_black_num--)
-        {
-            out_road = judge_road_black_state % 2;
-            judge_road_black_state >>= 1;
-        }
-        if (!out_road)
-            Error = -getSteerPwmFromADCError();
+        // if (judge_road_black_num--)
+        // {
+        //     out_road = judge_road_black_state % 2;
+        //     judge_road_black_state >>= 1;
+        // }
+        // if (!out_road)
+        //Error = -getSteerPwmFromADCError();
     }
 
     switch (circluFlag)
@@ -253,15 +253,15 @@ void  CalculateError(void)
             }
             break;
         case 8:
-            if (Error < 47 - BlackEndM)
+            if (Error < 49 - BlackEndM)
             {
-                Error = 47 - BlackEndM;
+                Error = 49 - BlackEndM;
             }
             break;
         case 9:
-            if (Error > BlackEndM - 47)
+            if (Error > BlackEndM - 49)
             {
-                Error = BlackEndM - 47;
+                Error = BlackEndM - 49;
             }
             break;
         case 10:
@@ -373,7 +373,7 @@ void SteerControl(void)
 
         SteerPwmAdd = -120;
 
-    SteerPwm = (uint32)(SteerPwmAdd * 7 / 10 + SteerMidle);
+    SteerPwm = (uint32)(SteerPwmAdd * 7 / 8 + SteerMidle);
 
     if (SteerPwm >= SteerMax) //限幅
 

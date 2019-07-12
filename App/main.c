@@ -4,8 +4,9 @@
 uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
-int   temx, temy;
-float temf = 0.23;
+uint32 temx, temy, tem1;
+int32  zbttem;
+float  temf = 0.23;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -22,6 +23,9 @@ Screen_Data mydata[] = { //
     { "KD", { .f = &(KD) }, 0.01, 2 },
     { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
     { "adcp", { .l = &(ADC_pid.kp) }, 1.0, 1 },
+    { "st0", { .l = &(tem1) }, 1, 1 },
+    { "st00", { .l = &(tem1) }, 10, 1 },
+    { "st000", { .l = &(tem1) }, 100, 1 },
     { "end", NULL, 0, 0 }
 };
 
@@ -40,8 +44,9 @@ Screen_Data debug_window[] = {
     { "blll", { .i = &(BlackEndL) }, 0, 3 },
     { "blrr", { .i = &(BlackEndR) }, 0, 3 },
     { "zbter", { .l = &(ADC_max_vaule[0]) }, 0, 1 },
-    { "cir", { .c = &(circluFlag) }, 0, 4 }, //breakLoadFlag
-    { "bre", { .c = &(breakLoadFlag) }, 0, 4 },
+    { "blm", { .i = &(BlackEndM) }, 0, 3 },
+    { "cir", { .c = &(circluFlag) }, 0, 4 },
+    { "cirlose", { .c = &(circlulose) }, 0, 4 },
     { "end", NULL, 0, 0 }
 };
 
@@ -109,17 +114,17 @@ void main(void)
     uint8 lcd_count = 0;
     HardWare_Init();
     InitEM();
-
     while (1)
     {
-        if (out_road)
-        {
-            setSteer(-50);
-            DELAY_MS(300);
-            setSteer(50);
-            DELAY_MS(300);
-            out_road = 0;
-        }
+        // if (out_road)
+        // {
+        //     setSteer(-50);
+        //     DELAY_MS(300);
+        //     setSteer(50);
+        //     DELAY_MS(300);
+        //     out_road = 0;
+        // }
+
         if (getSwitch(cameraSW))
         {                     //控制图像处理
             camera_get_img(); //（耗时13.4ms）图像采集
@@ -197,7 +202,22 @@ void main(void)
 
         if (getSwitch(steerSW)) //控制舵机开关
         {
-            SteerControl();
+            if (breakLoadFlag)
+            {
+                int32 error = getSteerPwmFromADCError();
+                setSteer(error);
+                if (BlackEndM > 30)
+                {
+                    breakLoadFlag = 0;
+                    eleSpeed += MySpeedSet;
+                    MySpeedSet = eleSpeed - MySpeedSet;
+                    eleSpeed -= MySpeedSet;
+                }
+            }
+            else
+            {
+                SteerControl();
+            }
         }
         else
         {
@@ -206,6 +226,7 @@ void main(void)
 
         if (getSwitch(mainShowSW)) //控制DeBug显示
         {
+            //ftm_pwm_duty(FTM0, FTM_CH6, tem1);
             //temx = ReadValue(ADC_LEFT);
             //temy = ReadValue(ADC_RIGHT);
             if (lcd_count > 32)
@@ -230,6 +251,7 @@ void main(void)
         }
         if (getSwitch(ADCSW))
         {
+            initADCUI();
             updateADCVaule();
             showADCvaule();
             DELAY_MS(500);
