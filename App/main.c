@@ -4,9 +4,9 @@
 uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
-int   temx, temy;
-int32 zbttem;
-float temf = 0.23;
+uint32 temx, temy, tem1;
+int32  zbttem;
+float  temf = 0.23;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -23,6 +23,9 @@ Screen_Data mydata[] = { //
     { "KD", { .f = &(KD) }, 0.01, 2 },
     { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
     { "adcp", { .l = &(ADC_pid.kp) }, 1.0, 1 },
+    { "st0", { .l = &(tem1) }, 1, 1 },
+    { "st00", { .l = &(tem1) }, 10, 1 },
+    { "st000", { .l = &(tem1) }, 100, 1 },
     { "end", NULL, 0, 0 }
 };
 
@@ -42,6 +45,7 @@ Screen_Data debug_window[] = {
     { "zbter", { .l = &(ADC_max_vaule[0]) }, 0, 1 },
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "cir", { .c = &(circluFlag) }, 0, 4 },
+    { "cirlose", { .c = &(circlulose) }, 0, 4 },
     { "end", NULL, 0, 0 }
 };
 
@@ -109,7 +113,6 @@ void main(void)
     uint8 lcd_count = 0;
     HardWare_Init();
     InitEM();
-
     while (1)
     {
         //zbttem = getSteerPwmFromADCError();
@@ -199,6 +202,7 @@ void main(void)
 
         if (getSwitch(mainShowSW)) //控制DeBug显示
         {
+            //ftm_pwm_duty(FTM0, FTM_CH6, tem1);
             //temx = ReadValue(ADC_LEFT);
             //temy = ReadValue(ADC_RIGHT);
             if (lcd_count > 32)

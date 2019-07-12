@@ -75,6 +75,7 @@ void SpeedGet(void)
 
 int   LK_jishi_flag, LK_jishi;
 uint8 runrunrun = 0, go;
+int16 ste = 868, dir = 1;
 void  PIT0_IRQHandler()
 {
 
@@ -91,7 +92,12 @@ void  PIT0_IRQHandler()
     if (TimerCnt8ms >= MotorControlPeriod) //一个8ms周期取一次速度，当作车的速度
 
     {
-
+        /* ftm_pwm_duty(FTM0, FTM_CH6, ste);
+        if (ste > SteerMax)
+            dir = -5;
+        else if (ste < SteerMin)
+            dir = 5;
+        ste += dir;*/
         GetRightMotorPules = RightMotorPulseAccumulate; //保持好这次测得的总数，10ms一共测得的脉冲
         GetLeftMotorPules  = -LeftMotorPulseAccumulate;
 
