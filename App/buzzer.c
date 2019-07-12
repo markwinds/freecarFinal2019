@@ -2,10 +2,10 @@
 #include "include.h"
 
 int buzzer_music[][10] = {
-    {100, 100, 100, 0},
-    {50, 0},
-    {0},
-    {100, 100, 50, 100, 100, 100, 50, 0}
+    { 100, 100, 100, 0 },
+    { 50, 0 },
+    { 0 },
+    { 100, 100, 50, 100, 100, 100, 50, 0 }
 
 };
 
@@ -35,7 +35,7 @@ void tellMeRoadType(SoundType sound_type)
     {
         return;
     }
-    int *p = buzzer_music[sound_type];
+    int* p = buzzer_music[sound_type];
     while (*p != 0)
     {
         turnBuzzer();
