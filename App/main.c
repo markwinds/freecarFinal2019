@@ -5,7 +5,6 @@ uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
 int   temx, temy;
-int32 zbttem;
 float temf = 0.23;
 
 //函数声明
@@ -112,7 +111,13 @@ void main(void)
 
     while (1)
     {
-        //zbttem = getSteerPwmFromADCError();
+        if (out_road)
+        {
+            setSteer(-50);
+            DELAY_MS(300);
+            setSteer(50);
+            DELAY_MS(300);
+        }
         if (getSwitch(cameraSW))
         {                     //控制图像处理
             camera_get_img(); //（耗时13.4ms）图像采集

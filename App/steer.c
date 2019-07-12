@@ -16,6 +16,10 @@ float  J               = 0.0290;       //调节p和偏差的关系，越大，�
 float  BasicP          = 3.3;          //基本的P值
 uint32 SteerPwm = 0, LastSteerSwm = 0; //舵机的pwm值和上次舵机的pwm值
 
+int judge_road_black_num   = 2;
+int judge_road_black_state = 1;
+int out_road               = 0;
+
 //加权平均，权值的选取
 #if 1
 float Weight[60] = {
@@ -140,7 +144,6 @@ uint8 espped        = 0;
 uint8 breakLoadFlag = 0;
 int32 eleSpeed      = 8;
 void  CalculateError(void)
-
 {
     //右是负的，左是正的
     int i;
@@ -186,7 +189,13 @@ void  CalculateError(void)
     }
     if (breakLoadFlag)
     {
-        Error = -getSteerPwmFromADCError();
+        if (judge_road_black_num--)
+        {
+            out_road = judge_road_black_state % 2;
+            judge_road_black_state >>= 1;
+        }
+        if (!out_road)
+            Error = -getSteerPwmFromADCError();
     }
 
     switch (circluFlag)
