@@ -1373,12 +1373,12 @@ void  CircluSearch()
         int i;
         for (i = 20; i < 35; i++)
         {
-            if (img[RowMax - 5][i] == White_Point)
+            if (img[RowMax - 6][i] == White_Point)
             {
                 break;
             }
         }
-        aMark = (char)(-((i - 20) / 2 + 8.5));
+        aMark = (char)(-((i - 20) / 2 + 9));
         if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;
