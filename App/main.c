@@ -22,7 +22,6 @@ Screen_Data mydata[] = { //
     { "KP", { .f = &(BasicP) }, 0.1, 2 },
     { "KD", { .f = &(KD) }, 0.01, 2 },
     { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
-
     { "adcp", { .l = &(ADC_pid.kp) }, 1.0, 1 },
     { "end", NULL, 0, 0 }
 };
