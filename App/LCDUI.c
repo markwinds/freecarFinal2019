@@ -1,9 +1,18 @@
 #include "include.h"
 #include <string.h>
 
+/*---------------------------------------------辅助ADC采集和显示函数----------------------------------------------*/
+Lcd_State* gotoShowADCValue()
+{
+    setMode(ADCMOD);
+    //choseagain = 0;
+    return &show_ADC_value;
+}
+
 /*---------------------------------------------变量----------------------------------------------*/
 
-uint8 key_on = 0;
+uint8 key_on
+    = 0;
 //float motor_go = 10;	//在显示状态下控制电机是否转动的变量
 int    colour[MAX_OPTION]; //0元素也保存有有效数据
 Site_t tem_site_str[]      = { 0, 0, 0, 20, 0, 40, 0, 60, 0, 80, 0, 100 };
@@ -126,8 +135,12 @@ Lcd_State* takePhoto(Lcd_State* pThis) //左
     else if (ePadjust == 3)
     {
         swP++;
-        if (swP > 4)
+        if (swP > 5)
             swP = 0;
+        if (swP == 5) //进入ADC的采集和显示
+        {
+            return gotoShowADCValue();
+        }
     }
     else
         ePadjust = -1;
@@ -145,7 +158,11 @@ Lcd_State* imgbuffShowToSetVaule(Lcd_State* pThis) //右
     {
         swP--;
         if (swP < 0)
-            swP = 4;
+            swP = 5;
+        if (swP == 5) //进入ADC的采集和显示
+        {
+            return gotoShowADCValue();
+        }
     }
     else
         ePadjust = -1;
@@ -317,6 +334,45 @@ Lcd_State* turnBack(Lcd_State* pThis) //右 向后翻页
     {
         page++;
     }
+    return pThis;
+}
+
+/*---------------------------------------------show_ADC_value----------------------------------------------*/
+
+Lcd_State* showADCVauleToImgbuffShow(Lcd_State* pThis)
+{
+    LCD_clear(WHITE);
+    //openCamera();
+    setMode(iniMOD);
+    return &imgbuff_show;
+}
+
+Lcd_State* showADCVauleUp(Lcd_State* pThis)
+{
+    showADCSeletPoint(WHITE);
+    ADCSelteBefore();
+    showADCSeletPoint(RED);
+    return pThis;
+}
+
+Lcd_State* showADCVauleDown(Lcd_State* pThis)
+{
+    showADCSeletPoint(WHITE);
+    ADCSelteNext();
+    showADCSeletPoint(RED);
+    return pThis;
+}
+
+Lcd_State* showADCVauleLeft(Lcd_State* pThis)
+{
+    writeADCParamToFlash();
+    tellMeRoadType(T4L1515);
+    return pThis;
+}
+
+Lcd_State* showADCVauleRight(Lcd_State* pThis)
+{
+    updateADCMaxVaule();
     return pThis;
 }
 
@@ -781,4 +837,11 @@ Lcd_State set_value = {
     downSetVaule,   //下
     leftSetVaule,   //左
     rightSetVaule   //右
+};
+Lcd_State show_ADC_value = {
+    showADCVauleToImgbuffShow, //中
+    showADCVauleUp,            //上
+    showADCVauleDown,          //下
+    showADCVauleLeft,          //左
+    showADCVauleRight          //右
 };

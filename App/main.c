@@ -228,6 +228,12 @@ void main(void)
                 lcd_count++;
             }
         }
+        if (getSwitch(ADCSW))
+        {
+            updateADCVaule();
+            showADCvaule();
+            DELAY_MS(500);
+        }
     }
 }
 

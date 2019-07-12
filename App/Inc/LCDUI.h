@@ -45,8 +45,8 @@ typedef struct Lcd_State //状态结构体
 } Lcd_State;
 
 /*------------------------------------------------全局变量---------------------------------------------*/
-extern Lcd_State  wait_middle, normal_page, imgbuff_show, read_picture, show_dealed_picture, set_value, various_adjust; //lcd等待按键时的4种状态
-extern Lcd_State* p_current_state;                                                                                      //指向当前状态的指针
+extern Lcd_State  wait_middle, normal_page, imgbuff_show, read_picture, show_dealed_picture, set_value, various_adjust, show_ADC_value; //lcd等待按键时的4种状态
+extern Lcd_State* p_current_state;                                                                                                      //指向当前状态的指针
 
 extern int          page;        //ui当前所在页
 extern int          current_row; //ui当前所在行
@@ -70,7 +70,7 @@ typedef enum bitControl
     cameraSW = 4,
     adjustSW = 5,
     updateSW = 6,
-    zbtSW    = 7,
+    ADCSW    = 7,
 } bitControl;
 
 typedef enum modeControl
@@ -79,9 +79,8 @@ typedef enum modeControl
     runMOD   = 0x16, // 0001 0110
     debugMOD = 0x39, // 0011 1001
     pageMOD  = 0x41, // 0100 0001
-    ZVTmod   = 0X80; // 1000 0000
-}
-modeControl;
+    ADCMOD   = 0X80, // 1000 0000
+} modeControl;
 /*--------------------------------------------------函数--------------------------------------------------*/
 
 /*普通函数*/
