@@ -1,15 +1,6 @@
 #include "include.h"
 #include <string.h>
 
-/*---------------------------------------------辅助ADC采集和显示函数----------------------------------------------*/
-Lcd_State* gotoShowADCValue()
-{
-    setMode(ADCMOD);
-    //choseagain = 0;
-    LCD_clear(WHITE);
-    return &show_ADC_value;
-}
-
 /*---------------------------------------------变量----------------------------------------------*/
 
 uint8 key_on
@@ -34,9 +25,18 @@ uint8        AllSwitch;
 uint8        amount_of_dvarious;
 int8         ePadjust = -1, swP = 0, choseagain = 0;
 Screen_Data *iPadjust, *now_adjust[3];
-const char   swStr[5][7] = { " RUN! ", "Motor ", "Steer ", " Lcd  ", "Camera" };
+const char   swStr[6][7] = { " RUN! ", "Motor ", "Steer ", " Lcd  ", "Camera", " ADC  " };
 
 uint8 roost = 1;
+
+/*---------------------------------------------辅助ADC采集和显示函数----------------------------------------------*/
+Lcd_State* gotoShowADCValue()
+{
+    setMode(ADCMOD);
+    choseagain = 0;
+    LCD_clear(WHITE);
+    return &show_ADC_value;
+}
 /*---------------------------------------------imgbuff_show状态的功能函数----------------------------------------------*/
 
 Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
@@ -46,7 +46,11 @@ Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
     {
         if (choseagain)
         {
-            if (swP)
+            if (swP == 5) //进入ADC的采集和显示
+            {
+                return gotoShowADCValue();
+            }
+            else if (swP)
             {
                 inverseSwitch(swP);
             }
@@ -138,10 +142,6 @@ Lcd_State* takePhoto(Lcd_State* pThis) //左
         swP++;
         if (swP > 5)
             swP = 0;
-        if (swP == 5) //进入ADC的采集和显示
-        {
-            return gotoShowADCValue();
-        }
     }
     else
         ePadjust = -1;
@@ -160,10 +160,6 @@ Lcd_State* imgbuffShowToSetVaule(Lcd_State* pThis) //右
         swP--;
         if (swP < 0)
             swP = 5;
-        if (swP == 5) //进入ADC的采集和显示
-        {
-            return gotoShowADCValue();
-        }
     }
     else
         ePadjust = -1;
@@ -707,7 +703,7 @@ void updateadjustUI()
         {
             bcolor = YELLOW;
         }
-        else if (getSwitch(swP) == 1)
+        else if (swP == 5 ? getSwitch(ADCSW) : getSwitch(swP) == 1)
             bcolor = BLUE;
         else
             bcolor = GREEN;

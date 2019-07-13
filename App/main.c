@@ -249,6 +249,7 @@ void main(void)
         }
         if (getSwitch(ADCSW))
         {
+            LCD_clear(WHITE);
             initADCUI();
             updateADCVaule();
             showADCvaule();
