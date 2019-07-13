@@ -23,9 +23,7 @@ Screen_Data mydata[] = { //
     { "KD", { .f = &(KD) }, 0.01, 2 },
     { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
     { "adcp", { .l = &(ADC_pid.kp) }, 1.0, 1 },
-    { "st0", { .l = &(tem1) }, 1, 1 },
-    { "st00", { .l = &(tem1) }, 10, 1 },
-    { "st000", { .l = &(tem1) }, 100, 1 },
+    { "adcd", { .l = &(ADC_pid.kd) }, 1.0, 1 },
     { "end", NULL, 0, 0 }
 };
 
@@ -195,15 +193,11 @@ void main(void)
             star_line_judg();
         }
 
-        if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
-        {
-            MotorControl();
-        }
-
         if (getSwitch(steerSW)) //控制舵机开关
         {
             if (breakLoadFlag)
             {
+                Error       = 0;
                 int32 error = getSteerPwmFromADCError();
                 setSteer(error);
                 if (BlackEndM > 30)
@@ -222,6 +216,10 @@ void main(void)
         else
         {
             ftm_pwm_duty(FTM0, FTM_CH6, SteerMidle); //舵机pwm更新
+        }
+        if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
+        {
+            MotorControl();
         }
 
         if (getSwitch(mainShowSW)) //控制DeBug显示

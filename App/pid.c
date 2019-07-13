@@ -1,7 +1,7 @@
 #include "common.h"
 #include "include.h"
 
-ADCPid ADC_pid = { 32, 0, 0, 0, 0 };
+ADCPid ADC_pid = { 32, 5, 0, 0, 0 };
 
 int32 getSteerPwmFromADCError()
 {

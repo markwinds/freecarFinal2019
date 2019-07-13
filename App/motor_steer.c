@@ -7,7 +7,7 @@ int speed_different = 0;
 void initMotorSteer()
 {
     //舵机初始化  FTM0
-    ftm_pwm_init(FTM0, FTM_CH6, 100, STEER_MID);
+    ftm_pwm_init(FTM0, FTM_CH6, 50, STEER_MID);
     //左电机初始化
     ftm_pwm_init(FTM3, FTM_CH0, 10000, 0);
     ftm_pwm_init(FTM3, FTM_CH1, 10000, 0);

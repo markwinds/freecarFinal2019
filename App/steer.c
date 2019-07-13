@@ -142,7 +142,7 @@ void SteerInit(void) //舵机初始化
 float eError;
 uint8 espped        = 0;
 uint8 breakLoadFlag = 0, breakcout = 0;
-int32 eleSpeed = 8;
+int32 eleSpeed = 5;
 void  CalculateError(void)
 {
     //右是负的，左是正的
