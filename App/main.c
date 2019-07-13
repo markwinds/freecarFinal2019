@@ -200,7 +200,7 @@ void main(void)
                 Error       = 0;
                 int32 error = getSteerPwmFromADCError();
                 setSteer(error);
-                if (BlackEndM > 30)
+                if (BlackEndM > 30) //如果摄像头得到有用的图像
                 {
                     breakLoadFlag = 0;
                     eleSpeed += MySpeedSet;
@@ -253,6 +253,7 @@ void main(void)
             initADCUI();
             updateADCVaule();
             showADCvaule();
+            showTrueError();
             DELAY_MS(500);
         }
     }

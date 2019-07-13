@@ -16,5 +16,6 @@ typedef struct ADCPid
 extern ADCPid ADC_pid;
 
 extern int32 getSteerPwmFromADCError();
+extern int32 getSteerPwmFromADCError1();
 
 #endif //_PID_H_

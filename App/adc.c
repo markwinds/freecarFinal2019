@@ -212,19 +212,62 @@ int32 getErrorFromADC()
     /**丢线的判定*/
     if (ADC_normal_vaule[0] < 280)
     {
-        return ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -500 : 500;
+        return ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -8000 : 8000;
     }
 
     /**得到纵向和横向的差比和*/
-    int32 horizontal_dec_add = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]);
-    int32 vertical_dec_add   = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[3], ADC_normal_vaule[4]);
+    int32 horizontal_dec_add = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]); //200
+    int32 vertical_dec_add   = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[3], ADC_normal_vaule[4]); //90
     /**得到权重和补偿值*/
-    int32 wright     = abs(vertical_dec_add);
+    //int32 wright     = abs(vertical_dec_add) << 1;
     int32 compensate = 0;
-    if (ADC_normal_vaule[0] < 500)
+    if (ADC_normal_vaule[0] < 600)
     {
-        compensate = (int32)(500 * 50 / ADC_normal_vaule[0] - 20);
-        compensate = ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -1 * compensate : compensate;
+        compensate = (int32)(300 * 1100 / ADC_normal_vaule[0] - 20);
+        compensate = ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -compensate : compensate;
     }
-    return ((horizontal_dec_add * (200 - wright) + wright * vertical_dec_add) >> 7) + compensate; //20000
+    //return ((horizontal_dec_add * abs(200 - wright) + wright * vertical_dec_add) >> 7) + compensate; //20000
+    return (horizontal_dec_add * (1000 / 200)) + (vertical_dec_add * abs(vertical_dec_add)) / (8000 / 3000) + compensate;
+}
+
+int32 getErrorFromADC1()
+{
+    updateADCVaule();
+    /**丢线的判定*/
+    if (ADC_normal_vaule[0] < 280)
+    {
+        return ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -500 : 500;
+    }
+
+    int32 horizontal_dec_add = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]);
+
+    ADC_normal_vaule[0] = ADC_normal_vaule[0] > 900 ? 900 : ADC_normal_vaule[0];
+    return ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -(900 - ADC_normal_vaule[0]) : (900 - ADC_normal_vaule[0]);
+}
+
+void showTrueError()
+{
+    int32 error = 0;
+    if (ADC_normal_vaule[0] < 280)
+    {
+        error = ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -8000 : 8000;
+    }
+    else
+    {
+        /**得到纵向和横向的差比和*/
+        int32 horizontal_dec_add = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]); //200
+        int32 vertical_dec_add   = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[3], ADC_normal_vaule[4]); //90
+        /**得到权重和补偿值*/
+        //int32 wright     = abs(vertical_dec_add) << 1;
+        int32 compensate = 0;
+        if (ADC_normal_vaule[0] < 600)
+        {
+            compensate = (int32)(600 * 300 / ADC_normal_vaule[0] - 20);
+            compensate = ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -compensate : compensate;
+        }
+        error = (horizontal_dec_add * 8) + (vertical_dec_add * abs(vertical_dec_add)) / 8 + compensate;
+    }
+    LCDShowNum(100, 0, getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]), RED, WHITE);
+    LCDShowNum(100, 40, getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[3], ADC_normal_vaule[4]), RED, WHITE);
+    LCDShowNum(100, 80, error, RED, WHITE);
 }

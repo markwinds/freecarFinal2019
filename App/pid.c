@@ -1,7 +1,7 @@
 #include "common.h"
 #include "include.h"
 
-ADCPid ADC_pid = { 32, 5, 0, 0, 0 };
+ADCPid ADC_pid = { 32, 0, 0, 0, 0 };
 
 int32 getSteerPwmFromADCError()
 {
@@ -9,5 +9,14 @@ int32 getSteerPwmFromADCError()
     ADC_pid.error     = getErrorFromADC();
     int32 ans_pwm     = ADC_pid.kp * ADC_pid.error + ADC_pid.kd * (ADC_pid.error - ADC_pid.pre_error);
     //LCDShowNumDefule(100, 60, (ans_pwm >> 10) / 3);
-    return (ans_pwm >> 5) / 5;
+    return (ans_pwm / 1200);
+}
+
+int32 getSteerPwmFromADCError1()
+{
+    ADC_pid.pre_error = ADC_pid.error;
+    ADC_pid.error     = getErrorFromADC1();
+    int32 ans_pwm     = ADC_pid.kp * ADC_pid.error + ADC_pid.kd * (ADC_pid.error - ADC_pid.pre_error);
+    //LCDShowNumDefule(100, 60, (ans_pwm >> 10) / 3);
+    return (ans_pwm >> 8);
 }
