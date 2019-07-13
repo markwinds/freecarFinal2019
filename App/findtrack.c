@@ -1373,11 +1373,11 @@ void  CircluSearch()
                 break;
             }
         }
-        aMark = (i - 15) / 2 + 6;
+        aMark = (i - 15) / 2 + 7;
         if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
         {
             circluTimeOutClearMark2++;
-            if (circluTimeOutClearMark2 > 8)
+            if (circluTimeOutClearMark2 > 2)
             {
                 circluFlag = 6;
             }
@@ -1393,11 +1393,11 @@ void  CircluSearch()
                 break;
             }
         }
-        aMark = (char)(-((i - 15) / 2 + 4));
+        aMark = (char)(-((i - 15) / 2 + 6));
         if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;
-            if (circluTimeOutClearMark3 > 8)
+            if (circluTimeOutClearMark3 > 2)
             {
                 circluFlag = 7;
             }
@@ -1408,7 +1408,7 @@ void  CircluSearch()
         if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
         {
             circluTimeOutClearMark2++;
-            if (circluTimeOutClearMark2 > 8)
+            if (circluTimeOutClearMark2 > 5)
             {
                 circluTimeOutClearMark4 = 0;
                 circluFlag              = 6;
@@ -1420,7 +1420,7 @@ void  CircluSearch()
         if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;
-            if (circluTimeOutClearMark3 > 8)
+            if (circluTimeOutClearMark3 > 5)
             {
                 circluTimeOutClearMark4 = 0;
                 circluFlag              = 7;
@@ -1433,24 +1433,27 @@ void  CircluSearch()
         // {
         //     circluFlag = 8;
         // }
-        uint8 i, j;
-        for (i = 8; i < 20; i++)
+        // uint8 i, j;
+        // for (i = 10; i < 25; i++)
+        // {
+        //     if (img[i][ColumnMax - 1] == Black_Point && img[i + 1][ColumnMax - 1] == White_Point)
+        //     {
+        //         for (j = i - 2; j < 30; j++)
+        //         {
+        //             if (img[j][0] == White_Point)
+        //             {
+        //                 if (JudgeConnect(j + 3, i))
+        //                 {
+        //                     circluFlag = 8;
+        //                 }
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
+        if (circlulose > 2)
         {
-            if (img[i][ColumnMax - 1] == White_Point)
-            {
-                for (j = 8; j < 30; j++)
-                {
-                    if (img[j][0] == White_Point)
-                    {
-                        if (JudgeConnect(j + 3, i))
-                        {
-                            circluFlag = 8;
-                        }
-                        break;
-                    }
-                }
-                break;
-            }
+            circluFlag = 8;
         }
     }
     else if (circluFlag == 7)
@@ -1459,24 +1462,27 @@ void  CircluSearch()
         // {
         //     circluFlag = 9;
         // }
-        int i, j;
-        for (i = 8; i < 20; i++)
+        // int i, j;
+        // for (i = 10; i < 25; i++)
+        // {
+        //     if (img[i][0] == Black_Point && img[i + 1][0] == White_Point)
+        //     {
+        //         for (j = i - 2; j < 30; j++)
+        //         {
+        //             if (img[j][ColumnMax - 1] == White_Point)
+        //             {
+        //                 if (JudgeConnect(i, j + 3))
+        //                 {
+        //                     circluFlag = 9;
+        //                 }
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
+        if (circlulose > 2)
         {
-            if (img[i][0] == White_Point)
-            {
-                for (j = 8; j < 30; j++)
-                {
-                    if (img[j][ColumnMax - 1] == White_Point)
-                    {
-                        if (JudgeConnect(i, j + 3))
-                        {
-                            circluFlag = 9;
-                        }
-                        break;
-                    }
-                }
-                break;
-            }
+            circluFlag = 9;
         }
     }
     else if (circluFlag == 8 || circluFlag == 9)

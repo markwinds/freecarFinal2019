@@ -206,6 +206,7 @@ void  CalculateError(void)
 
     switch (circluFlag)
     {
+      int16 ttem;
         case 2:
             if (Error < aMark)
             {
@@ -239,29 +240,39 @@ void  CalculateError(void)
             }
             break;
         case 6:
-            if (Error < 0)
-            {
+            // if (Error < -1)
+            // {
 
-                circluFlag = 8;
-            }
+            //     circluFlag = 8;
+            // }
             break;
         case 7:
-            if (Error > 0)
-            {
+            // if (Error > 1)
+            // {
 
-                circluFlag = 9;
-            }
+            //     circluFlag = 9;
+            // }
             break;
         case 8:
-            if (Error < 49 - BlackEndM)
+            // if (Error < 46 - BlackEndM)
+            // {
+            //     Error = (46 - BlackEndM);
+            // }
+            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 7;
+            if (Error < ttem)
             {
-                Error = 49 - BlackEndM;
+                Error = ttem;
             }
             break;
         case 9:
-            if (Error > BlackEndM - 49)
+            // if (Error > BlackEndM - 46)
+            // {
+            //     Error = BlackEndM - 46;
+            // }
+            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 7;
+            if (Error > -ttem)
             {
-                Error = BlackEndM - 49;
+                Error = -ttem;
             }
             break;
         case 10:
