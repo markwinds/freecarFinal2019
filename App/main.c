@@ -26,6 +26,8 @@ Screen_Data mydata[] = { //
     { "adcd", { .l = &(ADC_pid.kd) }, 1.0, 1 },
     { "tempi", { .l = &(temp_vaule) }, 10.0, 1 },
     { "tempf", { .f = &(temp_vaule_f) }, 0.1, 2 },
+    { "KP+", { .f = &(BasicP) }, 1, 2 },
+    { "KD+", { .f = &(KD) }, 0.1, 2 },
     { "end", NULL, 0, 0 }
 };
 

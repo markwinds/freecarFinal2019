@@ -267,7 +267,7 @@ void SearchCenterBlackline(void)
             {
                 j = 78;
             }
-            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 19)
+            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 17)
             {
                 RightEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
