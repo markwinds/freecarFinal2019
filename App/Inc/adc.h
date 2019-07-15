@@ -19,6 +19,9 @@ extern int32 ADC_normal_vaule[5];
 extern int32 last_ADC_normal_vaule[5];
 extern int   steer_offset;
 
+extern int32 temp_vaule;
+extern float temp_vaule_f;
+
 extern void  initADC();
 extern int32 getErrorFromADC();
 extern int32 getErrorFromADC1();

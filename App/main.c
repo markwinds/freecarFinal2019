@@ -24,6 +24,8 @@ Screen_Data mydata[] = { //
     { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
     { "adcp", { .l = &(ADC_pid.kp) }, 1.0, 1 },
     { "adcd", { .l = &(ADC_pid.kd) }, 1.0, 1 },
+    { "tempi", { .l = &(temp_vaule) }, 10.0, 1 },
+    { "tempf", { .f = &(temp_vaule_f) }, 0.1, 2 },
     { "end", NULL, 0, 0 }
 };
 

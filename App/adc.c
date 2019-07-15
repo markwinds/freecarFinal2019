@@ -7,6 +7,8 @@ int32 ADC_max_vaule[5]         = { 0 };
 int32 ADC_normal_vaule[5]      = { 0 };
 int32 last_ADC_normal_vaule[5] = { 0 };
 int   steer_offset             = 0;
+int32 temp_vaule               = 200;
+float temp_vaule_f             = 2.4;
 
 /****************************************flash操作***********************************************/
 void writeADCParamToFlash()
@@ -38,8 +40,8 @@ void initADC()
     adc_init(ADC0_DP3);
     adc_init(ADC0_DM1);
     adc_init(ADC1_DM1);
+    adc_init(ADC1_DP1);
     readADCParamToFlash();
-    //adc_init(ADC1_DP1);
 }
 
 /**
@@ -150,11 +152,12 @@ void updateADCVaule()
             sum[j] += adc_once(ADC_channel[j], ADC_12bit);
         }
     }
+    //sum[4] = (int32)(temp_vaule_f * sum[4]);
     /**数据的归一化*/
     for (int j = 0; j < 5; j++)
     {
         last_ADC_normal_vaule[j] = ADC_normal_vaule[j];
-        ADC_true_vaule[j]        = sum[j] >> 3;
+        ADC_true_vaule[j]        = sum[j] / 8;
         int32 min                = ADC_max_vaule[j] / 20;
         ADC_normal_vaule[j]      = 1000 * (ADC_true_vaule[j] - min) / (ADC_max_vaule[j] - min);
         ADC_normal_vaule[j]      = ADC_normal_vaule[j] < 1 ? 1 : ADC_normal_vaule[j];
@@ -221,13 +224,14 @@ int32 getErrorFromADC()
     /**得到权重和补偿值*/
     //int32 wright     = abs(vertical_dec_add) << 1;
     int32 compensate = 0;
-    if (ADC_normal_vaule[0] < 600)
+    if (ADC_normal_vaule[0] < 700)
     {
-        compensate = (int32)(300 * 1100 / ADC_normal_vaule[0] - 20);
+        compensate = (int32)(300 * 800 / ADC_normal_vaule[0] - 20);
         compensate = ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -compensate : compensate;
     }
     //return ((horizontal_dec_add * abs(200 - wright) + wright * vertical_dec_add) >> 7) + compensate; //20000
-    return (horizontal_dec_add * (1000 / 200)) + (vertical_dec_add * abs(vertical_dec_add)) / (8000 / 3000) + compensate;
+    int32 ans = (horizontal_dec_add * (1500 / 200)) + (vertical_dec_add * abs(vertical_dec_add)) / (8000 / 1500) + compensate;
+    return ans < temp_vaule ? ans / 2 : ans;
 }
 
 int32 getErrorFromADC1()

@@ -94,11 +94,16 @@ typedef enum
     VREFH1,      // 参考高电压,可用ADC函数 ,结果恒为 2^n-1
     VREFL1,      // 参考低电压,可用ADC函数 ,结果恒为 0
     Module1_Dis, // 不支持 ADC
-    horizontal_middle = ADC0_DP3,
+    // horizontal_middle = ADC0_DP3,
+    // horizontal_left = ADC0_DP1,
+    // horizontal_right = ADC1_DM1,
+    // vertical_left = ADC0_DP0,
+    // vertical_right = ADC0_DM1
+    horizontal_middle = ADC0_DM1,
     horizontal_left = ADC0_DP1,
     horizontal_right = ADC1_DM1,
     vertical_left = ADC0_DP0,
-    vertical_right = ADC0_DM1
+    vertical_right = ADC1_DP1
 } ADCn_Ch_e;
 
 typedef enum //ADC模块
