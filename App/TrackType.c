@@ -55,7 +55,6 @@ void NormalCrossConduct(void)
             }
         }
     }
-
     IsOrNotCrossLoop();
 }
 
@@ -107,7 +106,7 @@ void IsOrNotCrossLoop()
     {
 
         CloseLoopNum++;
-        gpio_set(PTD6, 1);
+        // gpio_set(PTD6, 1);
 
         if (CloseLoopNum >= 100) //如果时间太长还没遇到十字出口，强制打开环道
         {
@@ -116,7 +115,7 @@ void IsOrNotCrossLoop()
             LastLastCrossFlag = 0;
             LastCrossFlag     = 0;
             CrossNumberFalg   = 0; //开圆环处理
-            gpio_set(PTD6, 0);
+            //gpio_set(PTD6, 0);
         }
     }
 
@@ -127,7 +126,7 @@ void IsOrNotCrossLoop()
         LastCrossFlag     = 0;
         CrossNumberFalg   = 0;
         CloseLoopNum      = 0;
-        gpio_set(PTD6, 0);
+        //gpio_set(PTD6, 0);
     }
 }
 

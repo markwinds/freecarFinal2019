@@ -41,6 +41,8 @@ extern unsigned char RightInflectionPointFlag;
 extern unsigned char LeftInflectionPointFlag;
 extern uint8         star_lineflag;
 
+extern char lSlope, rSlope;
+
 /*** 函数声明 ****/
 
 void        FindInflectionPoint();

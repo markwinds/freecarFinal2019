@@ -10,8 +10,8 @@ int RightEdge[RowMax + 1];
 int LeftEdge[RowMax + 1];
 int Width[RowMax + 1] = { 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 10,
                           10, 12, 13, 14, 14, 16, 17, 18, 18, 20, 20, 22, 22,
-                          24, 24, 26, 26, 28, 30, 31, 32, 32, 34, 36, 36, 38,
-                          39, 41, 41, 43, 43, 45, 45, 47, 47, 49, 50, 50, 51,
+                          24, 24, 26, 26, 28, 30, 31, 34, 36, 38, 40, 41, 43,
+                          43, 43, 43, 44, 44, 46, 46, 47, 47, 49, 50, 50, 51,
                           52, 54, 55, 56, 57, 58, 59, 60, 61 };
 ;
 
@@ -100,6 +100,8 @@ unsigned char BreakStartRFlag                = 0;
 
 uint8 circlulose;
 
+char lSlope, rSlope;
+
 uint8 JudgeConnect(uint8, uint8);
 //设置中线，左线，右线的初始化值
 //设置每一行对应的赛道宽度
@@ -122,11 +124,12 @@ void SetInitVal()
 //外部调用
 void SearchCenterBlackline(void)
 {
-    uint8 debugMark, Auxiliary = 0;
+    //uint8 debugMark, Auxiliary = 0;
     int16 i        = 0;
     int16 j        = 0;
     uint8 jj       = 0;
     uint8 WhiteNum = 0;
+    lSlope = rSlope = -1;
 
     LeftLose   = 0; //变量清零
     RightLose  = 0;
@@ -142,7 +145,7 @@ void SearchCenterBlackline(void)
     SetInitVal();
     for (i = RowMax - 1; i >= 50; i--) //首先找前十行，全行扫描
     {
-        debugMark = 0;
+        //debugMark = 0;
         // 扫左端点
         if (i == RowMax - 1) //首行就以图像中心作为扫描起点
         {
@@ -245,12 +248,68 @@ void SearchCenterBlackline(void)
     }
     for (i = 49; i > 0; i--) //查找剩余行
     {
-        debugMark = 1;
-        if (LeftEdge[i + 1] != 0 && RightEdge[i + 1] != ColumnMax) //上一行两边都找到 启用边沿扫描
+        // debugMark = 1;
+        if (circluFlag == 2)
         {
-            Auxiliary = 0;
-            j         = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //先找左边界
-            jj        = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
+            j  = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //左边界用边沿扫描
+            jj = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
+            while (j >= jj)
+            {
+                if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
+                {
+                    LeftEdge[i] = j;
+                    break;
+                }
+                j--;
+            }
+            j = LeftEdge[i]; //上一行丢了右边界用全行扫描
+            if (j >= 78)
+            {
+                j = 78;
+            }
+            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 19)
+            {
+                RightEdge[i] = j;
+                if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
+                {
+                    break;
+                }
+                j++;
+            }
+        }
+        else if (circluFlag == 3)
+        {
+            j  = ((RightEdge[i + 1] - 5) <= 1) ? 1 : (RightEdge[i + 1] - 5); //边缘追踪找右边界
+            jj = ((RightEdge[i + 1] + 5) >= ColumnMax - 2) ? ColumnMax - 2 : (RightEdge[i + 1] + 5);
+            while (j <= jj)
+            {
+                if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
+                {
+                    RightEdge[i] = j;
+                    break;
+                }
+                j++;
+            }
+            j = RightEdge[i]; //全行扫描找左边界
+            if (j < 2)
+            {
+                j = 2;
+            }
+            while (j >= 1 && j >= RightEdge[i] - Width[i] - 15)
+            {
+                LeftEdge[i] = j;
+                if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
+                {
+                    break;
+                }
+                j--;
+            }
+        }
+        else if (LeftEdge[i + 1] != 0 && RightEdge[i + 1] != ColumnMax) //上一行两边都找到 启用边沿扫描
+        {
+            //Auxiliary = 0;
+            j  = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //先找左边界
+            jj = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
             while (j >= jj)
             {
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -275,9 +334,9 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i + 1] != 0 && RightEdge[i + 1] == ColumnMax) //上一行只找到左边界
         {
-            Auxiliary = 1;
-            j         = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //左边界用边沿扫描
-            jj        = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
+            //Auxiliary = 1;
+            j  = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //左边界用边沿扫描
+            jj = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
             while (j >= jj)
             {
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -304,9 +363,9 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i + 1] == 0 && RightEdge[i + 1] != ColumnMax) //上一行只找到右边界
         {
-            Auxiliary = 2;
-            j         = ((RightEdge[i + 1] - 10) <= 1) ? 1 : (RightEdge[i + 1] - 10); //边缘追踪找右边界
-            jj        = ((RightEdge[i + 1] + 5) >= ColumnMax - 2) ? ColumnMax - 2 : (RightEdge[i + 1] + 5);
+            //Auxiliary = 2;
+            j  = ((RightEdge[i + 1] - 10) <= 1) ? 1 : (RightEdge[i + 1] - 10); //边缘追踪找右边界
+            jj = ((RightEdge[i + 1] + 5) >= ColumnMax - 2) ? ColumnMax - 2 : (RightEdge[i + 1] + 5);
             while (j <= jj)
             {
                 if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
@@ -333,8 +392,8 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i + 1] == 0 && RightEdge[i + 1] == ColumnMax) //上一行没找到边界，可能是十字或者环形
         {
-            Auxiliary = 3;
-            j         = MiddleLine[i + 1]; //找全行找左边界
+            //  Auxiliary = 3;
+            j = MiddleLine[i + 1]; //找全行找左边界
             while (j >= 1)
             {
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -356,8 +415,8 @@ void SearchCenterBlackline(void)
             }
         }
 
-        debugMark = 2;
-        Auxiliary = 0;
+        // debugMark = 2;
+        //  Auxiliary = 0;
         if (i < 35 && i > 25)
         {
             if (circlulose & 1 && LeftEdge[i] < 5)
@@ -369,17 +428,23 @@ void SearchCenterBlackline(void)
                 circlulose++;
             }
         }
+        if (i > 20 && abs(RightEdge[i] - LeftEdge[i]) < 3)
+        {
+            lSlope = (LeftEdge[i] - LeftEdge[i - 4]) >> 2;
+            rSlope = (RightEdge[i - 4] - RightEdge[i]) >> 2;
+        }
+
         if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //不满足畸变
         {
 
-            Auxiliary     = 1;
+            //Auxiliary     = 1;
             MiddleLine[i] = MiddleLine[i + 1]; //用上一行
         }
         else
         {
             if (LeftEdge[i] != 0 && RightEdge[i] != ColumnMax) // 两边都不丟线
             {
-                Auxiliary     = 2;
+                // Auxiliary     = 2;
                 MiddleLine[i] = (LeftEdge[i] + RightEdge[i]) / 2;
 
                 //对斜出十字进行纠正
@@ -417,7 +482,7 @@ void SearchCenterBlackline(void)
             }
             else if (LeftEdge[i] != 0 && RightEdge[i] == ColumnMax) // find left
             {
-                Auxiliary = 3;
+                // Auxiliary = 3;
                 RightLose++;
 
                 if (LeftEdge[i + 1] != 0)
@@ -431,7 +496,7 @@ void SearchCenterBlackline(void)
             }
             else if (LeftEdge[i] == 0 && RightEdge[i] != ColumnMax) // find right 左丟线
             {
-                Auxiliary = 4;
+                //Auxiliary = 4;
                 LeftLose++;
 
                 if (RightEdge[i + 1] != ColumnMax)
@@ -445,7 +510,7 @@ void SearchCenterBlackline(void)
             }
             else if (LeftEdge[i] == 0 && RightEdge[i] == ColumnMax) //两边丢线
             {
-                Auxiliary = 5;
+                // Auxiliary = 5;
                 WhiteNum++;
                 AllLose++;
 
@@ -457,8 +522,8 @@ void SearchCenterBlackline(void)
             }
         }
 
-        debugMark = 3;
-        Auxiliary = 0;
+        // debugMark = 3;
+        //Auxiliary = 0;
         if (i == 0)
         {
             AvaliableLines = 60;
@@ -1314,7 +1379,7 @@ char  aMark;
 uint8 circluTimeOutClearMark1, circluTimeOutClearMark2, circluTimeOutClearMark3, circluTimeOutClearMark4;
 void  CircluSearch()
 {
-    if (circluFlag == 0)
+    if (circluFlag == 0 && BlackEndM > 40 && !CloseLoopFlag)
     {
         if (disgy_AD_val[2] > 95 || (disgy_AD_val[0] + disgy_AD_val[1]) > 95) //(disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
         {
@@ -1366,14 +1431,14 @@ void  CircluSearch()
     else if (circluFlag == 2)
     {
         int i;
-        for (i = 15; i < 35; i++)
-        {
-            if (img[i][5] == White_Point)
-            {
-                break;
-            }
-        }
-        aMark = (i - 15) / 2 + 7;
+        // for (i = 15; i < 35; i++)
+        // {
+        //     if (img[i][5] == White_Point)
+        //     {
+        //         break;
+        //     }
+        // }
+        // aMark = (i - 15) / 2 + 7;
         if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
         {
             circluTimeOutClearMark2++;
@@ -1386,14 +1451,14 @@ void  CircluSearch()
     else if (circluFlag == 3)
     {
         int i;
-        for (i = 15; i < 35; i++)
-        {
-            if (img[i][ColumnMax - 6] == White_Point)
-            {
-                break;
-            }
-        }
-        aMark = (char)(-((i - 15) / 2 + 6));
+        // for (i = 15; i < 35; i++)
+        // {
+        //     if (img[i][ColumnMax - 6] == White_Point)
+        //     {
+        //         break;
+        //     }
+        // }
+        // aMark = (char)(-((i - 15) / 2 + 6));
         if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;
@@ -1487,7 +1552,7 @@ void  CircluSearch()
     }
     else if (circluFlag == 8 || circluFlag == 9)
     {
-        if ((disgy_AD_val[2] + disgy_AD_val[1] + disgy_AD_val[0]) > 100)
+        if (disgy_AD_val[2] > 95 || (disgy_AD_val[0] + disgy_AD_val[1]) > 95)
         {
             circluFlag += 2;
         }

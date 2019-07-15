@@ -13,7 +13,7 @@ int32 GetRightMotorPules, GetLeftMotorPules; //获得的一次脉冲总数（用
 int32 LSpeedSet  = 0; //60;//2.5M/S
 int32 RSpeedSet  = 0;
 int32 SpeedSet   = 0;
-int32 MySpeedSet = 10;
+int32 MySpeedSet = 12;
 
 float SpeedErrorL = 0;
 float SpeedErrorR = 0;
@@ -46,7 +46,7 @@ int MotorPwmLeft  = 0;
 
 float LeftMotorPwmAdd  = 0;
 float RightMotorPwmAdd = 0;
-float errorspeed       = 4;
+float errorspeed       = 2;
 
 void MotorInit(void)
 {
@@ -261,15 +261,15 @@ void MotorControl(void)
     MotorPwmRight = (int)(MotorPwmR);
     MotorPwmL += (SpeedP + SpeedI + SpeedD) * SpeedErrorL - (SpeedP + 2 * SpeedD) * SpeedLastErrorL + SpeedD * SpeedPerErrorL;
     MotorPwmLeft = (int)(MotorPwmL);
-    if (MotorPwmLeft <= -990)
-        MotorPwmLeft = -990;
-    else if (MotorPwmLeft >= 1990)
-        MotorPwmLeft = 1990;
+    if (MotorPwmLeft <= -1390)
+        MotorPwmLeft = -1390;
+    else if (MotorPwmLeft >= 2990)
+        MotorPwmLeft = 2990;
 
-    if (MotorPwmRight <= -990)
-        MotorPwmRight = -990;
-    else if (MotorPwmRight >= 1990)
-        MotorPwmRight = 1990;
+    if (MotorPwmRight <= -1390)
+        MotorPwmRight = -1390;
+    else if (MotorPwmRight >= 2990)
+        MotorPwmRight = 2990;
 
     if (MotorPwmLeft > 0)
     {
