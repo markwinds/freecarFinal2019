@@ -5,7 +5,7 @@ uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
 uint32 temx, temy, tem1;
-int32  zbttem;
+int32  zbttem, blocktemp;
 float  temf = 0.23;
 
 //函数声明
@@ -200,6 +200,20 @@ void main(void)
         {
             star_line_judg();
         }
+
+        if (!circluFlag && BlackEndM < 50 && abs(BlackEndM - BlackEndML) < 2 && abs(BlackEndM - BlackEndMR) < 2)
+        {
+            if (!blocktemp)
+            {
+                blocktemp = BlackEndM;
+            }
+            else if (blocktemp - BlackEndM > 5)
+            {
+                tellMeRoadType(T4L1515);
+            }
+        }
+        else
+            blocktemp = 0;
 
         if (getSwitch(steerSW)) //控制舵机开关
         {

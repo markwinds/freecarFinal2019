@@ -1595,6 +1595,11 @@ void  star_line_judg() //起跑线检测
             hei_flag = 0;
         }
     }
+    for (kk = 35; kk < 45; kk++)
+    {
+        if (img[30][kk] == Black_Point)
+            return;
+    }
     if (baihei_flag >= 4 && heibai_flag >= 4 && baihei_flag - heibai_flag <= 2)
         star_lineflag = 1;
 }
