@@ -182,7 +182,7 @@ void  CalculateError(void)
                 MySpeedSet = eleSpeed - MySpeedSet;
                 eleSpeed -= MySpeedSet;
                 breakcout = 0;
-                tellMeRoadType(T1L5);
+                //tellMeRoadType(T2L11);
             }
             else if (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20)
             {
