@@ -15,9 +15,8 @@
  */
 #ifndef __MK60_GPIO_H__
 #define __MK60_GPIO_H__
-
+#include "include.h"
 #include "MK60_gpio_cfg.h"
-
 /*
  * 定义管脚方向
  */

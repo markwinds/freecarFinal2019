@@ -46,7 +46,7 @@ int MotorPwmLeft  = 0;
 
 float LeftMotorPwmAdd  = 0;
 float RightMotorPwmAdd = 0;
-float errorspeed       = 4;
+float errorspeed       = 0.5;
 
 void MotorInit(void)
 {
@@ -261,15 +261,15 @@ void MotorControl(void)
     MotorPwmRight = (int)(MotorPwmR);
     MotorPwmL += (SpeedP + SpeedI + SpeedD) * SpeedErrorL - (SpeedP + 2 * SpeedD) * SpeedLastErrorL + SpeedD * SpeedPerErrorL;
     MotorPwmLeft = (int)(MotorPwmL);
-    if (MotorPwmLeft <= -990)
-        MotorPwmLeft = -990;
-    else if (MotorPwmLeft >= 1990)
-        MotorPwmLeft = 1990;
+    if (MotorPwmLeft <= -1390)
+        MotorPwmLeft = -1390;
+    else if (MotorPwmLeft >= 2990)
+        MotorPwmLeft = 2990;
 
-    if (MotorPwmRight <= -990)
-        MotorPwmRight = -990;
-    else if (MotorPwmRight >= 1990)
-        MotorPwmRight = 1990;
+    if (MotorPwmRight <= -1390)
+        MotorPwmRight = -1390;
+    else if (MotorPwmRight >= 2990)
+        MotorPwmRight = 2990;
 
     if (MotorPwmLeft > 0)
     {

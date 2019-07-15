@@ -129,6 +129,10 @@ void main(void)
             img_extract(img, imgbuff);
             GetBlackEndParam(); //获取黑线截止行
             SearchCenterBlackline();
+            if (!circluFlag)
+            {
+                NormalCrossConduct();
+            }
 #if LoopOpen
             LoopFlag = 0; //环路清标志
 
