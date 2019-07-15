@@ -6,10 +6,11 @@
 
 typedef enum
 {
-    T2L1L1 = 0,
-    T1L5 = 1,
-    T0L0 = 2,
-    T4L1515 = 3
+    T2L11   = 0,
+    T1L5    = 1,
+    T0L0    = 2,
+    T4L1515 = 3,
+    T1L3    = 4
 } SoundType;
 
 extern void initBuzzer();
