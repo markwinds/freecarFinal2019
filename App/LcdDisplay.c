@@ -20,7 +20,7 @@ void LCD_Init()
 
 void LCDDisplay(void)
 {
-    uint32  i;
+    uint32 i;
     Site_t site_point = { 0, 0 };
 
     site.y = 128 - CAMERA_H; //显示图像左上角位置的y轴
@@ -37,7 +37,7 @@ void LCDDisplay(void)
         if (RightEdge[i] < 0)
             RightEdge[i] = 0;
         site_point.x = RightEdge[i] + 127 - CAMERA_W - 2; /////LeftEedg   rightEedg
-        LCD_point(site_point, BRED);
+        LCD_point(site_point, BLUE);
 
         //左线
         if (LeftEdge[i] > 79)
@@ -45,7 +45,7 @@ void LCDDisplay(void)
         if (LeftEdge[i] < 0)
             LeftEdge[i] = 0;
         site_point.x = LeftEdge[i] + 127 - CAMERA_W + 2;
-        LCD_point(site_point, BLUE);
+        LCD_point(site_point, GREEN);
 
         //路径中线
         site_point.x = MiddleLine[i] + 127 - CAMERA_W;

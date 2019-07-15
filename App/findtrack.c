@@ -100,6 +100,8 @@ unsigned char BreakStartRFlag                = 0;
 
 uint8 circlulose;
 
+char lSlope, rSlope;
+
 uint8 JudgeConnect(uint8, uint8);
 //设置中线，左线，右线的初始化值
 //设置每一行对应的赛道宽度
@@ -127,6 +129,7 @@ void SearchCenterBlackline(void)
     int16 j        = 0;
     uint8 jj       = 0;
     uint8 WhiteNum = 0;
+    lSlope = rSlope = -1;
 
     LeftLose   = 0; //变量清零
     RightLose  = 0;
@@ -264,7 +267,7 @@ void SearchCenterBlackline(void)
             {
                 j = 78;
             }
-            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 18)
+            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 19)
             {
                 RightEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
@@ -425,6 +428,12 @@ void SearchCenterBlackline(void)
                 circlulose++;
             }
         }
+        if (i > 20 && abs(RightEdge[i] - LeftEdge[i]) < 3)
+        {
+            lSlope = (LeftEdge[i] - LeftEdge[i - 4]) >> 2;
+            rSlope = (RightEdge[i - 4] - RightEdge[i]) >> 2;
+        }
+
         if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //不满足畸变
         {
 

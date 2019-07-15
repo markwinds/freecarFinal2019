@@ -13,7 +13,7 @@ float  WeightSum       = 0;
 float  CenterMeanValue = 0;
 float  CenterSum       = 0;
 float  J               = 0.0290;       //调节p和偏差的关系，越大，作用越强
-float  BasicP          = 3.3;          //基本的P值
+float  BasicP          = 5.8;          //基本的P值
 uint32 SteerPwm = 0, LastSteerSwm = 0; //舵机的pwm值和上次舵机的pwm值
 
 int judge_road_black_num   = 2;
@@ -172,8 +172,9 @@ void  CalculateError(void)
     Error = (40 - CenterMeanValue); // 一场图像偏差值
     if (!breakLoadFlag && !circluFlag)
     {
-        if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10)
+        if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20))
         {
+            breakcout++;
             if (breakcout > 5)
             {
                 breakLoadFlag = 1;
@@ -182,9 +183,13 @@ void  CalculateError(void)
                 eleSpeed -= MySpeedSet;
                 breakcout = 0;
             }
-            else
-                breakcout++;
+            else if (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20)
+            {
+                breakcout += 3;
+            }
         }
+        else
+            breakcout--;
     }
     else if (breakLoadFlag == 1 && BlackEndM > 30)
     {
