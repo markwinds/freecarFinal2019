@@ -13,6 +13,8 @@ typedef enum
     T1L3    = 4
 } SoundType;
 
+extern int timer_check;
+
 extern void initBuzzer();
 extern void openBuzzer();
 extern void closeBuzzer();

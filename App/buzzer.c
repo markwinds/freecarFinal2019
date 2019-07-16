@@ -1,6 +1,8 @@
 #include "common.h"
 #include "include.h"
 
+int timer_check = 0;
+
 int buzzer_music[][10] = {
     { 100, 100, 100, 0 },
     { 50, 0 },
