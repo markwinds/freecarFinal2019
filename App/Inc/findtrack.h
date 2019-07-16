@@ -25,7 +25,7 @@ extern int           Width[RowMax + 1];
 extern int           LeftLose;
 extern int           RightLose;
 extern unsigned char LoopFlag;
-extern uint8         circluFlag;
+extern uint8         circluFlag, hamperFlag;
 extern uint8         circlulose;
 extern char          aMark;
 
@@ -60,5 +60,6 @@ extern void LoopRepair();
 extern void LoopExitRepair();
 
 extern void CircluSearch();
+extern void HamperSearch();
 extern void star_line_judg();
 #endif

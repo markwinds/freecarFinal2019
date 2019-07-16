@@ -170,7 +170,7 @@ void  CalculateError(void)
     //eError = ((60 - disgy_AD_val[2]) / 8.0) * (dis_AD_val[0] - dis_AD_val[1]);
     //eError = getSteerPwmFromADCError();
     Error = (40 - CenterMeanValue); // 一场图像偏差值
-    if (!breakLoadFlag && !circluFlag)
+    if (!breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5))
     {
         if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20))
         {
@@ -286,6 +286,21 @@ void  CalculateError(void)
             break;
         case 11:
             Error /= 2;
+            break;
+    }
+    switch (hamperFlag)
+    {
+        case 1:
+            Error = 15;
+            break;
+        case 2:
+            Error = -13;
+            break;
+        case 3:
+            Error = -8;
+            break;
+        case 4:
+            Error = -13;
             break;
     }
     /* 
