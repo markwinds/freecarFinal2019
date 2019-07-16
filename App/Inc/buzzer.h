@@ -13,12 +13,16 @@ typedef enum
     T1L3    = 4
 } SoundType;
 
-extern int timer_check;
+extern int buzzer_timer_flag;
+extern int sound_choose;
+extern int sound_size;
+extern int sound_num;
 
 extern void initBuzzer();
 extern void openBuzzer();
 extern void closeBuzzer();
 extern void turnBuzzer();
 extern void tellMeRoadType(SoundType sound_type);
+extern void checkBuzzerShouldSpeak();
 
 #endif //_BUZZER_H_

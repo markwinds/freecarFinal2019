@@ -46,8 +46,11 @@ void closeTimer(PITn_e pitn)
     PIT_TCTRL(pitn) &= ~PIT_TCTRL_TEN_MASK; //禁止PITn定时器（用于清空计数值）
 }
 
-//定时的单位为ms
-void setFlagInTimerLong(int* p_flag, int time_long, int vaule)
+/** 
+ * 定时的单位为ms
+ * 如果定时器被占用就一直等到定时器空闲
+*/
+void setFlagInTimerLongMust(int* p_flag, int time_long, int vaule)
 {
     p_timer_flag   = p_flag;        //得到要操作的标志位的地址
     pre_timer_flag = *p_timer_flag; //保存操作之前的值
@@ -56,6 +59,21 @@ void setFlagInTimerLong(int* p_flag, int time_long, int vaule)
         ;
     timer_busy = 1;                            //占用定时器
     startTimer(PIT1, time_long * bus_clk_khz); //开始定时
+}
+
+/**
+ * 成功返回1 定时器被占用返回0
+*/
+int setFlagInTimerLongCheck(int* p_flag, int time_long, int vaule)
+{
+    if (timer_busy)
+        return 0;
+    p_timer_flag   = p_flag;                   //得到要操作的标志位的地址
+    pre_timer_flag = *p_timer_flag;            //保存操作之前的值
+    *p_timer_flag  = vaule;                    //将标志位赋值
+    timer_busy     = 1;                        //占用定时器
+    startTimer(PIT1, time_long * bus_clk_khz); //开始定时
+    return 1;
 }
 
 void resetFlagTimer()
@@ -70,4 +88,17 @@ void initTimerForFlag()
     closeTimer(PIT1);
     enable_irq(PIT1_IRQn);
     set_vector_handler(PIT1_VECTORn, resetFlagTimer);
+}
+
+void manageTimerFlag()
+{
+    /**蜂鸣器*/
+    if (buzzer_timer_flag)
+    {
+        openBuzzer();
+    }
+    else
+    {
+        closeBuzzer();
+    }
 }
