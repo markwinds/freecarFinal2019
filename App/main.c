@@ -6,7 +6,8 @@ uint8 img[CAMERA_H][CAMERA_W];
 
 uint32 temx, temy, tem1;
 int32  zbttem, blocktemp;
-float  temf = 0.23;
+float  temf         = 0.23;
+int    is_roadblock = 0;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -24,7 +25,7 @@ Screen_Data mydata[] = { //
     { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
     { "adcp", { .l = &(ADC_pid.kp) }, 1.0, 1 },
     { "adcd", { .l = &(ADC_pid.kd) }, 1.0, 1 },
-    { "tempi", { .l = &(temp_vaule) }, 10.0, 1 },
+    { "tempi", { .l = &(temp_vaule) }, 50.0, 1 },
     { "tempf", { .f = &(temp_vaule_f) }, 0.1, 2 },
     { "KP+", { .f = &(BasicP) }, 1, 2 },
     { "KD+", { .f = &(KD) }, 0.1, 2 },
@@ -57,6 +58,18 @@ void doThisEveryPeriod()
 {
     checkBuzzerShouldSpeak();
     manageTimerFlag(); //处理定时器控制的标志位
+}
+
+int judgeRoadOk()
+{
+    for (int i = 59; i > 40; i--)
+    {
+        if (img[i][40] == Black_Point)
+        {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 void HardWare_Init(void)
@@ -122,6 +135,7 @@ void main(void)
     initNVIC();
     initMotorSteer();
     initADC();
+    initUart();
     /**---------------------zbt----------------------*/
     /**---------------------yl----------------------*/
     uint8 lcd_count = 0;
@@ -130,18 +144,10 @@ void main(void)
     /**---------------------yl----------------------*/
 
     initTimerForFlag(); //这个必须放在最后初始化 zbt
+    printf("ddf");
 
     while (1)
     {
-        // if (out_road)
-        // {
-        //     setSteer(-50);
-        //     DELAY_MS(300);
-        //     setSteer(50);
-        //     DELAY_MS(300);
-        //     out_road = 0;
-        // }
-
         if (getSwitch(cameraSW))
         {                     //控制图像处理
             camera_get_img(); //（耗时13.4ms）图像采集
@@ -222,9 +228,16 @@ void main(void)
             {
                 blocktemp = BlackEndM;
             }
-            else if (blocktemp - BlackEndM > 5)
+            else if (blocktemp - BlackEndM > 5 && !is_roadblock)
             {
-                tellMeRoadType(T1L5); //判断得到路障
+                //tellMeRoadType(T1L5); //判断得到路障
+                //is_roadblock = 1;
+                setSteer(-50);
+                DELAY_MS(800);
+                setSteer(50);
+                DELAY_MS(180);
+                setFlagInTimerLongCheck(&is_roadblock, 20000, 1);
+                printf("1\n");
             }
         }
         else
@@ -232,7 +245,15 @@ void main(void)
         /***********************************UI的控制***************************************/
         if (getSwitch(steerSW)) //控制舵机开关
         {
-            if (breakLoadFlag)
+            if (is_roadblock)
+            {
+                setSteer(40);
+                if (judgeRoadOk())
+                {
+                    is_roadblock = 0;
+                }
+            }
+            else if (breakLoadFlag)
             {
                 Error       = 0;
                 int32 error = getSteerPwmFromADCError();
@@ -245,6 +266,7 @@ void main(void)
                     eleSpeed -= MySpeedSet;
                 }
             }
+
             else
             {
                 SteerControl();
@@ -256,7 +278,13 @@ void main(void)
         }
         if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
         {
-            MotorControl();
+            if (is_roadblock)
+            {
+                setSpeedLeft(1500);
+                setSpeedRight(1500);
+            }
+            else
+                MotorControl();
         }
 
         if (getSwitch(mainShowSW)) //控制DeBug显示

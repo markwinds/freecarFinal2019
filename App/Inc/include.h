@@ -66,5 +66,6 @@
 
 #include "timer.h" //用于flag计时的定时器
 #include "NVIC.h"  //中断优先级的确定
+#include "uart.h"  //串口
 
 #endif //__INCLUDE_H__
