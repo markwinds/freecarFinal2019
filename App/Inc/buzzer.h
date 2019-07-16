@@ -6,11 +6,11 @@
 
 typedef enum
 {
-    T2L11   = 0,
-    T1L5    = 1,
+    T2L33   = 0,
+    T1L2    = 1,
     T0L0    = 2,
-    T4L1515 = 3,
-    T1L3    = 4
+    T4L4242 = 3,
+    T1L5    = 4
 } SoundType;
 
 extern int buzzer_timer_flag;

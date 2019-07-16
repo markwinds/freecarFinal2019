@@ -224,7 +224,7 @@ void main(void)
             }
             else if (blocktemp - BlackEndM > 5)
             {
-                tellMeRoadType(T1L3); //判断得到路障
+                tellMeRoadType(T1L5); //判断得到路障
             }
         }
         else
