@@ -1,4 +1,4 @@
-function CloseUart%ï¿½Ø±Õ´ï¿½ï¿½ï¿½
+function CloseUart%¹Ø±Õ´®¿Ú
     global s;
     fclose(s);
     delete(s);

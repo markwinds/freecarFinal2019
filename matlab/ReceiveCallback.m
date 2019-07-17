@@ -1,17 +1,27 @@
-function ReceiveCallback( obj,event)     %ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ 
+function ReceiveCallback( obj,event)     %´´½¨ÖÐ¶ÏÏìÓ¦º¯Êý 
     global str_data s x h;
-    temp_str=fscanf(s,'%s');%ï¿½ï¿½È¡ï¿½Ö·ï¿½ï¿½ï¿½
-    str_data=[str_data,temp_str];%Æ´ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
-    for i= 1:length(str_data)-6
-        if str_data(i)=='@'
-            if str_data(i+5)=='#'
-                y=str2num(str_data(i+1:i+4));
-                x=x+0.1;
-                addpoints(h,x,y);
-                drawnow;
-            end
+%     temp_str=fscanf(s,'%s');%¶ÁÈ¡×Ö·û´®
+%     str_data=[str_data,temp_str];%Æ´½Ó×Ö·û´®
+%     for i= 1:length(str_data)-6
+%         if str_data(i)=='@'
+%             if str_data(i+5)=='#'
+%                 y=str2num(str_data(i+1:i+4));
+%                 x=x+0.1;
+%                 addpoints(h,x,y);
+%                 drawnow;
+%             end
+%         end
+%     end
+%     str_data=str_data(length(str_data)-5:length(str_data));
+%     disp(str_data);
+    str=fscanf(s,'%s');
+    display(str);
+    x=x+0.1;
+    if length(str)==6 && str(6)=='#'
+        if (str(1)=='@')
+            y=str2num(str(2:5));
+            addpoints(h,x,y);
+            drawnow;
         end
     end
-    str_data=str_data(length(str_data)-5:length(str_data));
-    disp(str_data);
 end

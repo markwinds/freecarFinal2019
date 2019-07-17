@@ -1,32 +1,32 @@
 
-%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-global s h x;
+%±äÁ¿µÄÉùÃ÷
+global s h x fuck;
 
-delete(instrfindall); %%ï¿½Ø±ï¿½Ã»ï¿½ÃµÄ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òª
+delete(instrfindall); %%¹Ø±ÕÃ»ÓÃµÄ£¬Õâ¾äºÜÖØÒª
 
-%ï¿½Â½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½
-s=serial('COM9','BaudRate',115200); 
-set(s,'inputBufferSize',1024000); %ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª1M
+%ÐÂ½¨´®¿Ú¶ÔÏó
+s=serial('COM11','BaudRate',115200); 
+set(s,'inputBufferSize',1024000); %ÉèÖÃÊäÈë»º³åÇøÓòÎª1M
 
- %ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
- set(s,'BytesAvailableFcnMode','byte');%ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
- set(s,'BytesAvailableFcnCount',10);%ï¿½ï¿½ï¿½ï¿½ï¿½Õ¶Ë´ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ïµ½10ï¿½ï¿½ï¿½Ö½Ú£ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½Ð¶Ï£ï¿½ï¿½ï¿½ï¿½Ã»Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½
- s.BytesAvailableFcn=@ReceiveCallback;%ReceiveCallbackï¿½ï¿½ï¿½Ð¶ÏµÄ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Ä¡ï¿½ÏµÍ³ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½Îªinstrcallback;
+ %´®¿ÚÊÂ¼þ»Øµ÷ÉèÖÃ
+ set(s,'BytesAvailableFcnMode','byte');%ÉèÖÃÖÐ¶ÏÏìÓ¦º¯Êý¶ÔÏó
+ set(s,'BytesAvailableFcnCount',10);%ÉèÖÃÖÕ¶Ë´¥·¢·½Ê½ ÈçÉè¶¨»º´æÇøÓò´ïµ½10¸ö×Ö½Ú£¬¾Í´¥·¢ÖÐ¶Ï£¬µ÷ÓÃ»Øµ÷º¯Êý£¬½øÐÐ´¦Àí¡£
+ s.BytesAvailableFcn=@ReceiveCallback;%ReceiveCallbackÊÇÖÐ¶ÏµÄ´¥·¢º¯Êý£¬ÕâÀïÎÒÊÇ×Ô¶¨ÒåµÄ¡£ÏµÍ³µÄ»Øµ÷º¯ÊýÎªinstrcallback;
 
-%ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+%³¢ÊÔ´ú¿ª´®¿Ú
 try
-  fopen(s);  %ï¿½ò¿ª´ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½
+  fopen(s);  %´ò¿ª´®¿Ú¶ÔÏó
 catch err
-  fclose(instrfind);  %ï¿½Ø±Õ±ï¿½Õ¼ï¿½ÃµÄ´ï¿½ï¿½ï¿½
-  error('ï¿½ï¿½È·ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½Ä´ï¿½ï¿½ï¿½');  %ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
+  fclose(instrfind);  %¹Ø±Õ±»Õ¼ÓÃµÄ´®¿Ú
+  error('ÇëÈ·ÈÏÑ¡ÔñÁËÕýÈ·µÄ´®¿Ú');  %Êä³ö´íÎóÌáÊ¾
 end
 
-% -------------------------------------ï¿½ï¿½ï¿½ï¿½Ì¬Í¼-----------------------------------------
-h = animatedline;  %ï¿½ï¿½ï¿½ï¿½ï¿½Õ°×¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½
-%axis([0 40 5 30])  %ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Î§
+% -------------------------------------»­¶¯Ì¬Í¼-----------------------------------------
+h = animatedline;  %´´½¨¿Õ°×¶¯Ì¬ÇúÏß
+%axis([0 40 5 30])  %ÉèÖÃ×ø±êÏµ·¶Î§
 %x = linspace(0,40,800);
-xlabel('Ê±ï¿½ï¿½');
-ylabel('ï¿½Ù¶ï¿½');
+xlabel('Ê±¼ä');
+ylabel('ËÙ¶È');
 x=0;
 % for k = 1:length(x)
 %     y = (fscanf(arduino,'%d')/100.0);
@@ -40,7 +40,7 @@ while(1)
     
 end
  
- %data=fread(s)%ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ fwriteï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ ï¿½ï¿½Ó¦ï¿½Ä±ï¿½ï¿½ï¿½fscanf ï¿½ï¿½fpintf
+ %data=fread(s)%¶ÁÈ¡¶þ½øÖÆ×Ö½Ú fwrite¶þ½øÖÆÐ´Èë ÏàÓ¦ÎÄ±¾ÓÃfscanf ºÍfpintf
 
 
 
