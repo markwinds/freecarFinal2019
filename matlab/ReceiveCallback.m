@@ -1,8 +1,7 @@
-function ReceiveCallback( obj,event)     %´´½¨ÖĞ¶ÏÏìÓ¦º¯Êı 
-<<<<<<< HEAD
+function ReceiveCallback( obj,event)     %ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ 
     global str_data s x h;
-    temp_str=fscanf(s,'%s');%¶ÁÈ¡×Ö·û´®
-    str_data=[str_data,temp_str];%Æ´½Ó×Ö·û´®
+    temp_str=fscanf(s,'%s');%ï¿½ï¿½È¡ï¿½Ö·ï¿½ï¿½ï¿½
+    str_data=[str_data,temp_str];%Æ´ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
     for i= 1:length(str_data)-6
         if str_data(i)=='@'
             if str_data(i+5)=='#'
@@ -15,9 +14,4 @@ function ReceiveCallback( obj,event)     %´´½¨ÖĞ¶ÏÏìÓ¦º¯Êı
     end
     str_data=str_data(length(str_data)-5:length(str_data));
     disp(str_data);
-=======
-    global str_data s;
-    fscanf(s,"%s")
-
->>>>>>> å†™è·¯éšœ
 end

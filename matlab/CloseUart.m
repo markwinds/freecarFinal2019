@@ -1,10 +1,7 @@
-function CloseUart%¹Ø±Õ´®¿Ú
+function CloseUart%ï¿½Ø±Õ´ï¿½ï¿½ï¿½
     global s;
     fclose(s);
     delete(s);
     clear s;
-<<<<<<< HEAD
     clear all;
-=======
->>>>>>> å†™è·¯éšœ
 end

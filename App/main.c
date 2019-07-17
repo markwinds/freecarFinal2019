@@ -5,9 +5,10 @@ uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
 uint32 temx, temy, tem1;
-int32  zbttem, blocktemp;
+int32  zbttem;
 float  temf         = 0.23;
 int    is_roadblock = 0;
+int    stopSpeed    = 0;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -29,6 +30,10 @@ Screen_Data mydata[] = { //
     { "tempf", { .f = &(temp_vaule_f) }, 0.1, 2 },
     { "KP+", { .f = &(BasicP) }, 1, 2 },
     { "KD+", { .f = &(KD) }, 0.1, 2 },
+    { "moKP", { .f = &(SpeedP) }, 1, 2 },
+    { "moKP+", { .f = &(SpeedP) }, 10, 2 },
+    { "moKD", { .f = &(SpeedD) }, 1, 2 },
+    { "moKI", { .f = &(SpeedI) }, 0.01, 2 },
     { "end", NULL, 0, 0 }
 };
 
@@ -281,6 +286,11 @@ void main(void)
         }
         if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
         {
+            if (stopSpeed)
+            {
+                MySpeedSet = stopSpeed;
+                stopSpeed  = 0;
+            }
             if (is_roadblock)
             {
                 setSpeedLeft(1500);
@@ -288,6 +298,16 @@ void main(void)
             }
             else
                 MotorControl();
+        }
+        else
+        {
+            if (!stopSpeed)
+            {
+                stopSpeed  = MySpeedSet + stopSpeed;
+                MySpeedSet = stopSpeed - MySpeedSet;
+                stopSpeed  = stopSpeed - MySpeedSet;
+            }
+            MotorControl();
         }
 
         if (getSwitch(mainShowSW)) //控制DeBug显示
