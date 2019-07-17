@@ -245,7 +245,7 @@ void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
     SpeedPerErrorL  = SpeedLastErrorL;                     //上上次
     SpeedLastErrorL = SpeedErrorL;                         //上次
     SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
-    printf("@%04d#\n", GetLeftMotorPules);
+    printf("@%04d#\r\n", GetLeftMotorPules);
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;

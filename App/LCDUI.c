@@ -363,7 +363,7 @@ Lcd_State* showADCVauleDown(Lcd_State* pThis)
 Lcd_State* showADCVauleLeft(Lcd_State* pThis)
 {
     writeADCParamToFlash();
-    tellMeRoadType(T4L1515);
+    tellMeRoadType(T4L4242);
     return pThis;
 }
 

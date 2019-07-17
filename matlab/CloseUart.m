@@ -3,5 +3,8 @@ function CloseUart%¹Ø±Õ´®¿Ú
     fclose(s);
     delete(s);
     clear s;
+<<<<<<< HEAD
     clear all;
+=======
+>>>>>>> å†™è·¯éšœ
 end

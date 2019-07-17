@@ -7,7 +7,7 @@ int32 ADC_max_vaule[5]         = { 0 };
 int32 ADC_normal_vaule[5]      = { 0 };
 int32 last_ADC_normal_vaule[5] = { 0 };
 int   steer_offset             = 0;
-int32 temp_vaule               = 200;
+int32 temp_vaule               = 400;
 float temp_vaule_f             = 2.4;
 
 /****************************************flash操作***********************************************/

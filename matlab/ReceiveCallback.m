@@ -1,4 +1,5 @@
 function ReceiveCallback( obj,event)     %´´½¨ÖĞ¶ÏÏìÓ¦º¯Êı 
+<<<<<<< HEAD
     global str_data s x h;
     temp_str=fscanf(s,'%s');%¶ÁÈ¡×Ö·û´®
     str_data=[str_data,temp_str];%Æ´½Ó×Ö·û´®
@@ -14,4 +15,9 @@ function ReceiveCallback( obj,event)     %´´½¨ÖĞ¶ÏÏìÓ¦º¯Êı
     end
     str_data=str_data(length(str_data)-5:length(str_data));
     disp(str_data);
+=======
+    global str_data s;
+    fscanf(s,"%s")
+
+>>>>>>> å†™è·¯éšœ
 end
