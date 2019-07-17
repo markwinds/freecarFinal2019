@@ -25,7 +25,7 @@ void NormalCrossConduct(void)
     LastCrossFlag     = CrossFlag;     //记录上一次是否是十字
     CrossFlag         = 0;             //清零
 
-    if ((AllLose >= 15)) //左右同时丢线
+    if ((AllLose >= 10)) //左右同时丢线
     {
         CrossFlag = 1; //标记十字
     }

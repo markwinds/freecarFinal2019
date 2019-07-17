@@ -5,7 +5,7 @@ uint8 imgbuff[CAMERA_SIZE]; //定义存储接收图像的数组
 uint8 img[CAMERA_H][CAMERA_W];
 
 uint32 temx, temy, tem1;
-int32  zbttem, blocktemp;
+int32  zbttem;
 float  temf = 0.23;
 
 //函数声明
@@ -48,6 +48,7 @@ Screen_Data debug_window[] = {
     { "blrr", { .i = &(BlackEndR) }, 0, 3 },
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "cir", { .c = &(circluFlag) }, 0, 4 },
+    { "hamper", { .c = &(hamperFlag) }, 0, 4 },
     { "cirlose", { .c = &(circlulose) }, 0, 4 },
     { "end", NULL, 0, 0 }
 };
@@ -96,6 +97,7 @@ void HardWare_Init(void)
 
     screen_data = mydata;
     dvarious    = debug_window;
+
     UI_INIT();
 
     adc_init(ADC0_DP0); //ADC初始化1
@@ -196,24 +198,12 @@ void main(void)
         //temx = adc_once(ADC0_DP0, ADC_10bit);
         //temy = adc_once(ADC0_DM1, ADC_10bit);
         CircluSearch();
+
         if (LK_jishi_flag && BlackEndM > 10)
         {
             star_line_judg();
         }
-
-        if (!circluFlag && BlackEndM < 50 && abs(BlackEndM - BlackEndML) < 2 && abs(BlackEndM - BlackEndMR) < 2)
-        {
-            if (!blocktemp)
-            {
-                blocktemp = BlackEndM;
-            }
-            else if (blocktemp - BlackEndM > 5)
-            {
-                tellMeRoadType(T1L3);
-            }
-        }
-        else
-            blocktemp = 0;
+        HamperSearch();
 
         if (getSwitch(steerSW)) //控制舵机开关
         {

@@ -54,19 +54,19 @@ unsigned int  StartRow                       = 0;
 unsigned int  StartCol                       = 0;
 unsigned char MilldleBlack                   = 0;
 unsigned int  LoopTop                        = 0;
-uint8         circluFlag                     = 0;
-unsigned int  LoopRightBorderLose            = 0;
-unsigned int  LoopLeftBorderLose             = 0;
-int           LoopBorttomFlag                = 0;
-int           LoopBorttomRow                 = 0;
-int           LoopMilldleRow                 = 0;
-unsigned int  LoopMilldleFlag                = 0;
-unsigned int  LoopTopRow                     = 0;
-unsigned int  LoopLeft                       = 0;
-unsigned int  MilldlePonit                   = 0;
-unsigned int  LoopRight                      = 0;
-unsigned int  LoopRightR                     = 0;
-unsigned int  LoopLeftL                      = 0;
+uint8         circluFlag = 0, hamperFlag = 0;
+unsigned int  LoopRightBorderLose = 0;
+unsigned int  LoopLeftBorderLose  = 0;
+int           LoopBorttomFlag     = 0;
+int           LoopBorttomRow      = 0;
+int           LoopMilldleRow      = 0;
+unsigned int  LoopMilldleFlag     = 0;
+unsigned int  LoopTopRow          = 0;
+unsigned int  LoopLeft            = 0;
+unsigned int  MilldlePonit        = 0;
+unsigned int  LoopRight           = 0;
+unsigned int  LoopRightR          = 0;
+unsigned int  LoopLeftL           = 0;
 int           BigLoopLeftUp[60];
 int           BigLoopRightUp[60];
 int           BigLooptUp[80];
@@ -75,7 +75,7 @@ unsigned int  RightUpExitFlag = 0;
 unsigned int  ExitFlag        = 0;
 unsigned int  LeftExitFlag    = 0;
 unsigned int  RightExitFlag   = 0;
-;
+
 unsigned char ClearLoopControlFlag           = 0;
 unsigned char LoopRightControlFlag           = 0;
 unsigned char LoopLeftControlFlag            = 0;
@@ -197,9 +197,12 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i] != 0 && RightEdge[i] == ColumnMax) //丢了右线
         {
-            RightLose++; //记录只有右线丢的数量
-
-            if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
+            RightLose++;         //记录只有右线丢的数量
+            if (i == RowMax - 1) //如果是首行就以图像中心作为中点
+            {
+                MiddleLine[i] = MidPri;
+            }
+            else if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
             {
                 MiddleLine[i] = MiddleLine[i + 1]; //用上一行的中点
             }
@@ -210,7 +213,11 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i] == 0 && RightEdge[i] != ColumnMax) //丢了左线
         {
-            if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
+            if (i == RowMax - 1) //如果是首行就以图像中心作为中点
+            {
+                MiddleLine[i] = MidPri;
+            }
+            else if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
             {
                 MiddleLine[i] = MiddleLine[i + 1]; //用上一行
             }
@@ -221,7 +228,7 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i] == 0 && RightEdge[i] == ColumnMax) //两边都丢了的话
         {
-            AllLose++;
+            //AllLose++;
 
             if (i == RowMax - 1) //如果是首行就以图像中心作为中点
             {
@@ -1573,6 +1580,62 @@ void  CircluSearch()
         }
     }
 }
+uint8  blocktemp;
+uint16 hampervec;
+void   HamperSearch()
+{
+    if (!hamperFlag && !breakLoadFlag)
+    {
+        if (!circluFlag && BlackEndM < 45 && BlackEndM > 30 && abs(BlackEndM - BlackEndML) < 2 && abs(BlackEndM - BlackEndMR) < 2)
+        {
+            if (!blocktemp)
+            {
+                blocktemp = BlackEndM;
+            }
+            else if (blocktemp - BlackEndM > 2)
+            {
+                hamperFlag = 1;
+                hampervec  = MySpeedSet >> 2;
+                MySpeedSet -= hampervec << 1;
+                //tellMeRoadType(T1L3);
+            }
+        }
+        else
+            blocktemp = 0;
+    }
+    else if (hamperFlag)
+    {
+        int i, j;
+        if (hamperFlag == 1 && BlackEndM + BlackEndL + BlackEndR < 2)
+        {
+            for (i = RowMax - 1; i > 50; i--)
+            {
+                if (img[i][ColumnMax - 1] == White_Point)
+                {
+                    return;
+                }
+            }
+            MySpeedSet += hampervec;
+            hamperFlag = 4;
+        }
+        else if (hamperFlag == 2 && 0)
+        {
+            MySpeedSet -= hampervec;
+            hamperFlag = 3;
+        }
+        else if (hamperFlag == 3 && j > RowMax - 5)
+        {
+            MySpeedSet += hampervec;
+            hamperFlag = 4;
+        }
+        else if (hamperFlag == 4 && BlackEndM > 10)
+        {
+            MySpeedSet += hampervec;
+            hamperFlag = 5;
+        }
+    }
+}
+
 uint8 star_lineflag = 0;
 void  star_line_judg() //起跑线检测
 {
