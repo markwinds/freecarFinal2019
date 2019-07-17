@@ -197,9 +197,12 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i] != 0 && RightEdge[i] == ColumnMax) //丢了右线
         {
-            RightLose++; //记录只有右线丢的数量
-
-            if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
+            RightLose++;         //记录只有右线丢的数量
+            if (i == RowMax - 1) //如果是首行就以图像中心作为中点
+            {
+                MiddleLine[i] = MidPri;
+            }
+            else if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
             {
                 MiddleLine[i] = MiddleLine[i + 1]; //用上一行的中点
             }
@@ -210,7 +213,11 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i] == 0 && RightEdge[i] != ColumnMax) //丢了左线
         {
-            if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
+            if (i == RowMax - 1) //如果是首行就以图像中心作为中点
+            {
+                MiddleLine[i] = MidPri;
+            }
+            else if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
             {
                 MiddleLine[i] = MiddleLine[i + 1]; //用上一行
             }
@@ -221,7 +228,7 @@ void SearchCenterBlackline(void)
         }
         else if (LeftEdge[i] == 0 && RightEdge[i] == ColumnMax) //两边都丢了的话
         {
-            AllLose++;
+            //AllLose++;
 
             if (i == RowMax - 1) //如果是首行就以图像中心作为中点
             {
@@ -1579,13 +1586,13 @@ void   HamperSearch()
 {
     if (!hamperFlag && !breakLoadFlag)
     {
-        if (!circluFlag && BlackEndM < 50 && abs(BlackEndM - BlackEndML) < 2 && abs(BlackEndM - BlackEndMR) < 2)
+        if (!circluFlag && BlackEndM < 45 && BlackEndM > 30 && abs(BlackEndM - BlackEndML) < 2 && abs(BlackEndM - BlackEndMR) < 2)
         {
             if (!blocktemp)
             {
                 blocktemp = BlackEndM;
             }
-            else if (blocktemp - BlackEndM > 3)
+            else if (blocktemp - BlackEndM > 2)
             {
                 hamperFlag = 1;
                 hampervec  = MySpeedSet >> 2;

@@ -5,7 +5,7 @@
 /*********define for SteerControl**********/
 
 float  KP          = 0.0; //舵机方向比例系数，影响舵机的打角范围
-float  KD          = 5;   //10//7.5//16.4//舵机方向微分系数,影响舵机的打角反应
+float  KD          = 5.5; //10//7.5//16.4//舵机方向微分系数,影响舵机的打角反应
 float  SteerPwmAdd = 0.0; //舵机pwm增量
 float  Error;             //偏差值
 float  LastError;         //上次的偏差
@@ -13,7 +13,7 @@ float  WeightSum       = 0;
 float  CenterMeanValue = 0;
 float  CenterSum       = 0;
 float  J               = 0.0290;       //调节p和偏差的关系，越大，作用越强
-float  BasicP          = 1;            //基本的P值
+float  BasicP          = 2.4;          //基本的P值
 uint32 SteerPwm = 0, LastSteerSwm = 0; //舵机的pwm值和上次舵机的pwm值
 
 int judge_road_black_num   = 2;
