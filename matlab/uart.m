@@ -5,7 +5,7 @@ global my_uart x  line1 line2;
 delete(instrfindall); %删除一些没用的设备，这个很重要
 
 %设置串口的属性
-my_uart=serial('COM9','BaudRate',115200); 
+my_uart=serial('COM11','BaudRate',115200); 
 set(my_uart,'inputBufferSize',1024000); %设置缓存为1M
 
  %设置回调函数（相当于中断处理函数）
@@ -32,16 +32,11 @@ x=0;
 
 while(1)
     cmd=input('command:');
-    fprintf(my_uart,'%s\n',cmd);
+    fprintf(my_uart,'%s#',cmd);
 end
  
 
 
 
-
-
-
-h=input('haha');
-h
 
 
