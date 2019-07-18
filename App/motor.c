@@ -124,7 +124,7 @@ void  PIT0_IRQHandler()
                 LK_jishi      = 2000;
             }
         }
-        else
+        else //出赛道停跑
         {
             if (!dis_AD_val[0] && !dis_AD_val[1] && !dis_AD_val[2])
             {
@@ -241,17 +241,15 @@ void GetTargetSpeed(void)
 #endif
 
 //计算速度偏差
-
+int  sendArray[2];
 void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
 {
     SpeedPerErrorL  = SpeedLastErrorL;                     //上上次
     SpeedLastErrorL = SpeedErrorL;                         //上次
     SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
-    if (send_speed)
-    {
-        printf("@%04d#\r\n", GetLeftMotorPules);
-        printf("$%04d#\r\n", (int)LeftMotorTarget);
-    }
+    sendArray[0]    = GetLeftMotorPules;
+    sendArray[1]    = (int)LeftMotorTarget;
+    vcan_sendware(sendArray, sizeof(sendArray));
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;
