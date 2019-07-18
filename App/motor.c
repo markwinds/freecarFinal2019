@@ -122,7 +122,7 @@ void  PIT0_IRQHandler()
                 LK_jishi      = 2000;
             }
         }
-        else
+        else //出赛道停跑
         {
             if (!dis_AD_val[0] && !dis_AD_val[1] && !dis_AD_val[2])
             {
@@ -264,13 +264,13 @@ void MotorControl(void)
     MotorPwmLeft = (int)(MotorPwmL);
     if (MotorPwmLeft <= -1390)
         MotorPwmLeft = -1390;
-    else if (MotorPwmLeft >= 2990)
-        MotorPwmLeft = 2990;
+    else if (MotorPwmLeft >= 6990)
+        MotorPwmLeft = 6990;
 
     if (MotorPwmRight <= -1390)
         MotorPwmRight = -1390;
-    else if (MotorPwmRight >= 2990)
-        MotorPwmRight = 2990;
+    else if (MotorPwmRight >= 6990)
+        MotorPwmRight = 6990;
 
     if (MotorPwmLeft > 0)
     {
