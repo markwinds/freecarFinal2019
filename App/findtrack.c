@@ -1605,7 +1605,7 @@ void   HamperSearch()
     }
     else if (hamperFlag)
     {
-        int i, j=0;
+        int i, j = 0;
         if (hamperFlag == 1 && BlackEndM + BlackEndL + BlackEndR < 2)
         {
             for (i = RowMax - 1; i > 50; i--)
@@ -1666,6 +1666,7 @@ void  star_line_judg() //起跑线检测
     if (baihei_flag >= 4 && heibai_flag >= 4 && baihei_flag - heibai_flag <= 2)
         star_lineflag = 1;
 }
+
 uint8 JudgeConnect(uint8 left, uint8 right)
 {
     float e = (right - left) / ColumnMax, val = left;

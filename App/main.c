@@ -158,6 +158,8 @@ void main(void)
 
         CircluSearch(); //圆环识别
 
+        HamperSearch(); //路障识别
+
         if (LK_jishi_flag && BlackEndM > 10) //起跑线检测
         {
             star_line_judg();
@@ -242,7 +244,7 @@ void main(void)
             }
         }
 
-        /********************************************************/
+        /******************************电磁**************************/
         if (getSwitch(ADCSW)) //电磁采集的显示
         {
             LCD_clear(WHITE);
