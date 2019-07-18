@@ -8,8 +8,8 @@ uint32 temx, temy, tem1;
 int32  zbttem;
 float  temf         = 0.23;
 int    is_roadblock = 0;
-int    stopSpeed    = 0;
-int32  actualSpeed  = 10;
+int    stopSpeed = 0, actualSpeed = 10;
+
 //函数声明
 void PORTA_IRQHandler();
 void DMA0_IRQHandler();
@@ -18,6 +18,7 @@ void PIT0_IRQHandler();
 void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
+//可以调控的ui
 Screen_Data mydata[] = { //
     { "speed", { .l = &(actualSpeed) }, 1.0, 1 },
     { "eleSpe", { .l = &(eleSpeed) }, 1.0, 1 },
@@ -37,6 +38,7 @@ Screen_Data mydata[] = { //
     { "end", NULL, 0, 0 }
 };
 
+//用于查看的ui
 int         block          = 0;
 Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
@@ -71,18 +73,7 @@ void doThisEveryPeriod()
     }
 }
 
-int judgeRoadOk()
-{
-    for (int i = 59; i > 40; i--)
-    {
-        if (img[i][40] == Black_Point)
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
+//硬件初始化
 void HardWare_Init(void)
 {
     DisableInterrupts;
@@ -143,119 +134,43 @@ void HardWare_Init(void)
 
 void main(void)
 {
+    //初始化
     /**---------------------zbt----------------------*/
     initNVIC();
     initMotorSteer();
     initADC();
     initUart();
-    /**---------------------zbt----------------------*/
     /**---------------------yl----------------------*/
     uint8 lcd_count = 0;
     HardWare_Init();
     InitEM();
-    /**---------------------yl----------------------*/
+    /**----------------------------------------------*/
 
     initTimerForFlag(); //这个必须放在最后初始化 zbt
 
     while (1)
     {
-
-        if (getSwitch(cameraSW))
-        {                     //控制图像处理
-            camera_get_img(); //（耗时13.4ms）图像采集
-            img_extract(img, imgbuff);
-            GetBlackEndParam(); //获取黑线截止行
-            SearchCenterBlackline();
-            if (!circluFlag)
+        if (getSwitch(cameraSW)) //控制图像处理
+        {
+            camera_get_img();          //（耗时13.4ms）图像采集
+            img_extract(img, imgbuff); //解压 图像
+            GetBlackEndParam();        //获取黑线截止行
+            SearchCenterBlackline();   //搜边线
+            if (!circluFlag)           //十字优化
             {
                 NormalCrossConduct();
             }
-#if LoopOpen
-            LoopFlag = 0; //环路清标志
-
-            if (MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && CloseLoopFlag == 0) //进了环道或者十字，关掉圆环处理
-            {
-                FindInflectionPoint(); //寻找拐点
-                FindLoopExit();
-                LoopControl();
-                LoopRepair();
-            }
-
-            if (MotivateLoopDlayFlagL || MotivateLoopDlayFlagR)
-            {
-                LoopExitRepair(); //出口处理
-            }
-            if (LoopRightControlFlag == 0 && LoopLeftControlFlag == 0 && MotivateLoopDlayFlagL == 0 && MotivateLoopDlayFlagR == 0 && LoopFlag == 0)
-            {
-                NormalCrossConduct();
-            }
-#endif
-
-#if ObstacleOpen //如果不需要避障碍，将这个宏定义置0即可
-
-            RecognitionObstacle();
-#endif
         }
-        /*
-                    if (BlackEndM < 35 && BlackEndM > 28 && BlackEndML - BlackEndM < 3 && BlackEndM - BlackEndMR < 3 && BlackEndM >= BlackEndMR && BlackEndML >= BlackEndM && !DisconnectFlag)
-                    {
-                        DisconnectFlag = 1; //断路识别
-                    }
-                    else if (DisconnectFlag == 1 && BlackEndM < 10)
-                    {
-                        DisconnectFlag = 2;
-                    }
-                    else if (DisconnectFlag == 2 && BlackEndM > 40)
-                    {
-                        DisconnectFlag = 0;
-                    }*/
 
-        /* if ((disgy_AD_val[0] > 95 || disgy_AD_val[1] > 95) && disgy_AD_val[2] > 95)
-                    {
-                        uint8 a, b;
-                        a = adc_once(ADC0_DP0, ADC_10bit);
-                        b = adc_once(ADC0_DM1, ADC_10bit);
-                        if (a > 100 && a > b)
-                        {
-                            //左环
-                            temx = 1;
-                        }
-                        else if (b > 100 && b > a)
-                        {
-                            //右环
-                            temy = 1;
-                        }
-                    }*/
-        //temx = adc_once(ADC0_DP0, ADC_10bit);
-        //temy = adc_once(ADC0_DM1, ADC_10bit);
-        //CircluSearch();
+        CircluSearch(); //圆环识别
 
-        if (LK_jishi_flag && BlackEndM > 10)
+        if (LK_jishi_flag && BlackEndM > 10) //起跑线检测
         {
             star_line_judg();
         }
 
-        // if (!circluFlag && BlackEndM < 50 && abs(BlackEndM - BlackEndML) < 2 && abs(BlackEndM - BlackEndMR) < 2)
-        // {
-        //     if (!blocktemp)
-        //     {
-        //         blocktemp = BlackEndM;
-        //     }
-        //     else if (blocktemp - BlackEndM > 5 && !is_roadblock)
-        //     {
-        //         //tellMeRoadType(T1L5); //判断得到路障
-        //         //is_roadblock = 1;
-        //         setSteer(-50);
-        //         DELAY_MS(800);
-        //         setSteer(50);
-        //         DELAY_MS(180);
-        //         setFlagInTimerLongCheck(&is_roadblock, 20000, 1);
-        //         printf("1\n");
-        //     }
-        // }
-        // else
-        //     blocktemp = 0;
         /***********************************UI的控制***************************************/
+        /*****************************舵机***************************/
         if (getSwitch(steerSW)) //控制舵机开关
         {
             if (is_roadblock)
@@ -279,7 +194,6 @@ void main(void)
                     eleSpeed -= MySpeedSet;
                 }
             }
-
             else
             {
                 SteerControl();
@@ -290,6 +204,7 @@ void main(void)
             ftm_pwm_duty(FTM0, FTM_CH6, SteerMidle); //舵机pwm更新
         }
 
+        /***************************电机*****************************/
         if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
         {
             if (stopSpeed)
@@ -319,6 +234,7 @@ void main(void)
             MotorControl();
         }
 
+        /*************************显示*******************************/
         if (getSwitch(mainShowSW)) //控制DeBug显示
         {
             //ftm_pwm_duty(FTM0, FTM_CH6, tem1);
@@ -344,6 +260,8 @@ void main(void)
                 lcd_count++;
             }
         }
+
+        /********************************************************/
         if (getSwitch(ADCSW)) //电磁采集的显示
         {
             LCD_clear(WHITE);
@@ -353,11 +271,12 @@ void main(void)
             showTrueError();
             //DELAY_MS(500);
         }
-        /***********************************UI的控制***************************************/
-        doThisEveryPeriod();
+        /***********************************UI的控制的结尾***************************************/
+        doThisEveryPeriod(); //不知道干嘛的
     }
 }
 
+//下面是山外摄像头中断配置
 void PORTA_IRQHandler()
 {
     uint8  n; //引脚号

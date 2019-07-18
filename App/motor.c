@@ -124,7 +124,7 @@ void  PIT0_IRQHandler()
                 LK_jishi      = 2000;
             }
         }
-        else
+        else //出赛道停跑
         {
             if (!dis_AD_val[0] && !dis_AD_val[1] && !dis_AD_val[2])
             {
