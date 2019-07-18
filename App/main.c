@@ -9,7 +9,7 @@ int32  zbttem;
 float  temf         = 0.23;
 int    is_roadblock = 0;
 int    stopSpeed    = 0;
-
+int32  actualSpeed  = 10;
 //函数声明
 void PORTA_IRQHandler();
 void DMA0_IRQHandler();
@@ -19,7 +19,7 @@ void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
 Screen_Data mydata[] = { //
-    { "speed", { .l = &(MySpeedSet) }, 1.0, 1 },
+    { "speed", { .l = &(actualSpeed) }, 1.0, 1 },
     { "eleSpe", { .l = &(eleSpeed) }, 1.0, 1 },
     { "KP", { .f = &(BasicP) }, 0.1, 2 },
     { "KD", { .f = &(KD) }, 0.01, 2 },
@@ -64,6 +64,11 @@ void doThisEveryPeriod()
 {
     checkBuzzerShouldSpeak();
     manageTimerFlag(); //处理定时器控制的标志位
+    if (uart4_to_do_flag)
+    {
+        uart4_to_do_flag = 0;
+        analysisCommand();
+    }
 }
 
 int judgeRoadOk()
@@ -154,6 +159,7 @@ void main(void)
 
     while (1)
     {
+
         if (getSwitch(cameraSW))
         {                     //控制图像处理
             camera_get_img(); //（耗时13.4ms）图像采集
@@ -191,38 +197,38 @@ void main(void)
 #endif
         }
         /*
-            if (BlackEndM < 35 && BlackEndM > 28 && BlackEndML - BlackEndM < 3 && BlackEndM - BlackEndMR < 3 && BlackEndM >= BlackEndMR && BlackEndML >= BlackEndM && !DisconnectFlag)
-            {
-                DisconnectFlag = 1; //断路识别
-            }
-            else if (DisconnectFlag == 1 && BlackEndM < 10)
-            {
-                DisconnectFlag = 2;
-            }
-            else if (DisconnectFlag == 2 && BlackEndM > 40)
-            {
-                DisconnectFlag = 0;
-            }*/
+                    if (BlackEndM < 35 && BlackEndM > 28 && BlackEndML - BlackEndM < 3 && BlackEndM - BlackEndMR < 3 && BlackEndM >= BlackEndMR && BlackEndML >= BlackEndM && !DisconnectFlag)
+                    {
+                        DisconnectFlag = 1; //断路识别
+                    }
+                    else if (DisconnectFlag == 1 && BlackEndM < 10)
+                    {
+                        DisconnectFlag = 2;
+                    }
+                    else if (DisconnectFlag == 2 && BlackEndM > 40)
+                    {
+                        DisconnectFlag = 0;
+                    }*/
 
         /* if ((disgy_AD_val[0] > 95 || disgy_AD_val[1] > 95) && disgy_AD_val[2] > 95)
-            {
-                uint8 a, b;
-                a = adc_once(ADC0_DP0, ADC_10bit);
-                b = adc_once(ADC0_DM1, ADC_10bit);
-                if (a > 100 && a > b)
-                {
-                    //左环
-                    temx = 1;
-                }
-                else if (b > 100 && b > a)
-                {
-                    //右环
-                    temy = 1;
-                }
-            }*/
+                    {
+                        uint8 a, b;
+                        a = adc_once(ADC0_DP0, ADC_10bit);
+                        b = adc_once(ADC0_DM1, ADC_10bit);
+                        if (a > 100 && a > b)
+                        {
+                            //左环
+                            temx = 1;
+                        }
+                        else if (b > 100 && b > a)
+                        {
+                            //右环
+                            temy = 1;
+                        }
+                    }*/
         //temx = adc_once(ADC0_DP0, ADC_10bit);
         //temy = adc_once(ADC0_DM1, ADC_10bit);
-        CircluSearch();
+        //CircluSearch();
 
         if (LK_jishi_flag && BlackEndM > 10)
         {
@@ -283,11 +289,12 @@ void main(void)
         {
             ftm_pwm_duty(FTM0, FTM_CH6, SteerMidle); //舵机pwm更新
         }
+
         if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
         {
             if (stopSpeed)
             {
-                MySpeedSet = stopSpeed;
+                MySpeedSet = actualSpeed;
                 stopSpeed  = 0;
             }
             if (is_roadblock)
@@ -300,11 +307,14 @@ void main(void)
         }
         else
         {
+            //ftm_pwm_duty(FTM3, FTM_CH0, 0);
+            //ftm_pwm_duty(FTM3, FTM_CH1, 0);
+            //ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,右电机
+            //ftm_pwm_duty(FTM3, FTM_CH3, 0); //PTC2,右电机
             if (!stopSpeed)
             {
-                stopSpeed  = MySpeedSet + stopSpeed;
-                MySpeedSet = stopSpeed - MySpeedSet;
-                stopSpeed  = stopSpeed - MySpeedSet;
+                stopSpeed  = 1;
+                MySpeedSet = 0;
             }
             MotorControl();
         }

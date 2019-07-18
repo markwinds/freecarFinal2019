@@ -15,6 +15,8 @@ int32 RSpeedSet  = 0;
 int32 SpeedSet   = 0;
 int32 MySpeedSet = 12;
 
+int send_speed = 0;
+
 float SpeedErrorL = 0;
 float SpeedErrorR = 0;
 
@@ -155,7 +157,7 @@ void  PIT0_IRQHandler()
 void GetTargetSpeed(void)
 {
 
-    if (1) //二号拨码开关不拨上去,动态速度
+    if (0) //二号拨码开关不拨上去,动态速度
     {
 
         LastSpeedDropRow = SpeedDropRow;
@@ -204,34 +206,34 @@ void GetTargetSpeed(void)
         }
     }
 
-    else if (0) //二号拨码开关往上波
+    else if (1) //二号拨码开关往上波
     {
-        SpeedSet = 210;
-        SpeedP   = 40.0;   //50.0;40
-        SpeedI   = 0.0009; //16.0;50,0.0006
-        SpeedD   = 10.0;   //1.3,10.0
+        SpeedSet = 10;
+        // SpeedP   = 40.0;   //50.0;40
+        // SpeedI   = 0.0009; //16.0;50,0.0006
+        // SpeedD   = 10.0;   //1.3,10.0
 
-        if (ABS(Error) >= 10)
-        {
-            //Differential_P=(float)(30.0/((60-(AvaliableLines+10))*(60-(AvaliableLines+10))));
-            SpeedSet = 40;
+        // if (ABS(Error) >= 10)
+        // {
+        //     //Differential_P=(float)(30.0/((60-(AvaliableLines+10))*(60-(AvaliableLines+10))));
+        //     SpeedSet = 40;
 
-            Differential_P = 0.0180;                                                  //调差速，调太大会跳轮
-            LSpeedSet      = (int32)(SpeedSet - (Differential_P * Error * SpeedSet)); //左轮差速
-            if (LSpeedSet <= 100)
-                LSpeedSet = 100;
-            if (LSpeedSet >= 300)
-                LSpeedSet = 300;
-            RSpeedSet = (int32)(SpeedSet + (Differential_P * Error * SpeedSet)); //右轮差速
-            if (RSpeedSet <= 100)
-                RSpeedSet = 100;
-            if (RSpeedSet >= 300)
-                RSpeedSet = 300;
-        }
-        else
+        //     Differential_P = 0.0180;                                                  //调差速，调太大会跳轮
+        //     LSpeedSet      = (int32)(SpeedSet - (Differential_P * Error * SpeedSet)); //左轮差速
+        //     if (LSpeedSet <= 100)
+        //         LSpeedSet = 100;
+        //     if (LSpeedSet >= 300)
+        //         LSpeedSet = 300;
+        //     RSpeedSet = (int32)(SpeedSet + (Differential_P * Error * SpeedSet)); //右轮差速
+        //     if (RSpeedSet <= 100)
+        //         RSpeedSet = 100;
+        //     if (RSpeedSet >= 300)
+        //         RSpeedSet = 300;
+        // }
+        if (1)
         {
-            LSpeedSet = SpeedSet;
-            RSpeedSet = SpeedSet;
+            LSpeedSet = SpeedSet * MySpeedSet;
+            RSpeedSet = SpeedSet * MySpeedSet;
         }
     }
 }
@@ -245,8 +247,11 @@ void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
     SpeedPerErrorL  = SpeedLastErrorL;                     //上上次
     SpeedLastErrorL = SpeedErrorL;                         //上次
     SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
-    // printf("@%04d#\r\n", GetLeftMotorPules);
-    // printf("$%04d#\r\n", (int)LeftMotorTarget);
+    if (send_speed)
+    {
+        printf("@%04d#\r\n", GetLeftMotorPules);
+        printf("$%04d#\r\n", (int)LeftMotorTarget);
+    }
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;
@@ -264,13 +269,13 @@ void MotorControl(void)
     MotorPwmLeft = (int)(MotorPwmL);
     if (MotorPwmLeft <= -1390)
         MotorPwmLeft = -1390;
-    else if (MotorPwmLeft >= 2990)
-        MotorPwmLeft = 2990;
+    else if (MotorPwmLeft >= 6990)
+        MotorPwmLeft = 6990;
 
     if (MotorPwmRight <= -1390)
         MotorPwmRight = -1390;
-    else if (MotorPwmRight >= 2990)
-        MotorPwmRight = 2990;
+    else if (MotorPwmRight >= 6990)
+        MotorPwmRight = 6990;
 
     if (MotorPwmLeft > 0)
     {
