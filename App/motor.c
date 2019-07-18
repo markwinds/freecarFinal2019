@@ -30,16 +30,16 @@ int LastSpeedDropRow;
 
 #if 1
 
-float SpeedP = 10.0; //50.0;40
-float SpeedI = 0;    //16.0;50,0.0006
-float SpeedD = 0.0;  //1.3,10.0
+float SpeedP = 36.0; //50.0;40
+float SpeedD = 30;   //1.3,10.0
+float SpeedI = 0.36; //16.0;50,0.0006
 
 #endif
 
 float Differential_P = 0.0; //0.0250,0.1050
 
-int MotorPwmL = 0;
-int MotorPwmR = 0;
+float MotorPwmL = 0;
+float MotorPwmR = 0;
 
 int MotorPwmRight = 0;
 int MotorPwmLeft  = 0;
@@ -47,8 +47,8 @@ int MotorPwmLeft  = 0;
 float LeftMotorPwmAdd  = 0;
 float RightMotorPwmAdd = 0;
 float errorspeed       = 2;
-
-void MotorInit(void)
+void  CalPID(float);
+void  MotorInit(void)
 {
     //gpio_init(PTB18, GPO, 0);             //0正转，1反转
     ftm_pwm_init(FTM3, FTM_CH2, 10000, 0); //PTC1，右电机
@@ -197,7 +197,7 @@ void GetTargetSpeed(void)
         }
         LSpeedSet = (LSpeedSet >> 1) * MySpeedSet;
         RSpeedSet = (RSpeedSet >> 1) * MySpeedSet;
-        if (!go || star_lineflag)
+        if (star_lineflag)
         {
             LSpeedSet = 0;
             RSpeedSet = 0;
@@ -239,56 +239,99 @@ void GetTargetSpeed(void)
 #endif
 
 //计算速度偏差
-
-void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
+uint8 sendFlag;
+float pp, pi, pd;
+void  CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
 {
     SpeedPerErrorL  = SpeedLastErrorL;                     //上上次
     SpeedLastErrorL = SpeedErrorL;                         //上次
     SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
-    printf("@%04d#\r\n", GetLeftMotorPules);
+
+    if (sendFlag)
+    {
+        printf("@%04d#\r\n", GetLeftMotorPules);
+        printf("$%04d#\r\n", (int)LeftMotorTarget);
+    }
+
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;
 }
 
 //增量式PID控制算法
-
-void MotorControl(void)
+float tempid;
+void  MotorControl(void)
 {
+
     GetTargetSpeed();
     CalculateMotorSpeedError(LSpeedSet, RSpeedSet); //设定目标速度计算偏差
-    MotorPwmR += (SpeedP + SpeedI + SpeedD) * SpeedErrorR - (SpeedP + 2 * SpeedD) * SpeedLastErrorR + SpeedD * SpeedPerErrorR;
-    MotorPwmRight = (int)(MotorPwmR);
-    MotorPwmL += (SpeedP + SpeedI + SpeedD) * SpeedErrorL - (SpeedP + 2 * SpeedD) * SpeedLastErrorL + SpeedD * SpeedPerErrorL;
-    MotorPwmLeft = (int)(MotorPwmL);
-    if (MotorPwmLeft <= -1390)
-        MotorPwmLeft = -1390;
-    else if (MotorPwmLeft >= 2990)
-        MotorPwmLeft = 2990;
 
-    if (MotorPwmRight <= -1390)
-        MotorPwmRight = -1390;
-    else if (MotorPwmRight >= 2990)
-        MotorPwmRight = 2990;
+    CalPID(SpeedErrorR);
+    tempid = (pp + pi + pd) * SpeedErrorR - (pp + 2 * pd) * SpeedLastErrorR + pd * SpeedPerErrorR;
+    MotorPwmR += tempid;
+    if (MotorPwmR <= -2390)
+        MotorPwmR = -2390.0;
+    else if (MotorPwmR >= 7090)
+        MotorPwmR = 7090.0;
+    MotorPwmRight = (int)(MotorPwmR);
+
+    CalPID(SpeedErrorL);
+    tempid += (pp + pi + pd) * SpeedErrorL - (pp + 2 * pd) * SpeedLastErrorL + pd * SpeedPerErrorL;
+    MotorPwmL += tempid;
+    if (MotorPwmL <= -2390)
+        MotorPwmL = -2390;
+    else if (MotorPwmL >= 7090)
+        MotorPwmL = 7090;
+    MotorPwmLeft = (int)(MotorPwmL);
 
     if (MotorPwmLeft > 0)
     {
-        ftm_pwm_duty(FTM3, FTM_CH0, MotorPwmLeft * 2);
+        ftm_pwm_duty(FTM3, FTM_CH0, MotorPwmLeft);
         ftm_pwm_duty(FTM3, FTM_CH1, 0);
     }
     else
     {
         ftm_pwm_duty(FTM3, FTM_CH0, 0);
-        ftm_pwm_duty(FTM3, FTM_CH1, -MotorPwmLeft * 2);
+        ftm_pwm_duty(FTM3, FTM_CH1, -MotorPwmLeft);
     }
     if (MotorPwmRight > 0)
     {
-        ftm_pwm_duty(FTM3, FTM_CH2, MotorPwmRight * 2); //PTC2,右电机
-        ftm_pwm_duty(FTM3, FTM_CH3, 0);                 //PTC2,右电机
+        ftm_pwm_duty(FTM3, FTM_CH2, MotorPwmRight); //PTC2,右电机
+        ftm_pwm_duty(FTM3, FTM_CH3, 0);             //PTC2,右电机
     }
     else
     {
-        ftm_pwm_duty(FTM3, FTM_CH2, 0);                  //PTC2,右电机
-        ftm_pwm_duty(FTM3, FTM_CH3, -MotorPwmRight * 2); //PTC2,右电机
+        ftm_pwm_duty(FTM3, FTM_CH2, 0);              //PTC2,右电机
+        ftm_pwm_duty(FTM3, FTM_CH3, -MotorPwmRight); //PTC2,右电机
     }
+}
+uint8 pdac;
+void  CalPID(float jError)
+{
+    pp = SpeedP;
+    pd = SpeedD;
+    pi = SpeedI;
+    // if (abs(jError) > 200)
+    // {
+    //     pdac = 8;
+    // }
+    // else if (abs(jError) > 130)
+    // {
+    //     pdac = 4;
+    // }
+
+    // if (pdac)
+    // {
+    //     pd = SpeedD * pdac / 8;
+    //     pdac--;
+    // }
+
+    // if (abs(jError) < 50)
+    // {
+    //     pi = SpeedI;
+    // }
+    // else
+    // {
+    //     pi = SpeedI / 2;
+    // }
 }

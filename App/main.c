@@ -8,7 +8,7 @@ uint32 temx, temy, tem1;
 int32  zbttem;
 float  temf         = 0.23;
 int    is_roadblock = 0;
-int    stopSpeed    = 0;
+int    stopSpeed = 0, actualSpeed = 12;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -19,7 +19,7 @@ void PORTE_IRQHandler();
 void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函数到中断向量表里
 
 Screen_Data mydata[] = { //
-    { "speed", { .l = &(MySpeedSet) }, 1.0, 1 },
+    { "speed", { .l = &(actualSpeed) }, 1.0, 1 },
     { "eleSpe", { .l = &(eleSpeed) }, 1.0, 1 },
     { "KP", { .f = &(BasicP) }, 0.1, 2 },
     { "KD", { .f = &(KD) }, 0.01, 2 },
@@ -34,6 +34,7 @@ Screen_Data mydata[] = { //
     { "moKP+", { .f = &(SpeedP) }, 10, 2 },
     { "moKD", { .f = &(SpeedD) }, 1, 2 },
     { "moKI", { .f = &(SpeedI) }, 0.01, 2 },
+    { "jxuc", { .c = &(sendFlag) }, 1, 4 },
     { "end", NULL, 0, 0 }
 };
 
@@ -284,11 +285,12 @@ void main(void)
         {
             ftm_pwm_duty(FTM0, FTM_CH6, SteerMidle); //舵机pwm更新
         }
-        if (getSwitch(motorSW)) //控制电机开关 && !star_lineflag && go
+
+        if (getSwitch(motorSW) && go) //控制电机开关 && !star_lineflag && go
         {
             if (stopSpeed)
             {
-                MySpeedSet = stopSpeed;
+                MySpeedSet = actualSpeed;
                 stopSpeed  = 0;
             }
             if (is_roadblock)
@@ -301,13 +303,16 @@ void main(void)
         }
         else
         {
+            ftm_pwm_duty(FTM3, FTM_CH0, 0);
+            ftm_pwm_duty(FTM3, FTM_CH1, 0);
+            ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,右电机
+            ftm_pwm_duty(FTM3, FTM_CH3, 0); //PTC2,右电机
             if (!stopSpeed)
             {
-                stopSpeed  = MySpeedSet + stopSpeed;
-                MySpeedSet = stopSpeed - MySpeedSet;
-                stopSpeed  = stopSpeed - MySpeedSet;
+                stopSpeed  = 1;
+                MySpeedSet = 0;
             }
-            MotorControl();
+            // MotorControl();
         }
 
         if (getSwitch(mainShowSW)) //控制DeBug显示
