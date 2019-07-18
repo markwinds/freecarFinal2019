@@ -29,6 +29,7 @@ void uart4_handler(void)
             uart4_to_do_flag            = 1;
             uart4_buff[uart4_buff_size] = '\0';
             uart4_buff_size             = 0;
+            printf("%s\r\n", uart4_buff);
         }
         else
             uart4_buff[uart4_buff_size++] = ch;
@@ -39,6 +40,6 @@ void uart4_handler(void)
 void initUart()
 {
     uart_init(UART4, 115200);
-    //set_vector_handler(UART4_RX_TX_VECTORn, uart4_handler);
-    //uart_rx_irq_en(UART4);
+    set_vector_handler(UART4_RX_TX_VECTORn, uart4_handler);
+    uart_rx_irq_en(UART4);
 }

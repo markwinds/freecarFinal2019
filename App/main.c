@@ -151,7 +151,6 @@ void main(void)
     /**---------------------yl----------------------*/
 
     initTimerForFlag(); //这个必须放在最后初始化 zbt
-    printf("ddf");
 
     while (1)
     {

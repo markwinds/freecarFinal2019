@@ -1,34 +1,47 @@
-glob
 
-delete(instrfindall); %%¹Ø±ÕÃ»ÓÃµÄ£¬Õâ¾äºÜÖØÒª
+%å…¨å±€å˜é‡çš„å£°æ˜
+global my_uart x  line1 line2;
 
-%ĞÂ½¨´®¿Ú¶ÔÏó
-s=serial('COM9','BaudRate',115200); 
-set(s,'inputBufferSize',1024000); %ÉèÖÃÊäÈë»º³åÇøÓòÎª1M
+delete(instrfindall); %åˆ é™¤ä¸€äº›æ²¡ç”¨çš„è®¾å¤‡ï¼Œè¿™ä¸ªå¾ˆé‡è¦
 
- %´®¿ÚÊÂ¼ş»Øµ÷ÉèÖÃ
- set(s,'BytesAvailabelFcnMode','bytes');%ÉèÖÃÖĞ¶ÏÏìÓ¦º¯Êı¶ÔÏó
- set(s,'BytesAvailabelFcnCount',10);%ÉèÖÃÖÕ¶Ë´¥·¢·½Ê½ ÈçÉè¶¨»º´æÇøÓò´ïµ½10¸ö×Ö½Ú£¬¾Í´¥·¢ÖĞ¶Ï£¬µ÷ÓÃ»Øµ÷º¯Êı£¬½øĞĞ´¦Àí¡£
- s.BytesAvailabelFcn=@ReceiveCallback;%ReceiveCallbackÊÇÖĞ¶ÏµÄ´¥·¢º¯Êı£¬ÕâÀïÎÒÊÇ×Ô¶¨ÒåµÄ¡£ÏµÍ³µÄ»Øµ÷º¯ÊıÎªinstrcallback;
+%è®¾ç½®ä¸²å£çš„å±æ€§
+my_uart=serial('COM9','BaudRate',115200); 
+set(my_uart,'inputBufferSize',1024000); %è®¾ç½®ç¼“å­˜ä¸º1M
 
-%³¢ÊÔ´ú¿ª´®¿Ú
+ %è®¾ç½®å›è°ƒå‡½æ•°ï¼ˆç›¸å½“äºä¸­æ–­å¤„ç†å‡½æ•°ï¼‰
+ set(my_uart,'BytesAvailableFcnMode','byte');%ä¸­æ–­è§¦å‘æ–¹å¼
+ set(my_uart,'BytesAvailableFcnCount',10);%ä¸­æ–­è§¦å‘éœ€è¦æ¥å—çš„å­—èŠ‚ï¼ˆå®é™…ç”¨çš„æ—¶å€™ï¼Œé‡åˆ°æ¢è¡Œå°±è§¦å‘ä¸­æ–­å‡½æ•°äº†ï¼‰
+ my_uart.BytesAvailableFcn=@ReceiveCallback;%è®¾ç½®ReceiveCallbackä¸ºä¸­æ–­å‡½æ•°
+
+%å°è¯•æ‰“å¼€ä¸²å£
 try
-  fopen(s1);  %´ò¿ª´®¿Ú¶ÔÏó
+  fopen(my_uart);  %æ‰“å¼€ä¸²å£
 catch err
-  fclose(instrfind);  %¹Ø±Õ±»Õ¼ÓÃµÄ´®¿Ú
-  error('ÇëÈ·ÈÏÑ¡ÔñÁËÕıÈ·µÄ´®¿Ú');  %Êä³ö´íÎóÌáÊ¾
+  fclose(instrfind);  %å…³é—­
+  error('Please change Com');  %æŠ¥é”™
 end
 
+% -------------------------------------åŠ¨æ€ç»˜å›¾-----------------------------------------
+line1 = animatedline;  %å®šä¹‰ä¸€æ¡åŠ¨æ€ä½œå›¾çº¿
+line2 =animatedline('Color','r');%å®šä¹‰ä¸€æ¡é¢œè‰²ä¸ºçº¢è‰²çš„åŠ¨æ€çº¿
+xlabel('Time');
+ylabel('Value');
+x=0;
 
+% ---------------------------------------------------------------------
 
+while(1)
+    cmd=input();
+    fprint(my_uart,'%s\n',cmd);
+end
  
 
 
- fopen(s);%´ò¿ª´®¿Ú
- %data=fread(s)%¶ÁÈ¡¶ş½øÖÆ×Ö½Ú fwrite¶ş½øÖÆĞ´Èë ÏàÓ¦ÎÄ±¾ÓÃfscanf ºÍfpintf
 
- %data %½øĞĞÊı¾İ´¦Àí
 
- %fclose(s);
- %delete(s);
- %clear s;
+
+
+h=input('haha');
+h
+
+

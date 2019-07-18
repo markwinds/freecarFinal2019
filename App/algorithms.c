@@ -234,7 +234,7 @@ void sobel(uint8* ans, uint8* src)
 // }
 Coordinate getNewCoordinate(Coordinate site)
 {
-    Coordinate temp;
+  Coordinate temp={0,0};
     // temp.x = O_to_P_table[site.x][site.y][0];
     // temp.y = O_to_P_table[site.x][site.y][1];
     return temp;
