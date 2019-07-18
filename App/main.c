@@ -6,8 +6,7 @@ uint8 img[CAMERA_H][CAMERA_W];
 
 uint32 temx, temy, tem1;
 int32  zbttem;
-float  temf         = 0.23;
-int    is_roadblock = 0;
+float  temf      = 0.23;
 int    stopSpeed = 0, actualSpeed = 10;
 
 //函数声明
@@ -65,8 +64,8 @@ Screen_Data debug_window[] = {
 void doThisEveryPeriod()
 {
     checkBuzzerShouldSpeak();
-    manageTimerFlag(); //处理定时器控制的标志位
-    if (uart4_to_do_flag)
+    manageTimerFlag();    //处理定时器控制的标志位
+    if (uart4_to_do_flag) //串口是否接收到命令
     {
         uart4_to_do_flag = 0;
         analysisCommand();
@@ -82,21 +81,16 @@ void HardWare_Init(void)
     set_vector_handler(PORTA_VECTORn, PORTA_IRQHandler); //设置 PORTA 的中断服务函数为 PORTA_IRQHandler
     set_vector_handler(DMA0_VECTORn, DMA0_IRQHandler);   //设置 DMA0 的中断服务函数为 PORTA_IRQHandler
 
-#if 1
     ftm_quad_init(FTM1);  //FTM1  PTA8 （ PTA9 ）正交解码初始化
     ftm_quad_clean(FTM1); //计数寄存器清零
     ftm_quad_init(FTM2);  //FTM2  PTA10 （ PTA11 ）正交解码初始化
     ftm_quad_clean(FTM2); //计数寄存器清零
     //lptmr_pulse_init(LPT0_ALT2, 0xffff, LPT_Rising); //PTA19
     // lptmr_pulse_clean();
-#endif
 
-#if 1
     pit_init_ms(PIT0, 1);                              //PIT初始化  1ms
     set_vector_handler(PIT0_VECTORn, PIT0_IRQHandler); // 设置中断复位函数到中断向量表
     enable_irq(PIT0_IRQn);                             // 使能PIT0中断
-
-#endif
 
     // NVIC_SetPriorityGrouping(4);     //设置优先级分组,4bit 抢占优先级,没有亚优先
     // NVIC_SetPriority(PORTA_IRQn, 0); //配置优先级  图像场中断  PORTA
@@ -108,7 +102,6 @@ void HardWare_Init(void)
     DialSwitchInit(); //拨码开关初始化
 
 #endif
-    //gpio_init(PTD2, GPO, 0); //蜂鸣器初始化
     initBuzzer(); //蜂鸣器初始化
 
     SteerInit(); //舵机初始化
@@ -173,15 +166,7 @@ void main(void)
         /*****************************舵机***************************/
         if (getSwitch(steerSW)) //控制舵机开关
         {
-            if (is_roadblock)
-            {
-                setSteer(40);
-                if (judgeRoadOk())
-                {
-                    is_roadblock = 0;
-                }
-            }
-            else if (breakLoadFlag)
+            if (breakLoadFlag) //如果是电磁跑的断路
             {
                 Error       = 0;
                 int32 error = getSteerPwmFromADCError();
@@ -211,11 +196,6 @@ void main(void)
             {
                 MySpeedSet = actualSpeed;
                 stopSpeed  = 0;
-            }
-            if (is_roadblock)
-            {
-                setSpeedLeft(1500);
-                setSpeedRight(1500);
             }
             else
                 MotorControl();
@@ -269,10 +249,10 @@ void main(void)
             updateADCVaule();
             showADCvaule();
             showTrueError();
-            //DELAY_MS(500);
+            DELAY_MS(500);
         }
         /***********************************UI的控制的结尾***************************************/
-        doThisEveryPeriod(); //不知道干嘛的
+        doThisEveryPeriod(); //每次循环都要执行的一些操作，主要是一些状态（状态位）的更新
     }
 }
 
