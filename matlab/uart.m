@@ -1,6 +1,6 @@
 
 %����������
-global s h x fuck;
+global s h x fuck aim;
 
 delete(instrfindall); %%�ر�û�õģ�������Ҫ
 

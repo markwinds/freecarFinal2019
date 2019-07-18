@@ -1,5 +1,5 @@
 function ReceiveCallback( obj,event)     %�����ж���Ӧ���� 
-    global str_data s x h;
+    global str_data s x h aim;
 %     temp_str=fscanf(s,'%s');%��ȡ�ַ���
 %     str_data=[str_data,temp_str];%ƴ���ַ���
 %     for i= 1:length(str_data)-6
