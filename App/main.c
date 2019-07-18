@@ -159,6 +159,8 @@ void main(void)
 
         CircluSearch(); //圆环识别
 
+        HamperSearch(); //路障识别
+
         if (LK_jishi_flag && BlackEndM > 10) //起跑线检测
         {
             star_line_judg();
@@ -168,15 +170,7 @@ void main(void)
         /*****************************舵机***************************/
         if (getSwitch(steerSW)) //控制舵机开关
         {
-            if (is_roadblock)
-            {
-                setSteer(40);
-                if (judgeRoadOk())
-                {
-                    is_roadblock = 0;
-                }
-            }
-            else if (breakLoadFlag)
+            if (breakLoadFlag)
             {
                 Error       = 0;
                 int32 error = getSteerPwmFromADCError();
@@ -256,7 +250,7 @@ void main(void)
             }
         }
 
-        /********************************************************/
+        /******************************电磁**************************/
         if (getSwitch(ADCSW)) //电磁采集的显示
         {
             LCD_clear(WHITE);
