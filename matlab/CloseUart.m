@@ -1,7 +1,7 @@
-function CloseUart%¹Ø±Õ´®¿Ú
-    global s;
-    fclose(s);
-    delete(s);
-    clear s;
+function CloseUart%å…³é—­ä¸²å£
+    global my_uart;
+    fclose(my_uart);
+    delete(my_uart);
+    clear my_uart;
     clear all;
 end

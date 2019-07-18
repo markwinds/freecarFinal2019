@@ -1,31 +1,25 @@
-function ReceiveCallback( obj,event)     %�����ж���Ӧ���� 
-    global str_data s x h aim;
-%     temp_str=fscanf(s,'%s');%��ȡ�ַ���
-%     str_data=[str_data,temp_str];%ƴ���ַ���
-%     for i= 1:length(str_data)-6
-%         if str_data(i)=='@'
-%             if str_data(i+5)=='#'
-%                 y=str2num(str_data(i+1:i+4));
-%                 x=x+0.1;
-%                 addpoints(h,x,y);
-%                 drawnow;
-%             end
-%         end
-%     end
-%     str_data=str_data(length(str_data)-5:length(str_data));
-%     disp(str_data);
-    str=fscanf(s,'%s');
-    display(str);
-    if length(str)==6 && str(6)=='#'
-        if str(1)=='@'
-            y=str2num(str(2:5));
-            addpoints(h,x,y);
-            drawnow;
-            x=x+0.1;
+function ReceiveCallback( obj,event)     %串口接收到数据后的回调函数 
+    global my_uart x  line1 line2 x1 y1 y2 count fuck;
+    str=fscanf(my_uart,'%s');%从串口读取数据
+    %display(str);%显示读取到的数据
+    if length(str)==6 && str(6)=='#' %数据为6位，且最后一位是#结束位
+        if str(1)=='@' %根据数据头来判断是什么数据
+            y=str2num(str(2:5));%得到数据
+            x1(count)=x;
+            y1(count)=y;
         elseif str(1)=='$'
             y=str2num(str(2:5));
-            addpoints(aim,x,y);
-            drawnow;
+            x1(count)=x;
+            y2(count)=y;
+            count=count+1;
+            x=x+0.1;
+            if count==fuck+1
+                count=1;
+                addpoints(line1,x1,y1);%添加点到线
+                drawnow;%作图
+                addpoints(line2,x1,y2);
+                drawnow;
+            end
         end
     end
 end

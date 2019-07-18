@@ -1437,7 +1437,7 @@ void  CircluSearch()
     }
     else if (circluFlag == 2)
     {
-        int i;
+        //int i;
         // for (i = 15; i < 35; i++)
         // {
         //     if (img[i][5] == White_Point)
@@ -1457,7 +1457,7 @@ void  CircluSearch()
     }
     else if (circluFlag == 3)
     {
-        int i;
+        //int i;
         // for (i = 15; i < 35; i++)
         // {
         //     if (img[i][ColumnMax - 6] == White_Point)
@@ -1605,7 +1605,7 @@ void   HamperSearch()
     }
     else if (hamperFlag)
     {
-        int i, j;
+        int i, j=0;
         if (hamperFlag == 1 && BlackEndM + BlackEndL + BlackEndR < 2)
         {
             for (i = RowMax - 1; i > 50; i--)

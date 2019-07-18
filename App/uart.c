@@ -23,12 +23,19 @@ void uart4_handler(void)
     if (UART_S1_REG(UARTN[uratn]) & UART_S1_RDRF_MASK) //接收数据寄存器满
     {
         uart_getchar(UART4, &ch); //无限等待接受1个字节
-        if (ch == '\n')
+        if (ch == '#')
         {
             //在这里加入缓存处理
             uart4_to_do_flag            = 1;
             uart4_buff[uart4_buff_size] = '\0';
             uart4_buff_size             = 0;
+            //printf("%s\r\n", uart4_buff);
+            // LCD_clear(WHITE);
+            // turnBuzzer();
+            // Site_t tt;
+            // tt.x = 10;
+            // tt.y = 10;
+            // LCD_str(tt, uart4_buff, RED, WHITE);
         }
         else
             uart4_buff[uart4_buff_size++] = ch;
@@ -39,6 +46,6 @@ void uart4_handler(void)
 void initUart()
 {
     uart_init(UART4, 115200);
-    //set_vector_handler(UART4_RX_TX_VECTORn, uart4_handler);
-    //uart_rx_irq_en(UART4);
+    set_vector_handler(UART4_RX_TX_VECTORn, uart4_handler);
+    uart_rx_irq_en(UART4);
 }

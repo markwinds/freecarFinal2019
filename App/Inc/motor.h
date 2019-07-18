@@ -24,7 +24,8 @@ extern int   LK_jishi_flag;
 extern uint8 go;
 extern float errorspeed;
 extern float SpeedP, SpeedD, SpeedI;
-extern uint8 sendFlag;
+
+extern int send_speed;
 
 void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget);
 
