@@ -8,14 +8,20 @@
 int MiddleLine[RowMax + 1];
 int RightEdge[RowMax + 1];
 int LeftEdge[RowMax + 1];
-int Width[RowMax + 1] = { 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 10,
-                          10, 12, 13, 14, 14, 16, 17, 18, 18, 20, 20, 22, 22,
-                          24, 24, 26, 26, 28, 30, 31, 34, 36, 38, 40, 41, 43,
-                          43, 43, 43, 44, 44, 46, 46, 47, 47, 49, 50, 50, 51,
-                          52, 54, 55, 56, 57, 58, 59, 60, 61 };
-;
+int Width[RowMax + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3,
+                          5, 8, 8, 12, 14, 16, 18, 20, 22, 24, 26, 28,
+                          30, 32, 33, 35, 37, 39, 41, 43, 45, 47, 48, 50,
+                          52, 54, 55, 57, 58, 60, 61, 63, 65, 66, 68, 70,
+                          70, 72, 74, 75, 76, 78, 78, 79, 79, 80, 80, 80 };
 
-int   MidPri         = 40;
+// { 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 10,
+//                           10, 12, 13, 14, 14, 16, 17, 18, 18, 20, 20, 22, 22,
+//                           24, 24, 26, 26, 28, 30, 31, 34, 36, 38, 40, 41, 43,
+//                           43, 43, 43, 44, 44, 46, 46, 47, 47, 49, 50, 50, 51,
+//                           52, 54, 55, 56, 57, 58, 59, 60, 61 };
+
+int MidPri
+    = 40;
 int   LastLine       = 0;
 float AvaliableLines = 0;
 int   LeftLose       = 0;
@@ -164,7 +170,8 @@ void SearchCenterBlackline(void)
             if (img[i][j] == White_Point && img[i][j - 1] == Black_Point && img[i][j - 2] == Black_Point) //从右向左找到白白黑跳变
             {
                 LeftEdge[i] = j; //找到则赋值 找不到保持原值0
-                break;           //跳出本行寻线
+
+                break; //跳出本行寻线
             }
             j--; //列数往左移动
         }
@@ -186,7 +193,8 @@ void SearchCenterBlackline(void)
             if (img[i][j] == White_Point && img[i][j + 1] == Black_Point && img[i][j + 2] == Black_Point) //从左向右找到白白黑跳变点
             {
                 RightEdge[i] = j; //找到则赋值   找不到保持原值
-                break;            //跳出本行寻线
+                if (j >= ColumnMax - 10 || img[i][j + 5] == Black_Point)
+                    break; //跳出本行寻线
             }
             j++; //列数往右移动
         }
@@ -200,7 +208,7 @@ void SearchCenterBlackline(void)
             RightLose++;         //记录只有右线丢的数量
             if (i == RowMax - 1) //如果是首行就以图像中心作为中点
             {
-                MiddleLine[i] = MidPri;
+                MiddleLine[i] = LeftEdge[i] > 30 ? 70 : LeftEdge[i] + 40;
             }
             else if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
             {
@@ -215,7 +223,7 @@ void SearchCenterBlackline(void)
         {
             if (i == RowMax - 1) //如果是首行就以图像中心作为中点
             {
-                MiddleLine[i] = MidPri;
+                MiddleLine[i] = RightEdge[i] < 50 ? 10 : RightEdge[i] - 40;
             }
             else if ((RightEdge[i] - LeftEdge[i]) >= (RightEdge[i + 1] - LeftEdge[i + 1] + 1)) //突变
             {
@@ -229,15 +237,7 @@ void SearchCenterBlackline(void)
         else if (LeftEdge[i] == 0 && RightEdge[i] == ColumnMax) //两边都丢了的话
         {
             //AllLose++;
-
-            if (i == RowMax - 1) //如果是首行就以图像中心作为中点
-            {
-                MiddleLine[i] = MidPri;
-            }
-            else
-            {
-                MiddleLine[i] = MiddleLine[i + 1]; //如果不是首行就用上一行的中线作为本行中点
-            }
+            MiddleLine[i] = 40;
         }
         // 下一个第一行
         if (MiddleLine[RowMax - 1] >= 70)
@@ -274,7 +274,7 @@ void SearchCenterBlackline(void)
             {
                 j = 78;
             }
-            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 17)
+            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 5)
             {
                 RightEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
@@ -302,7 +302,7 @@ void SearchCenterBlackline(void)
             {
                 j = 2;
             }
-            while (j >= 1 && j >= RightEdge[i] - Width[i] - 15)
+            while (j >= 1 && j >= RightEdge[i] - Width[i] - 5)
             {
                 LeftEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)

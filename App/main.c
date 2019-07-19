@@ -47,7 +47,7 @@ Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
     //{ "speed", { .l = &(SpeedSet) }, 0, 1 },ADC_normal_vaule
     { "error", { .f = &(Error) }, 0, 2 },
-    { "adcl", { .i = &(disgy_AD_val[0]) }, 0, 3 },
+    { "adcl", { .i = &(MiddleLine[57]) }, 0, 3 },
     { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
     { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
     { "rslo", { .c = &(rSlope) }, 0, 4 },
@@ -161,7 +161,7 @@ void main(void)
 
         CircluSearch(); //圆环识别
 
-        HamperSearch(); //路障识别
+        //HamperSearch(); //路障识别
 
         if (LK_jishi_flag && BlackEndM > 10) //起跑线检测
         {

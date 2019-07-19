@@ -11,7 +11,7 @@ extern int out_road;
 
 #define SteerMax 965   //舵机最大值
 #define SteerMin 765   //舵机最小值
-#define SteerMidle 874 //舵机中值
+#define SteerMidle 868 //舵机中值
 
 extern float LastError;
 extern float Error;

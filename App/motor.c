@@ -32,9 +32,9 @@ int LastSpeedDropRow;
 
 #if 1
 
-float SpeedP = 77; //50.0;40  //67
-float SpeedD = 0;  //1.3,10.0
-float SpeedI = 0;  //16.0;50,0.0006
+float SpeedP = 90;    //50.0;40  //67
+float SpeedD = 10;    //1.3,10.0
+float SpeedI = 0.025; //16.0;50,0.0006
 float pp, pi, pd;
 
 #endif
@@ -158,7 +158,7 @@ void  PIT0_IRQHandler()
 void GetTargetSpeed(void)
 {
 
-    if (0) //二号拨码开关不拨上去,动态速度
+    if (1) //二号拨码开关不拨上去,动态速度
     {
 
         LastSpeedDropRow = SpeedDropRow;
@@ -207,7 +207,7 @@ void GetTargetSpeed(void)
         }
     }
 
-    else if (1) //二号拨码开关往上波
+    else if (0) //二号拨码开关往上波
     {
         SpeedSet = 10;
         // SpeedP   = 40.0;   //50.0;40
@@ -273,8 +273,8 @@ void  MotorControl(void)
 
     MotorPwmL += (SpeedP + SpeedI + SpeedD) * SpeedErrorL - (SpeedP + 2 * SpeedD) * SpeedLastErrorL + SpeedD * SpeedPerErrorL;
     MotorPwmLeft = (int)(MotorPwmL);
-    if (MotorPwmLeft <= -1390)
-        MotorPwmLeft = -1390;
+    if (MotorPwmLeft <= -2390)
+        MotorPwmLeft = -2390;
     else if (MotorPwmLeft >= 7090)
         MotorPwmLeft = 7090;
 

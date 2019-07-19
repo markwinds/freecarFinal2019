@@ -31,6 +31,11 @@ void LCDDisplay(void)
     for (i = CAMERA_H - 1; i > 2; i--)
     {
         site_point.y = i + 127 - CAMERA_H;
+
+        //镜头中心
+        site_point.x = 40 + 127 - CAMERA_W;
+        LCD_point(site_point, YELLOW);
+
         //右线
         if (RightEdge[i] > 79)
             RightEdge[i] = 79;
@@ -50,9 +55,6 @@ void LCDDisplay(void)
         //路径中线
         site_point.x = MiddleLine[i] + 127 - CAMERA_W;
         LCD_point(site_point, RED);
-        //镜头中心
-        site_point.x = 40 + 127 - CAMERA_W;
-        LCD_point(site_point, YELLOW);
     }
     /*
     site.x = 0; //变量显示行地址
