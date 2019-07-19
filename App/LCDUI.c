@@ -768,8 +768,6 @@ uint8 getSwitch(enum bitControl bit)
 }
 void setMode(enum modeControl mod)
 {
-    if (mod == runMOD)
-        sendFlag = 1;
     AllSwitch = (uint8)mod;
 }
 void setSwitch(enum bitControl bit)

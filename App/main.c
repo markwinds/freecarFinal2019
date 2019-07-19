@@ -7,7 +7,7 @@ uint8 img[CAMERA_H][CAMERA_W];
 uint32 temx, temy, tem1;
 int32  zbttem;
 float  temf      = 0.23;
-int    stopSpeed = 0, actualSpeed = 10;
+int    stopSpeed = 0, actualSpeed = 6;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -30,11 +30,14 @@ Screen_Data mydata[] = { //
     { "tempf", { .f = &(temp_vaule_f) }, 0.1, 2 },
     { "KP+", { .f = &(BasicP) }, 1, 2 },
     { "KD+", { .f = &(KD) }, 0.1, 2 },
+    { "moKP-", { .f = &(SpeedP) }, 0.1, 2 },
     { "moKP", { .f = &(SpeedP) }, 1, 2 },
     { "moKP+", { .f = &(SpeedP) }, 10, 2 },
     { "moKD", { .f = &(SpeedD) }, 1, 2 },
+    { "moKD+", { .f = &(SpeedD) }, 10, 2 },
     { "moKI", { .f = &(SpeedI) }, 0.01, 2 },
-    { "jxuc", { .c = &(sendFlag) }, 1, 4 },
+    { "moKI-", { .f = &(SpeedI) }, 0.001, 2 },
+    //{ "jxuc", { .c = &(sendFlag) }, 1, 4 },
     { "end", NULL, 0, 0 }
 };
 
@@ -205,10 +208,10 @@ void main(void)
         }
         else
         {
-            //ftm_pwm_duty(FTM3, FTM_CH0, 0);
-            //ftm_pwm_duty(FTM3, FTM_CH1, 0);
-            //ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,右电机
-            //ftm_pwm_duty(FTM3, FTM_CH3, 0); //PTC2,右电机
+            ftm_pwm_duty(FTM3, FTM_CH0, 0);
+            ftm_pwm_duty(FTM3, FTM_CH1, 0);
+            ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,右电机
+            ftm_pwm_duty(FTM3, FTM_CH3, 0); //PTC2,右电机
             if (!stopSpeed)
             {
                 stopSpeed  = 1;

@@ -32,9 +32,10 @@ int LastSpeedDropRow;
 
 #if 1
 
-float SpeedP = 36.0; //50.0;40
-float SpeedD = 30;   //1.3,10.0
-float SpeedI = 0.36; //16.0;50,0.0006
+float SpeedP = 77; //50.0;40  //67
+float SpeedD = 0;  //1.3,10.0
+float SpeedI = 0;  //16.0;50,0.0006
+float pp, pi, pd;
 
 #endif
 
@@ -248,7 +249,7 @@ void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
     SpeedLastErrorL = SpeedErrorL;                         //上次
     SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
     sendArray[0]    = GetLeftMotorPules;
-    sendArray[1]    = (int)LeftMotorTarget;
+    sendArray[1]    = LSpeedSet;
     vcan_sendware(sendArray, sizeof(sendArray));
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
@@ -263,25 +264,19 @@ void  MotorControl(void)
     GetTargetSpeed();
     CalculateMotorSpeedError(LSpeedSet, RSpeedSet); //设定目标速度计算偏差
 
-    CalPID(SpeedErrorR);
-    tempid = (pp + pi + pd) * SpeedErrorR - (pp + 2 * pd) * SpeedLastErrorR + pd * SpeedPerErrorR;
-    MotorPwmR += tempid;
+    MotorPwmR += (SpeedP + SpeedI + SpeedD) * SpeedErrorR - (SpeedP + 2 * SpeedD) * SpeedLastErrorR + SpeedD * SpeedPerErrorR;
     if (MotorPwmR <= -2390)
         MotorPwmR = -2390.0;
     else if (MotorPwmR >= 7090)
         MotorPwmR = 7090.0;
     MotorPwmRight = (int)(MotorPwmR);
+
     MotorPwmL += (SpeedP + SpeedI + SpeedD) * SpeedErrorL - (SpeedP + 2 * SpeedD) * SpeedLastErrorL + SpeedD * SpeedPerErrorL;
     MotorPwmLeft = (int)(MotorPwmL);
     if (MotorPwmLeft <= -1390)
         MotorPwmLeft = -1390;
-    else if (MotorPwmLeft >= 6990)
-        MotorPwmLeft = 6990;
-
-    if (MotorPwmRight <= -1390)
-        MotorPwmRight = -1390;
-    else if (MotorPwmRight >= 6990)
-        MotorPwmRight = 6990;
+    else if (MotorPwmLeft >= 7090)
+        MotorPwmLeft = 7090;
 
     if (MotorPwmLeft > 0)
     {
