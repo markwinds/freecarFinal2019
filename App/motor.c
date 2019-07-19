@@ -32,9 +32,9 @@ int LastSpeedDropRow;
 
 #if 1
 
-float SpeedP = 90;    //50.0;40  //67
-float SpeedD = 10;    //1.3,10.0
-float SpeedI = 0.025; //16.0;50,0.0006
+float SpeedP = 0;  //50.0;40  //67
+float SpeedD = 0;  //1.3,10.0
+float SpeedI = 10; //16.0;50,0.0006
 float pp, pi, pd;
 
 #endif

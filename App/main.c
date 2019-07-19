@@ -7,7 +7,7 @@ uint8 img[CAMERA_H][CAMERA_W];
 uint32 temx, temy, tem1;
 int32  zbttem;
 float  temf      = 0.23;
-int    stopSpeed = 0, actualSpeed = 6;
+int    stopSpeed = 0, actualSpeed = 15;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -35,8 +35,8 @@ Screen_Data mydata[] = { //
     { "moKP+", { .f = &(SpeedP) }, 10, 2 },
     { "moKD", { .f = &(SpeedD) }, 1, 2 },
     { "moKD+", { .f = &(SpeedD) }, 10, 2 },
-    { "moKI", { .f = &(SpeedI) }, 0.01, 2 },
-    { "moKI-", { .f = &(SpeedI) }, 0.001, 2 },
+    { "moKI", { .f = &(SpeedI) }, 10, 2 },
+    { "moKI-", { .f = &(SpeedI) }, 1, 2 },
     //{ "jxuc", { .c = &(sendFlag) }, 1, 4 },
     { "end", NULL, 0, 0 }
 };

@@ -5,12 +5,13 @@ global my_uart x  line1 line2 x1 y1 y2 count o c fuck;
 delete(instrfindall); %删除一些没用的设备，这个很重要
 
 %设置串口的属性
-my_uart=serial('COM11','BaudRate',115200); 
+my_uart=serial('COM9','BaudRate',115200); 
 set(my_uart,'inputBufferSize',1024000); %设置缓存为1M
 
  %设置回调函数（相当于中断处理函数）
  set(my_uart,'BytesAvailableFcnMode','byte');%中断触发方式
  set(my_uart,'BytesAvailableFcnCount',10);%中断触发需要接受的字节（实际用的时候，遇到换行就触发中断函数了）
+ set(my_uart,'Timeout',100);
  my_uart.BytesAvailableFcn=@ReceiveCallback;%设置ReceiveCallback为中断函数
 
 %尝试打开串口
@@ -36,12 +37,23 @@ y1=zeros(1,fuck);
 y2=zeros(1,fuck);
 o='o';
 c='c';
+r='reset';
+n='';
 
 % ---------------------------------------------------------------------
 
 while(1)
     cmd=input('command:');
-    fprintf(my_uart,'%s#',cmd);
+    if length(cmd)~=0
+        if cmd==r
+          clearpoints(line1);
+          clearpoints(line2);
+        else
+            fprintf(my_uart,'%s#',cmd);
+        end
+    else
+        fprintf(my_uart,'%s#',cmd);
+    end
 end
  
 
