@@ -87,6 +87,8 @@ void analysisCommand()
     }
     switch (argc)
     {
+        case 0:
+            send_speed = 1;
         case 1: //命令参数个数为1
             analysisCommand1(argv);
             break;

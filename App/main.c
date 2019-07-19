@@ -159,7 +159,7 @@ void main(void)
             }
         }
 
-        CircluSearch(); //圆环识别
+        //CircluSearch(); //圆环识别
 
         //HamperSearch(); //路障识别
 

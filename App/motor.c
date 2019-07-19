@@ -158,7 +158,7 @@ void  PIT0_IRQHandler()
 void GetTargetSpeed(void)
 {
 
-    if (1) //二号拨码开关不拨上去,动态速度
+    if (0) //二号拨码开关不拨上去,动态速度
     {
 
         LastSpeedDropRow = SpeedDropRow;
@@ -207,7 +207,7 @@ void GetTargetSpeed(void)
         }
     }
 
-    else if (0) //二号拨码开关往上波
+    else if (1) //二号拨码开关往上波
     {
         SpeedSet = 10;
         // SpeedP   = 40.0;   //50.0;40
@@ -250,7 +250,12 @@ void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
     SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
     sendArray[0]    = GetLeftMotorPules;
     sendArray[1]    = LSpeedSet;
-    vcan_sendware(sendArray, sizeof(sendArray));
+    if (send_speed)
+    {
+        printf("@%04d#\r\n", (int)GetLeftMotorPules);
+        printf("$%04d#\r\n", (int)LeftMotorTarget);
+    }
+    //vcan_sendware(sendArray, sizeof(sendArray));
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;
