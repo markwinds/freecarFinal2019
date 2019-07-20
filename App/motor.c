@@ -32,9 +32,9 @@ int LastSpeedDropRow;
 
 #if 1
 
-float SpeedP = 0;  //50.0;40  //67
-float SpeedD = 0;  //1.3,10.0
-float SpeedI = 10; //16.0;50,0.0006
+float SpeedP = 110; //50.0;40  //67
+float SpeedD = 0;   //1.3,10.0
+float SpeedI = 5.5; //16.0;50,0.0006
 float pp, pi, pd;
 
 #endif
@@ -200,7 +200,7 @@ void GetTargetSpeed(void)
         }
         LSpeedSet = (LSpeedSet >> 1) * MySpeedSet;
         RSpeedSet = (RSpeedSet >> 1) * MySpeedSet;
-        if (star_lineflag)
+        if (star_lineflag || !go)
         {
             LSpeedSet = 0;
             RSpeedSet = 0;
@@ -250,15 +250,25 @@ void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
     SpeedErrorL     = LeftMotorTarget - GetLeftMotorPules; //这次
     sendArray[0]    = GetLeftMotorPules;
     sendArray[1]    = LSpeedSet;
-    if (send_speed)
-    {
-        printf("@%04d#\r\n", (int)GetLeftMotorPules);
-        printf("$%04d#\r\n", (int)LeftMotorTarget);
-    }
     //vcan_sendware(sendArray, sizeof(sendArray));
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;
+    if (1)
+    {
+        if (send_speed == 0)
+        {
+            send_speed++;
+            printf("\r\n#");
+            printf("P:%d.%d%d_____", (int)(SpeedP), (int)(SpeedP * 10) % 10, (int)(SpeedP * 100) % 10);
+            printf("I:%d.%d%d_____", (int)(SpeedI), (int)(SpeedI * 10) % 10, (int)(SpeedI * 100) % 10);
+            printf("D:%d.%d%d", (int)(SpeedD), (int)(SpeedD * 10) % 10, (int)(SpeedD * 100) % 10);
+            printf("#\r\n");
+        }
+        printf("@%04d#\r\n", (int)GetLeftMotorPules);
+        printf("*%04d#\r\n", (int)GetRightMotorPules);
+        printf("$%04d#\r\n", (int)LeftMotorTarget);
+    }
 }
 
 //增量式PID控制算法
@@ -269,7 +279,15 @@ void  MotorControl(void)
     GetTargetSpeed();
     CalculateMotorSpeedError(LSpeedSet, RSpeedSet); //设定目标速度计算偏差
 
-    MotorPwmR += (SpeedP + SpeedI + SpeedD) * SpeedErrorR - (SpeedP + 2 * SpeedD) * SpeedLastErrorR + SpeedD * SpeedPerErrorR;
+    if (SpeedErrorR < 50)
+    {
+        MotorPwmR += (SpeedP + SpeedI + SpeedD) * SpeedErrorR - (SpeedP + 2 * SpeedD) * SpeedLastErrorR + SpeedD * SpeedPerErrorR;
+    }
+    else
+    {
+        MotorPwmR += (0 + SpeedI + 0) * SpeedErrorR - (0 + 2 * 0) * SpeedLastErrorR + 0 * SpeedPerErrorR;
+    }
+
     if (MotorPwmR <= -2390)
         MotorPwmR = -2390.0;
     else if (MotorPwmR >= 7090)
