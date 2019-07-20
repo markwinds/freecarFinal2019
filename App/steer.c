@@ -405,7 +405,7 @@ void SteerControl(void)
 
         SteerPwmAdd = -120;
 
-    SteerPwm = (uint32)(SteerPwmAdd / 2 + SteerMidle);
+    SteerPwm = (uint32)(SteerPwmAdd * 5 / 8 + SteerMidle);
 
     if (SteerPwm >= SteerMax) //限幅
 

@@ -32,9 +32,9 @@ int LastSpeedDropRow;
 
 #if 1
 
-float SpeedP = 110; //50.0;40  //67
-float SpeedD = 0;   //1.3,10.0
-float SpeedI = 5.5; //16.0;50,0.0006
+float SpeedP = 40; //50.0;40  //67
+float SpeedD = 0;  //1.3,10.0
+float SpeedI = 2;  //16.0;50,0.0006
 float pp, pi, pd;
 
 #endif
@@ -158,7 +158,7 @@ void  PIT0_IRQHandler()
 void GetTargetSpeed(void)
 {
 
-    if (0) //二号拨码开关不拨上去,动态速度
+    if (1) //二号拨码开关不拨上去,动态速度
     {
 
         LastSpeedDropRow = SpeedDropRow;
@@ -204,6 +204,13 @@ void GetTargetSpeed(void)
         {
             LSpeedSet = 0;
             RSpeedSet = 0;
+            // if (abs(GetLeftMotorPules) < 50 || GetRightMotorPules < 50)
+            // {
+            //     ftm_pwm_duty(FTM3, FTM_CH0, 0);
+            //     ftm_pwm_duty(FTM3, FTM_CH1, 0);
+            //     ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,右电机
+            //     ftm_pwm_duty(FTM3, FTM_CH3, 0);
+            // }
         }
     }
 
@@ -279,25 +286,36 @@ void  MotorControl(void)
     GetTargetSpeed();
     CalculateMotorSpeedError(LSpeedSet, RSpeedSet); //设定目标速度计算偏差
 
-    if (SpeedErrorR < 50)
+    // if (abs(SpeedErrorR) < 50)
+    // {
+    //     MotorPwmR += (0 + 1) * SpeedErrorR - (0) * SpeedLastErrorR;
+    // }
+    // else
+    // {
+    //     MotorPwmR += (SpeedP + SpeedI) * SpeedErrorR - (SpeedP)*SpeedLastErrorR;
+    // }
+    if (LSpeedSet == 0 && (abs(GetLeftMotorPules) < 50 || GetRightMotorPules < 50))
     {
-        MotorPwmR += (SpeedP + SpeedI + SpeedD) * SpeedErrorR - (SpeedP + 2 * SpeedD) * SpeedLastErrorR + SpeedD * SpeedPerErrorR;
-    }
-    else
-    {
-        MotorPwmR += (0 + SpeedI + 0) * SpeedErrorR - (0 + 2 * 0) * SpeedLastErrorR + 0 * SpeedPerErrorR;
+        ftm_pwm_duty(FTM3, FTM_CH0, 0);
+        ftm_pwm_duty(FTM3, FTM_CH1, 0);
+        ftm_pwm_duty(FTM3, FTM_CH2, 0); //PTC2,右电机
+        ftm_pwm_duty(FTM3, FTM_CH3, 0);
+        return;
     }
 
-    if (MotorPwmR <= -2390)
-        MotorPwmR = -2390.0;
+    CalPID(SpeedErrorR);
+    MotorPwmR += (pp + pi + pd) * SpeedErrorR - (pp + 2 * pd) * SpeedLastErrorR + pd * SpeedPerErrorR;
+    if (MotorPwmR <= -6390)
+        MotorPwmR = -6390.0;
     else if (MotorPwmR >= 7090)
         MotorPwmR = 7090.0;
     MotorPwmRight = (int)(MotorPwmR);
 
-    MotorPwmL += (SpeedP + SpeedI + SpeedD) * SpeedErrorL - (SpeedP + 2 * SpeedD) * SpeedLastErrorL + SpeedD * SpeedPerErrorL;
+    CalPID(SpeedErrorL);
+    MotorPwmL += (pp + pi + pd) * SpeedErrorL - (pp + 2 * pd) * SpeedLastErrorL + pd * SpeedPerErrorL;
     MotorPwmLeft = (int)(MotorPwmL);
-    if (MotorPwmLeft <= -2390)
-        MotorPwmLeft = -2390;
+    if (MotorPwmLeft <= -6390)
+        MotorPwmLeft = -6390;
     else if (MotorPwmLeft >= 7090)
         MotorPwmLeft = 7090;
 
@@ -322,12 +340,44 @@ void  MotorControl(void)
         ftm_pwm_duty(FTM3, FTM_CH3, -MotorPwmRight); //PTC2,右电机
     }
 }
-uint8 pdac;
+uint8 pdac = 0;
 void  CalPID(float jError)
 {
-    pp = SpeedP;
-    pd = SpeedD;
-    pi = SpeedI;
+    jError = jError > 0 ? jError : -jError;
+    pd     = 0;
+    pi     = SpeedI;
+    pp     = SpeedP;
+    // if (jError < 50)
+    // {
+    //     pi = 1;
+    // }
+    // else if (jError < 150)
+    // {
+    //     pdac += 6;
+    //     pi = (SpeedI - 1) * (jError / 100 - 0.5) + 1;
+    // }
+    // else
+    // {
+    //     pdac += 12;
+    //     pi = SpeedI;
+    // }
+
+    // if (pdac)
+    // {
+    //     pdac--;
+    //     pp = SpeedP;
+    // }
+    // else
+    // {
+    //     pp = 20;
+    // }
+    //********************************************************************************
+    // if (LSpeedSet == 0 && jError < 50)
+    // {
+    //     pi = 1;
+    //     pp = 130;
+    // }
+
     // if (abs(jError) > 200)
     // {
     //     pdac = 8;
