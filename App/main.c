@@ -7,7 +7,7 @@ uint8 img[CAMERA_H][CAMERA_W];
 uint32 temx, temy, tem1;
 int32  zbttem;
 float  temf      = 0.23;
-int    stopSpeed = 0, actualSpeed = 15;
+int    stopSpeed = 0, actualSpeed = 8;
 
 //函数声明
 void PORTA_IRQHandler();
@@ -35,8 +35,8 @@ Screen_Data mydata[] = { //
     { "moKP+", { .f = &(SpeedP) }, 10, 2 },
     { "moKD", { .f = &(SpeedD) }, 1, 2 },
     { "moKD+", { .f = &(SpeedD) }, 10, 2 },
-    { "moKI", { .f = &(SpeedI) }, 10, 2 },
-    { "moKI-", { .f = &(SpeedI) }, 1, 2 },
+    { "moKI", { .f = &(SpeedI) }, 1, 2 },
+    { "moKI-", { .f = &(SpeedI) }, 0.1, 2 },
     //{ "jxuc", { .c = &(sendFlag) }, 1, 4 },
     { "end", NULL, 0, 0 }
 };
@@ -161,7 +161,7 @@ void main(void)
 
         //CircluSearch(); //圆环识别
 
-        //HamperSearch(); //路障识别
+        // HamperSearch(); //路障识别
 
         if (LK_jishi_flag && BlackEndM > 10) //起跑线检测
         {

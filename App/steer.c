@@ -170,7 +170,7 @@ void  CalculateError(void)
     //eError = ((60 - disgy_AD_val[2]) / 8.0) * (dis_AD_val[0] - dis_AD_val[1]);
     //eError = getSteerPwmFromADCError();
     Error = (40 - CenterMeanValue); // 一场图像偏差值
-    if (0 && !breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5))
+    if (!breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5))
     {
         if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20))
         {
@@ -405,7 +405,7 @@ void SteerControl(void)
 
         SteerPwmAdd = -120;
 
-    SteerPwm = (uint32)(SteerPwmAdd * 7 / 8 + SteerMidle);
+    SteerPwm = (uint32)(SteerPwmAdd * 5 / 8 + SteerMidle);
 
     if (SteerPwm >= SteerMax) //限幅
 
