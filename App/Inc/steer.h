@@ -11,16 +11,17 @@ extern int out_road;
 
 #define SteerMax 965   //舵机最大值
 #define SteerMin 765   //舵机最小值
-#define SteerMidle 871 //舵机中值
+#define SteerMidle 852 //舵机中值
 
-extern float LastError;
-extern float Error;
-extern float KD;     //舵机方向比例系数，影响舵机的打角范围
-extern float BasicP; //10//7.5//舵机方向微分系数,影响舵机的打角反应
-extern int32 eleSpeed;
-extern uint8 breakLoadFlag;
-void         SteerInit(void); //舵机初始化
-void         CalculateError(void);
-extern void  SteerControl(void);
+extern float  LastError;
+extern float  Error;
+extern float  KD;     //舵机方向比例系数，影响舵机的打角范围
+extern float  BasicP; //10//7.5//舵机方向微分系数,影响舵机的打角反应
+extern int32  eleSpeed;
+extern uint8  breakLoadFlag;
+extern uint32 LastSteerSwm;
+void          SteerInit(void); //舵机初始化
+void          CalculateError(void);
+extern void   SteerControl(void);
 
 #endif

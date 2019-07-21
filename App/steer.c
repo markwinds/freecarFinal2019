@@ -12,7 +12,7 @@ float  LastError;         //上次的偏差
 float  WeightSum       = 0;
 float  CenterMeanValue = 0;
 float  CenterSum       = 0;
-float  J               = 0.0290;       //调节p和偏差的关系，越大，作用越强
+float  J               = 0.05;         //调节p和偏差的关系，越大，作用越强
 float  BasicP          = 2.4;          //基本的P值
 uint32 SteerPwm = 0, LastSteerSwm = 0; //舵机的pwm值和上次舵机的pwm值
 
@@ -170,7 +170,7 @@ void  CalculateError(void)
     //eError = ((60 - disgy_AD_val[2]) / 8.0) * (dis_AD_val[0] - dis_AD_val[1]);
     //eError = getSteerPwmFromADCError();
     Error = (40 - CenterMeanValue); // 一场图像偏差值
-    if (!breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5))
+    if (LK_jishi_flag && !breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5) && (dis_AD_val[0] + dis_AD_val[1] + dis_AD_val[2]) > 40)
     {
         if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20))
         {
@@ -192,22 +192,17 @@ void  CalculateError(void)
         else
             breakcout--;
     }
-    else if (breakLoadFlag == 1 && BlackEndM > 30)
+    else if (breakLoadFlag) //如果是电磁跑的断路
     {
-        breakLoadFlag = 0;
-        eleSpeed += MySpeedSet;
-        MySpeedSet = eleSpeed - MySpeedSet;
-        eleSpeed -= MySpeedSet;
-    }
-    if (breakLoadFlag)
-    {
-        // if (judge_road_black_num--)
-        // {
-        //     out_road = judge_road_black_state % 2;
-        //     judge_road_black_state >>= 1;
-        // }
-        // if (!out_road)
-        //Error = -getSteerPwmFromADCError();
+        Error = 600.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1]) / (disgy_AD_val[2] + 20);
+        Error = Error * (Error * Error / 500 + 1);
+        if (BlackEndM > 30 || (BlackEndM && (dis_AD_val[0] + dis_AD_val[1] + dis_AD_val[2]) < 10)) //如果摄像头得到有用的图像
+        {
+            breakLoadFlag = 0;
+            eleSpeed += MySpeedSet;
+            MySpeedSet = eleSpeed - MySpeedSet;
+            eleSpeed -= MySpeedSet;
+        }
     }
 
     switch (circluFlag)
@@ -251,6 +246,8 @@ void  CalculateError(void)
 
             //     circluFlag = 8;
             // }
+
+            Error -= Error / 3;
             break;
         case 7:
             // if (Error > 1)
@@ -258,13 +255,14 @@ void  CalculateError(void)
 
             //     circluFlag = 9;
             // }
+            Error -= Error / 3;
             break;
         case 8:
             // if (Error < 46 - BlackEndM)
             // {
             //     Error = (46 - BlackEndM);
             // }
-            ttem = (44 - BlackEndM) * (44 - BlackEndM) / 6;
+            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 8;
             if (Error < ttem)
             {
                 Error = ttem;
@@ -275,7 +273,7 @@ void  CalculateError(void)
             // {
             //     Error = BlackEndM - 46;
             // }
-            ttem = (44 - BlackEndM) * (44 - BlackEndM) / 6;
+            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 8;
             if (Error > -ttem)
             {
                 Error = -ttem;
@@ -288,6 +286,7 @@ void  CalculateError(void)
             Error /= 2;
             break;
     }
+
     switch (hamperFlag)
     {
         case 1:
@@ -300,7 +299,7 @@ void  CalculateError(void)
             Error = -8;
             break;
         case 4:
-            Error = -13;
+            Error = -11;
             break;
     }
     /* 
@@ -360,6 +359,16 @@ void  CalculateError(void)
         Error /= 2;
     }
     */
+    if (!LK_jishi_flag && !getSwitch(mainShowSW))
+    {
+        if (Error >= 6.0) //偏差限幅
+
+            Error = 6.0;
+
+        if (Error <= -6.0)
+
+            Error = -6.0;
+    }
     if (Error >= 30.0) //偏差限幅
 
         Error = 30.0;
@@ -370,8 +379,8 @@ void  CalculateError(void)
 
     KP = BasicP + (Error * Error) * J; //动态二次p模型
 
-    if (KP >= 11)
-        KP = 11; //p值限幅
+    if (KP >= 12)
+        KP = 12; //p值限幅
 }
 
 #endif
@@ -405,7 +414,7 @@ void SteerControl(void)
 
         SteerPwmAdd = -120;
 
-    SteerPwm = (uint32)(SteerPwmAdd * 5 / 8 + SteerMidle);
+    SteerPwm = (uint32)(SteerPwmAdd * 5 / 6 + SteerMidle);
 
     if (SteerPwm >= SteerMax) //限幅
 
