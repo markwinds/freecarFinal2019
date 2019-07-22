@@ -8,17 +8,16 @@
 int MiddleLine[RowMax + 1];
 int RightEdge[RowMax + 1];
 int LeftEdge[RowMax + 1];
-int Width[RowMax + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3,
-                          5, 8, 8, 12, 14, 16, 18, 20, 22, 24, 26, 28,
-                          30, 32, 33, 35, 37, 39, 41, 43, 45, 47, 48, 50,
-                          52, 54, 55, 57, 58, 60, 61, 63, 65, 66, 68, 70,
-                          70, 72, 74, 75, 76, 78, 78, 79, 79, 80, 80, 80 };
-
-// { 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 10,
-//                           10, 12, 13, 14, 14, 16, 17, 18, 18, 20, 20, 22, 22,
-//                           24, 24, 26, 26, 28, 30, 31, 34, 36, 38, 40, 41, 43,
-//                           43, 43, 43, 44, 44, 46, 46, 47, 47, 49, 50, 50, 51,
-//                           52, 54, 55, 56, 57, 58, 59, 60, 61 };
+int Width[RowMax + 1] = { 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 6, 6,
+                          8, 9, 11, 12, 14, 14, 16, 17, 19, 19, 21, 22,
+                          24, 24, 26, 26, 28, 29, 31, 33, 34, 37, 39, 41,
+                          43, 44, 46, 46, 46, 47, 48, 48, 50, 51, 52, 52,
+                          54, 55, 56, 57, 58, 60, 60, 61, 62, 63, 64, 65 };
+/* { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3,
+                          5, 8, 8, 13, 15, 17, 19, 22, 24, 26, 28, 30,
+                          33, 35, 36, 38, 40, 42, 45, 47, 49, 51, 52, 55,
+                          57, 59, 60, 62, 63, 66, 67, 69, 71, 72, 74, 77,
+                          77, 79, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80 }; */
 
 int MidPri
     = 40;
@@ -258,7 +257,7 @@ void SearchCenterBlackline(void)
         // debugMark = 1;
         if (circluFlag == 2)
         {
-            j  = ((LeftEdge[i + 1] + 10) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 10); //左边界用边沿扫描
+            j  = ((LeftEdge[i + 1] + 5) >= ColumnMax - 2) ? ColumnMax - 2 : (LeftEdge[i + 1] + 5); //左边界用边沿扫描
             jj = ((LeftEdge[i + 1] - 5) <= 1) ? 1 : (LeftEdge[i + 1] - 5);
             while (j >= jj)
             {
@@ -274,7 +273,7 @@ void SearchCenterBlackline(void)
             {
                 j = 78;
             }
-            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 5)
+            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 10)
             {
                 RightEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
@@ -302,7 +301,7 @@ void SearchCenterBlackline(void)
             {
                 j = 2;
             }
-            while (j >= 1 && j >= RightEdge[i] - Width[i] - 5)
+            while (j >= 1 && j >= RightEdge[i] - Width[i] - 10)
             {
                 LeftEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -446,6 +445,17 @@ void SearchCenterBlackline(void)
 
             //Auxiliary     = 1;
             MiddleLine[i] = MiddleLine[i + 1]; //用上一行
+            if (BlackEndM > 40)
+            {
+                if (RightEdge[i + 1] < RightEdge[i])
+                {
+                    RightEdge[i] = RightEdge[i + 1];
+                }
+                else if (LeftEdge[i + 1] > LeftEdge[i])
+                {
+                    LeftEdge[i] = LeftEdge[i + 1];
+                }
+            }
         }
         else
         {
@@ -1386,11 +1396,12 @@ char  aMark;
 uint8 circluTimeOutClearMark1, circluTimeOutClearMark2, circluTimeOutClearMark3, circluTimeOutClearMark4;
 void  CircluSearch()
 {
-    if (circluFlag == 0 && BlackEndM > 40 && !CloseLoopFlag)
+    if (circluFlag == 0 && BlackEndM > 35 && !CloseLoopFlag)
     {
-        if (disgy_AD_val[2] > 95 || (disgy_AD_val[0] + disgy_AD_val[1]) > 95) //(disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
+        if (disgy_AD_val[2] > 115 || disgy_AD_val[0] > 115 || disgy_AD_val[1] > 115 || (disgy_AD_val[0] + disgy_AD_val[2]) > 200 || (disgy_AD_val[1] + disgy_AD_val[2]) > 200) //(disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
         {
-            circluFlag              = 1;
+            circluFlag = 1;
+            MySpeedSet -= 1;
             circluTimeOutClearMark1 = 0;
         }
     }
@@ -1559,19 +1570,20 @@ void  CircluSearch()
     }
     else if (circluFlag == 8 || circluFlag == 9)
     {
-        if (disgy_AD_val[2] > 95 || (disgy_AD_val[0] + disgy_AD_val[1]) > 95)
+        if (disgy_AD_val[2] > 110 || disgy_AD_val[0] > 110 || disgy_AD_val[1] > 110 || (disgy_AD_val[0] + disgy_AD_val[2]) > 200 || (disgy_AD_val[1] + disgy_AD_val[2]) > 200)
         {
             circluFlag += 2;
         }
     }
     if (circluFlag == 1 || circluFlag == 10 || circluFlag == 11)
     {
-        if (disgy_AD_val[2] < 95 && (disgy_AD_val[0] + disgy_AD_val[1]) < 95)
+        if (disgy_AD_val[2] < 110 && disgy_AD_val[0] < 110 && disgy_AD_val[1] < 110 && (disgy_AD_val[0] + disgy_AD_val[2]) < 200 && (disgy_AD_val[1] + disgy_AD_val[2]) < 200)
         {
             circluTimeOutClearMark1++;
             if (circluTimeOutClearMark1 > 15)
             {
                 circluFlag = 0;
+                MySpeedSet += 1;
             }
         }
         else

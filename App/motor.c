@@ -119,7 +119,7 @@ void  PIT0_IRQHandler()
             {
                 go = 1; //小车前进
             }
-            if (LK_jishi >= 800) //延迟2000*5ms后（10s）检测起跑线
+            if (LK_jishi >= 380) //延迟2000*5ms后（10s）检测起跑线
             {
                 LK_jishi_flag = 1;
                 LK_jishi      = 2000;
@@ -151,14 +151,14 @@ void  PIT0_IRQHandler()
 
     enable_irq(PIT0_IRQn); //使能中断
 }
-
+int ees;
 #endif
 
 #if 1
 void GetTargetSpeed(void)
 {
 
-    if (1) //二号拨码开关不拨上去,动态速度
+    if (!breakLoadFlag) //二号拨码开关不拨上去,动态速度
     {
 
         LastSpeedDropRow = SpeedDropRow;
@@ -238,10 +238,32 @@ void GetTargetSpeed(void)
         //     if (RSpeedSet >= 300)
         //         RSpeedSet = 300;
         // }
+        ees = 100 - (((int)LastSteerSwm - SteerMidle) >> 1);
+        if (!ees)
+            ees = 100;
+        if (abs(ees) < 50)
+        {
+            ees /= ees;
+            ees *= 50;
+        }
+        else if (abs(ees) > 100)
+        {
+            ees /= ees;
+            ees *= 100;
+        }
+
         if (1)
         {
             LSpeedSet = SpeedSet * MySpeedSet;
             RSpeedSet = SpeedSet * MySpeedSet;
+        }
+        if (ees > 0)
+        {
+            LSpeedSet = LSpeedSet * ees / 100;
+        }
+        else
+        {
+            RSpeedSet = -RSpeedSet * ees / 100;
         }
     }
 }
@@ -261,21 +283,21 @@ void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
     SpeedPerErrorR  = SpeedLastErrorR;
     SpeedLastErrorR = SpeedErrorR;
     SpeedErrorR     = RightMotorTarget - GetRightMotorPules;
-    if (1)
-    {
-        if (send_speed == 0)
-        {
-            send_speed++;
-            printf("\r\n#");
-            printf("P:%d.%d%d_____", (int)(SpeedP), (int)(SpeedP * 10) % 10, (int)(SpeedP * 100) % 10);
-            printf("I:%d.%d%d_____", (int)(SpeedI), (int)(SpeedI * 10) % 10, (int)(SpeedI * 100) % 10);
-            printf("D:%d.%d%d", (int)(SpeedD), (int)(SpeedD * 10) % 10, (int)(SpeedD * 100) % 10);
-            printf("#\r\n");
-        }
-        printf("@%04d#\r\n", (int)GetLeftMotorPules);
-        printf("*%04d#\r\n", (int)GetRightMotorPules);
-        printf("$%04d#\r\n", (int)LeftMotorTarget);
-    }
+    // if (1)
+    // {
+    //     if (send_speed == 0)
+    //     {
+    //         send_speed++;
+    //         printf("\r\n#");
+    //         printf("P:%d.%d%d_____", (int)(SpeedP), (int)(SpeedP * 10) % 10, (int)(SpeedP * 100) % 10);
+    //         printf("I:%d.%d%d_____", (int)(SpeedI), (int)(SpeedI * 10) % 10, (int)(SpeedI * 100) % 10);
+    //         printf("D:%d.%d%d", (int)(SpeedD), (int)(SpeedD * 10) % 10, (int)(SpeedD * 100) % 10);
+    //         printf("#\r\n");
+    //     }
+    //     printf("@%04d#\r\n", (int)GetLeftMotorPules);
+    //     printf("*%04d#\r\n", (int)GetRightMotorPules);
+    //     printf("$%04d#\r\n", (int)LeftMotorTarget);
+    // }
 }
 
 //增量式PID控制算法

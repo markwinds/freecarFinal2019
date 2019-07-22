@@ -47,7 +47,7 @@ Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
     //{ "speed", { .l = &(SpeedSet) }, 0, 1 },ADC_normal_vaule
     { "error", { .f = &(Error) }, 0, 2 },
-    { "adcl", { .i = &(MiddleLine[57]) }, 0, 3 },
+    { "adcl", { .i = &(disgy_AD_val[0]) }, 0, 3 },
     { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
     { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
     { "rslo", { .c = &(rSlope) }, 0, 4 },
@@ -60,7 +60,7 @@ Screen_Data debug_window[] = {
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "cir", { .c = &(circluFlag) }, 0, 4 },
     { "hamper", { .c = &(hamperFlag) }, 0, 4 },
-    { "cirlose", { .c = &(circlulose) }, 0, 4 },
+    { "ees", { .i = &(ees) }, 0, 3 },
     { "end", NULL, 0, 0 }
 };
 
@@ -159,9 +159,9 @@ void main(void)
             }
         }
 
-        //CircluSearch(); //圆环识别
+        CircluSearch(); //圆环识别
 
-        // HamperSearch(); //路障识别
+        //HamperSearch(); //路障识别
 
         if (LK_jishi_flag && BlackEndM > 10) //起跑线检测
         {
@@ -172,23 +172,7 @@ void main(void)
         /*****************************舵机***************************/
         if (getSwitch(steerSW)) //控制舵机开关
         {
-            if (breakLoadFlag) //如果是电磁跑的断路
-            {
-                Error       = 0;
-                int32 error = getSteerPwmFromADCError();
-                setSteer(error);
-                if (BlackEndM > 30) //如果摄像头得到有用的图像
-                {
-                    breakLoadFlag = 0;
-                    eleSpeed += MySpeedSet;
-                    MySpeedSet = eleSpeed - MySpeedSet;
-                    eleSpeed -= MySpeedSet;
-                }
-            }
-            else
-            {
-                SteerControl();
-            }
+            SteerControl();
         }
         else
         {

@@ -16,8 +16,8 @@ int AD_val_max[3];
 /*---------------------------------------------manipulte EM function----------------------------------------------*/
 void InitEM()
 {
-    AD_val_min[2] = AD_val_min[1] = AD_val_min[0] = 50;
-    AD_val_max[2] = AD_val_max[1] = AD_val_max[0] = 1074;
+    AD_val_min[2] = AD_val_min[1] = AD_val_min[0] = 5;
+    AD_val_max[2] = AD_val_max[1] = AD_val_max[0] = 900;
     InitTree(&gLeftTree, ADC_LEFT);
     InitTree(&gRightTree, ADC_RIGHT);
     InitTree(&gMiddleTree, ADC_MIDDLE);
@@ -83,7 +83,7 @@ uint8 Normalized(int index)
         AD_val[index] = AD_val_min[index];
     else if (AD_val[index] > AD_val_max[index])
         AD_val[index] = AD_val_max[index];
-    int result = ((AD_val[index] - AD_val_min[index]) >> 3);
+    int result = ((AD_val[index] - AD_val_min[index]) / 7);
     return result > 127 ? 127 : (uint8)result;
 }
 /*---------------------------------------------address tree function----------------------------------------------*/
