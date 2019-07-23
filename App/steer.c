@@ -18,7 +18,7 @@ uint32 SteerPwm = 0, LastSteerSwm = 0; //舵机的pwm值和上次舵机的pwm值
 
 int judge_road_black_num   = 2;
 int judge_road_black_state = 1;
-int out_road               = 0;
+int out_road = 0, eleP = 15;
 
 //加权平均，权值的选取
 #if 1
@@ -142,7 +142,7 @@ void SteerInit(void) //舵机初始化
 float eError;
 uint8 espped        = 0;
 uint8 breakLoadFlag = 0, breakcout = 0;
-int32 eleSpeed = 4;
+int32 eleSpeed = 16;
 void  CalculateError(void)
 {
     //右是负的，左是正的
@@ -170,7 +170,7 @@ void  CalculateError(void)
     //eError = ((60 - disgy_AD_val[2]) / 8.0) * (dis_AD_val[0] - dis_AD_val[1]);
     //eError = getSteerPwmFromADCError();
     Error = (40 - CenterMeanValue); // 一场图像偏差值
-    if (LK_jishi_flag && !breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5) && (dis_AD_val[0] + dis_AD_val[1] + dis_AD_val[2]) > 40)
+    if ((LK_jishi_flag || getSwitch(mainShowSW)) && !breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5) && (dis_AD_val[0] + dis_AD_val[1] + dis_AD_val[2]) > 40)
     {
         if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20))
         {
@@ -178,10 +178,7 @@ void  CalculateError(void)
             if (breakcout > 5)
             {
                 breakLoadFlag = 1;
-                eleSpeed += MySpeedSet;
-                MySpeedSet = eleSpeed - MySpeedSet;
-                eleSpeed -= MySpeedSet;
-                breakcout = 0;
+                breakcout     = 0;
                 //tellMeRoadType(T2L11);
             }
             else if (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20)
@@ -194,20 +191,26 @@ void  CalculateError(void)
     }
     else if (breakLoadFlag) //如果是电磁跑的断路
     {
-        Error = 600.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1]) / (disgy_AD_val[2] + 20);
-        Error = Error * (Error * Error / 500 + 1);
+        Error = 1000.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1] + 1) / (disgy_AD_val[2] + 20);
         if (BlackEndM > 30 || (BlackEndM && (dis_AD_val[0] + dis_AD_val[1] + dis_AD_val[2]) < 10)) //如果摄像头得到有用的图像
         {
             breakLoadFlag = 0;
-            eleSpeed += MySpeedSet;
-            MySpeedSet = eleSpeed - MySpeedSet;
-            eleSpeed -= MySpeedSet;
         }
     }
 
     switch (circluFlag)
     {
         int16 ttem;
+        case 1:
+            if (Error > 6)
+            {
+                Error = 6;
+            }
+            else if (Error < -6)
+            {
+                Error = -6;
+            }
+            break;
         case 2:
             // if (Error < aMark)
             // {
@@ -262,7 +265,7 @@ void  CalculateError(void)
             // {
             //     Error = (46 - BlackEndM);
             // }
-            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 8;
+            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 7;
             if (Error < ttem)
             {
                 Error = ttem;
@@ -273,7 +276,7 @@ void  CalculateError(void)
             // {
             //     Error = BlackEndM - 46;
             // }
-            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 8;
+            ttem = (43 - BlackEndM) * (43 - BlackEndM) / 7;
             if (Error > -ttem)
             {
                 Error = -ttem;
@@ -290,10 +293,12 @@ void  CalculateError(void)
     switch (hamperFlag)
     {
         case 1:
-            Error = 15;
+
+            Error = 11;
+
             break;
         case 2:
-            Error = -13;
+            Error = -9;
             break;
         case 3:
             Error = -8;
@@ -376,8 +381,14 @@ void  CalculateError(void)
     if (Error <= -30.0)
 
         Error = -30.0;
-
-    KP = BasicP + (Error * Error) * J; //动态二次p模型
+    if (breakLoadFlag)
+    {
+        KP = Error * Error / eleP + 1;
+    }
+    else
+    {
+        KP = BasicP + (Error * Error) * J; //动态二次p模型
+    }
 
     if (KP >= 12)
         KP = 12; //p值限幅

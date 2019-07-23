@@ -104,8 +104,10 @@ unsigned char BreakStartR                    = 0;
 unsigned char BreakStartRFlag                = 0;
 
 uint8 circlulose;
+char  cirin = 13;
 
-char lSlope, rSlope;
+char lSlope,
+    rSlope;
 
 uint8 JudgeConnect(uint8, uint8);
 //设置中线，左线，右线的初始化值
@@ -273,7 +275,7 @@ void SearchCenterBlackline(void)
             {
                 j = 78;
             }
-            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + 10)
+            while (j <= ColumnMax - 2 && j <= LeftEdge[i] + Width[i] + cirin)
             {
                 RightEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j + 1] == Black_Point)
@@ -301,7 +303,7 @@ void SearchCenterBlackline(void)
             {
                 j = 2;
             }
-            while (j >= 1 && j >= RightEdge[i] - Width[i] - 10)
+            while (j >= 1 && j >= RightEdge[i] - Width[i] - cirin)
             {
                 LeftEdge[i] = j;
                 if (img[i][j] == White_Point && img[i][j - 1] == Black_Point)
@@ -445,7 +447,7 @@ void SearchCenterBlackline(void)
 
             //Auxiliary     = 1;
             MiddleLine[i] = MiddleLine[i + 1]; //用上一行
-            if (BlackEndM > 40)
+            if (BlackEndM > 40 && !circluFlag)
             {
                 if (RightEdge[i + 1] < RightEdge[i])
                 {
@@ -1396,12 +1398,11 @@ char  aMark;
 uint8 circluTimeOutClearMark1, circluTimeOutClearMark2, circluTimeOutClearMark3, circluTimeOutClearMark4;
 void  CircluSearch()
 {
-    if (circluFlag == 0 && BlackEndM > 35 && !CloseLoopFlag)
+    if (circluFlag == 0 && BlackEndM > 35)
     {
         if (disgy_AD_val[2] > 115 || disgy_AD_val[0] > 115 || disgy_AD_val[1] > 115 || (disgy_AD_val[0] + disgy_AD_val[2]) > 200 || (disgy_AD_val[1] + disgy_AD_val[2]) > 200) //(disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
         {
-            circluFlag = 1;
-            MySpeedSet -= 1;
+            circluFlag              = 1;
             circluTimeOutClearMark1 = 0;
         }
     }
@@ -1462,6 +1463,7 @@ void  CircluSearch()
             circluTimeOutClearMark2++;
             if (circluTimeOutClearMark2 > 2)
             {
+                MySpeedSet = actualSpeed;
                 circluFlag = 6;
             }
         }
@@ -1482,6 +1484,7 @@ void  CircluSearch()
             circluTimeOutClearMark3++;
             if (circluTimeOutClearMark3 > 2)
             {
+                MySpeedSet = actualSpeed;
                 circluFlag = 7;
             }
         }
@@ -1507,6 +1510,7 @@ void  CircluSearch()
             {
                 circluTimeOutClearMark4 = 0;
                 circluFlag              = 7;
+                MySpeedSet              = actualSpeed;
             }
         }
     }
@@ -1573,6 +1577,7 @@ void  CircluSearch()
         if (disgy_AD_val[2] > 110 || disgy_AD_val[0] > 110 || disgy_AD_val[1] > 110 || (disgy_AD_val[0] + disgy_AD_val[2]) > 200 || (disgy_AD_val[1] + disgy_AD_val[2]) > 200)
         {
             circluFlag += 2;
+            MySpeedSet = actualSpeed;
         }
     }
     if (circluFlag == 1 || circluFlag == 10 || circluFlag == 11)
@@ -1582,8 +1587,8 @@ void  CircluSearch()
             circluTimeOutClearMark1++;
             if (circluTimeOutClearMark1 > 15)
             {
+                MySpeedSet = actualSpeed;
                 circluFlag = 0;
-                MySpeedSet += 1;
             }
         }
         else
@@ -1598,19 +1603,27 @@ void   HamperSearch()
 {
     if (!hamperFlag && !breakLoadFlag)
     {
-        if (!circluFlag && BlackEndM < 45 && BlackEndM > 30 && abs(BlackEndM - BlackEndML) < 2 && abs(BlackEndM - BlackEndMR) < 2)
+        if (!circluFlag && BlackEndM < 42 && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
         {
-            if (!blocktemp)
+            int i, j = 68 - BlackEndM;
+            for (i = j; i > 57 - BlackEndM; i--)
             {
-                blocktemp = BlackEndM;
+                if (img[i][LeftEdge[j] - 1] == White_Point || img[i][RightEdge[j] + 1] == White_Point
+                    || (i > 63 - BlackEndM && (LeftEdge[i] < 5 || RightEdge[i] > ColumnMax - 6 || LeftEdge[i] < LeftEdge[i + 2] || RightEdge[i] > RightEdge[i + 2])))
+                {
+                    return;
+                }
             }
-            else if (blocktemp - BlackEndM > 2)
+            for (i = LeftEdge[j]; i < RightEdge[j]; i++)
             {
-                hamperFlag = 1;
-                hampervec  = MySpeedSet >> 2;
-                MySpeedSet -= hampervec << 1;
-                //tellMeRoadType(T1L3);
+                if (img[57 - BlackEndM][i] == White_Point)
+                {
+                    return;
+                }
             }
+            hamperFlag = 1;
+            MySpeedSet -= actualSpeed / 3;
+            //tellMeRoadType(T1L3);
         }
         else
             blocktemp = 0;
@@ -1618,36 +1631,58 @@ void   HamperSearch()
     else if (hamperFlag)
     {
         int i, j = 0;
-        if (hamperFlag == 1 && BlackEndM + BlackEndL + BlackEndR < 2)
+        if (hamperFlag == 1 && BlackEndR < 5)
         {
             for (i = RowMax - 1; i > 50; i--)
             {
-                if (img[i][ColumnMax - 1] == White_Point)
+                if (img[i][ColumnMax - 5] == White_Point)
                 {
                     return;
                 }
             }
-            MySpeedSet += hampervec;
-            hamperFlag = 4;
+            //MySpeedSet += hampervec;
+            hamperFlag = 2;
         }
-        else if (hamperFlag == 2 && 0)
+        else if (hamperFlag == 2)
         {
-            MySpeedSet -= hampervec;
-            hamperFlag = 3;
+            int16 temar[3] = { -1, -1, -1 };
+            for (i = ColumnMax - 1; i > 40; i--)
+            {
+                if (temar[0] == -1 && img[45][i] == White_Point && img[45][i - 1] == Black_Point)
+                {
+                    temar[0] = i;
+                }
+                if (temar[1] == -1 && img[40][i] == White_Point && img[40][i - 1] == Black_Point)
+                {
+                    temar[1] = i;
+                }
+                if (temar[2] == -1 && img[35][i] == White_Point && img[35][i - 1] == Black_Point)
+                {
+                    temar[2] = i;
+                }
+                if (temar[0] > temar[1] && temar[1] > temar[2] && abs(temar[0] + temar[2] - 2 * temar[1]) < 3)
+                {
+                    hamperFlag = 4;
+                    break;
+                }
+            }
         }
         else if (hamperFlag == 3 && j > RowMax - 5)
         {
             MySpeedSet += hampervec;
             hamperFlag = 4;
         }
-        else if (hamperFlag == 4 && BlackEndM > 10)
+        else if ((hamperFlag == 2 || hamperFlag == 4) && BlackEndM > 5)
         {
-            MySpeedSet += hampervec;
+            hamperFlag = 6;
+        }
+        else if (hamperFlag == 6 && BlackEndM > 30 && abs(Error) < 7)
+        {
+            MySpeedSet = actualSpeed;
             hamperFlag = 5;
         }
     }
 }
-
 uint8 star_lineflag = 0;
 void  star_line_judg() //起跑线检测
 {

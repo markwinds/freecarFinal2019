@@ -42,6 +42,7 @@ extern unsigned char LeftInflectionPointFlag;
 extern uint8         star_lineflag;
 
 extern char lSlope, rSlope;
+extern char cirin;
 
 /*** 函数声明 ****/
 

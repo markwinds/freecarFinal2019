@@ -30,13 +30,9 @@ Screen_Data mydata[] = { //
     { "tempf", { .f = &(temp_vaule_f) }, 0.1, 2 },
     { "KP+", { .f = &(BasicP) }, 1, 2 },
     { "KD+", { .f = &(KD) }, 0.1, 2 },
-    { "moKP-", { .f = &(SpeedP) }, 0.1, 2 },
-    { "moKP", { .f = &(SpeedP) }, 1, 2 },
-    { "moKP+", { .f = &(SpeedP) }, 10, 2 },
-    { "moKD", { .f = &(SpeedD) }, 1, 2 },
-    { "moKD+", { .f = &(SpeedD) }, 10, 2 },
-    { "moKI", { .f = &(SpeedI) }, 1, 2 },
-    { "moKI-", { .f = &(SpeedI) }, 0.1, 2 },
+    { "elep", { .i = &(eleP) }, 1.0, 3 },
+    { "hamsw", { .c = &(hamperFlag) }, 1, 4 },
+    { "cirin", { .c = &(cirin) }, 1, 4 },
     //{ "jxuc", { .c = &(sendFlag) }, 1, 4 },
     { "end", NULL, 0, 0 }
 };
@@ -161,7 +157,7 @@ void main(void)
 
         CircluSearch(); //圆环识别
 
-        //HamperSearch(); //路障识别
+        HamperSearch(); //路障识别
 
         if (LK_jishi_flag && BlackEndM > 10) //起跑线检测
         {

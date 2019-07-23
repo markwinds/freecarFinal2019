@@ -119,7 +119,7 @@ void  PIT0_IRQHandler()
             {
                 go = 1; //小车前进
             }
-            if (LK_jishi >= 380) //延迟2000*5ms后（10s）检测起跑线
+            if (LK_jishi >= 400) //延迟2000*5ms后（10s）检测起跑线
             {
                 LK_jishi_flag = 1;
                 LK_jishi      = 2000;
@@ -216,7 +216,7 @@ void GetTargetSpeed(void)
 
     else if (1) //二号拨码开关往上波
     {
-        SpeedSet = 10;
+        SpeedSet = (int)(10.0 * (1.0 - (abs(Error) + 1.0) / 100.0));
         // SpeedP   = 40.0;   //50.0;40
         // SpeedI   = 0.0009; //16.0;50,0.0006
         // SpeedD   = 10.0;   //1.3,10.0
@@ -238,13 +238,11 @@ void GetTargetSpeed(void)
         //     if (RSpeedSet >= 300)
         //         RSpeedSet = 300;
         // }
-        ees = 100 - (((int)LastSteerSwm - SteerMidle) >> 1);
-        if (!ees)
-            ees = 100;
-        if (abs(ees) < 50)
+        ees = 120 - (((int)LastSteerSwm - SteerMidle));
+        if (abs(ees) < 20)
         {
             ees /= ees;
-            ees *= 50;
+            ees *= 20;
         }
         else if (abs(ees) > 100)
         {
@@ -254,8 +252,8 @@ void GetTargetSpeed(void)
 
         if (1)
         {
-            LSpeedSet = SpeedSet * MySpeedSet;
-            RSpeedSet = SpeedSet * MySpeedSet;
+            LSpeedSet = SpeedSet * eleSpeed;
+            RSpeedSet = SpeedSet * eleSpeed;
         }
         if (ees > 0)
         {

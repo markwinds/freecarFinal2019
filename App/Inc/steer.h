@@ -20,6 +20,8 @@ extern float  BasicP; //10//7.5//舵机方向微分系数,影响舵机的打角�
 extern int32  eleSpeed;
 extern uint8  breakLoadFlag;
 extern uint32 LastSteerSwm;
+extern int    actualSpeed;
+extern int    eleP;
 void          SteerInit(void); //舵机初始化
 void          CalculateError(void);
 extern void   SteerControl(void);
