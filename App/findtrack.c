@@ -104,7 +104,7 @@ unsigned char BreakStartR                    = 0;
 unsigned char BreakStartRFlag                = 0;
 
 uint8 circlulose;
-char  cirin = 13;
+char  cirin = 12;
 
 char lSlope,
     rSlope;
@@ -1601,7 +1601,7 @@ uint8  blocktemp;
 uint16 hampervec;
 void   HamperSearch()
 {
-    if (!hamperFlag && !breakLoadFlag)
+    if (hhhar[hhhead] && !hamperFlag && !breakLoadFlag)
     {
         if (!circluFlag && BlackEndM < 42 && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
         {
@@ -1621,8 +1621,21 @@ void   HamperSearch()
                     return;
                 }
             }
-            hamperFlag = 1;
-            MySpeedSet -= actualSpeed / 3;
+
+            if (hhhar[hhhead] == 2 || hhhar[hhhead] == 5)
+            {
+                hamperFlag = 1;
+                MySpeedSet -= actualSpeed / 3;
+            }
+            else if (hhhar[hhhead] == 4)
+            {
+                hamperFlag = 3;
+            }
+            else if (hhhar[hhhead] == 1)
+            {
+                MySpeedSet -= actualSpeed / 3;
+                hamperFlag = 5;
+            }
             //tellMeRoadType(T1L3);
         }
         else
@@ -1667,19 +1680,25 @@ void   HamperSearch()
                 }
             }
         }
-        else if (hamperFlag == 3 && j > RowMax - 5)
+        else if (hamperFlag == 3 && BlackEndM < 30)
         {
-            MySpeedSet += hampervec;
-            hamperFlag = 4;
+            hamperFlag = 6;
         }
         else if ((hamperFlag == 2 || hamperFlag == 4) && BlackEndM > 5)
         {
             hamperFlag = 6;
         }
-        else if (hamperFlag == 6 && BlackEndM > 30 && abs(Error) < 7)
+        else if (hamperFlag == 6 && BlackEndM > 30)
         {
             MySpeedSet = actualSpeed;
-            hamperFlag = 5;
+            hamperFlag = 0;
+            hhhead++;
+        }
+        else if (hamperFlag == 5 && BlackEndM < 5)
+        {
+            breakLoadFlag = 1;
+            breakLoadCont = 0;
+            hamperFlag    = 0;
         }
     }
 }

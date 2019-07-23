@@ -45,13 +45,16 @@ typedef struct Lcd_State //状态结构体
 } Lcd_State;
 
 /*------------------------------------------------全局变量---------------------------------------------*/
-extern Lcd_State  wait_middle, normal_page, imgbuff_show, read_picture, show_dealed_picture, set_value, various_adjust, show_ADC_value; //lcd等待按键时的4种状态
-extern Lcd_State* p_current_state;                                                                                                      //指向当前状态的指针
+extern Lcd_State  wait_middle, normal_page, imgbuff_show, read_picture, show_dealed_picture, set_value, various_adjust, show_ADC_value, ready_go; //lcd等待按键时的4种状态
+extern Lcd_State* p_current_state;                                                                                                                //指向当前状态的指针
 
 extern int          page;        //ui当前所在页
 extern int          current_row; //ui当前所在行
 extern Screen_Data* screen_data; //ui显示的参数
 extern Screen_Data* dvarious;    //调试用的参数,ip变为是否已经选中
+
+extern uint8 hhhar[15]; //断路判别
+extern uint8 hhhead;
 
 //extern float motor_go; //在显示状态下控制电机是否转动的变量
 extern uint8  key_on;
@@ -80,6 +83,7 @@ typedef enum modeControl
     debugMOD = 0x39, // 0011 1001
     pageMOD  = 0x41, // 0100 0001
     ADCMOD   = 0X80, // 1000 0000
+    hhhMOD   = 0x00, // 0000 0000
 } modeControl;
 /*--------------------------------------------------函数--------------------------------------------------*/
 

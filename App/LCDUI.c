@@ -22,13 +22,26 @@ Lcd_State* p_current_state = &imgbuff_show;
 
 /*---------------------------------------------辅助变量----------------------------------------------*/
 uint8        AllSwitch;
+uint8        hhhpi = 0;
+uint8        hhhar[15]; //断路判别
+uint8        hhhead       = 0;
+const char   hhhstr[6][8] = { "GOGOGO!", "duanlu", "luzL", "poda", "DEL", "luzR" };
+const uint16 hhhcol[6]    = { YELLOW, BLUE, RED, GREEN, GRED, BRED };
 uint8        amount_of_dvarious;
 int8         ePadjust = -1, swP = 0, choseagain = 0;
 Screen_Data *iPadjust, *now_adjust[3];
 const char   swStr[6][7] = { " RUN! ", "Motor ", "Steer ", " Lcd  ", "Camera", " ADC  " };
 
 uint8 roost = 1;
-
+/*---------------------------------------------局部函数----------------------------------------------*/
+void       updatehhh();
+void       addhhh(uint8);
+void       delhhh();
+Lcd_State* hhh_u(Lcd_State*);
+Lcd_State* hhh_d(Lcd_State*);
+Lcd_State* hhh_l(Lcd_State*);
+Lcd_State* hhh_r(Lcd_State*);
+Lcd_State* hhh_m(Lcd_State*);
 /*---------------------------------------------辅助ADC采集和显示函数----------------------------------------------*/
 Lcd_State* gotoShowADCValue()
 {
@@ -56,8 +69,8 @@ Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
             }
             else
             {
-                setMode(runMOD);
-                disable_irq(PORTD_IRQn);
+                setMode(hhhMOD);
+                return &ready_go;
             }
             choseagain = 0;
         }
@@ -558,7 +571,69 @@ Lcd_State* rightSetVaule(Lcd_State* pThis) //右
     addFlowValue();
     return pThis;
 }
+/*---------------------------------------------delay_go----------------------------------------------*/
 
+Lcd_State* hhh_m(Lcd_State* pThis) //中
+{
+    switch (hhhpi)
+    {
+        case 0:
+            setMode(runMOD);
+            disable_irq(PORTD_IRQn);
+            hhhead = 0;
+            break;
+        case 1:
+            addhhh(1);
+            break;
+        case 2:
+            addhhh(2);
+            break;
+        case 3:
+            addhhh(3);
+            break;
+        case 4:
+            delhhh();
+            break;
+        case 5:
+            addhhh(5);
+            break;
+    }
+    return pThis;
+}
+Lcd_State* hhh_u(Lcd_State* pThis) //上
+{
+    if (hhhpi == 5)
+        hhhpi = 2;
+    else if (!hhhpi)
+        hhhpi = 1;
+    else
+        hhhpi = 0;
+    return pThis;
+}
+Lcd_State* hhh_d(Lcd_State* pThis) //下
+{
+    if (hhhpi == 2)
+        hhhpi = 5;
+    else if (!hhhpi)
+        hhhpi = 4;
+    else
+        hhhpi = 0;
+    return pThis;
+}
+Lcd_State* hhh_r(Lcd_State* pThis) //右
+{
+    if (hhhpi == 5)
+        hhhpi = 2;
+    hhhpi = (hhhpi + 1) % 5;
+    return pThis;
+}
+Lcd_State* hhh_l(Lcd_State* pThis) //左
+{
+    if (hhhpi == 5)
+        hhhpi = 2;
+    hhhpi = (hhhpi + 4) % 5;
+    return pThis;
+}
 /*---------------------------------------------do nothing----------------------------------------------*/
 
 Lcd_State* doNothing(Lcd_State* pThis) //忽略按键操作，返回原来的状态即保持状态不变
@@ -607,6 +682,11 @@ void PORTD_IRQHandler()
     if (getSwitch(updateSW))
     {
         updateUI();
+    }
+    else if (p_current_state == &ready_go)
+    {
+        LCD_clear(WHITE);
+        updatehhh();
     }
     else if (!getSwitch(ADCSW))
     {
@@ -710,7 +790,50 @@ void updateadjustUI()
     }
     LCD_str(tem_site, (uint8*)(swStr[swP]), fcolor, bcolor);
 }
-
+void updatehhh()
+{
+    int    i;
+    Site_t tem_site = { 0, 0 };
+    for (i = 1, tem_site.y = 15; i <= 4; i++, tem_site.x += 32)
+    {
+        if (hhhpi == i)
+        {
+            LCD_str(tem_site, (uint8*)(hhhstr[i]), BLACK, hhhcol[i]);
+        }
+        else
+        {
+            LCD_str(tem_site, (uint8*)(hhhstr[i]), WHITE, hhhcol[i]);
+        }
+    }
+    tem_site.x = 32;
+    tem_site.y = 30;
+    if (hhhpi == 5)
+    {
+        LCD_str(tem_site, (uint8*)(hhhstr[5]), BLACK, hhhcol[5]);
+    }
+    else
+    {
+        LCD_str(tem_site, (uint8*)(hhhstr[5]), WHITE, hhhcol[5]);
+    }
+    tem_site.x = 16;
+    tem_site.y = 55;
+    if (hhhpi == 0)
+    {
+        LCD_str(tem_site, (uint8*)(hhhstr[0]), BLACK, hhhcol[0]);
+    }
+    else
+    {
+        LCD_str(tem_site, (uint8*)(hhhstr[0]), WHITE, hhhcol[0]);
+    }
+    Size_t tem_size = { 7, 20 };
+    tem_site.y      = 100;
+    tem_site.x      = 0;
+    for (i = 0; i < hhhead; i++)
+    {
+        LCD_rectangle(tem_site, tem_size, hhhcol[hhhar[i]]);
+        tem_site.x += 8;
+    }
+}
 void UI_INIT()
 {
     int i = 0;
@@ -761,6 +884,18 @@ void DiyDataPrintf(Site_t tem_site, Screen_Data* da, int16 fcolor, int16 bcolor)
             break;
     }
 }
+void addhhh(uint8 mask)
+{
+    if (hhhead > 14)
+        return;
+    hhhar[hhhead++] = mask;
+}
+void delhhh()
+{
+    if (!hhhead)
+        return;
+    hhhar[hhhead--] = 0;
+}
 /*----------------------------------------状态控制---------------------------------------*/
 uint8 getSwitch(enum bitControl bit)
 {
@@ -798,6 +933,14 @@ Lcd_State various_adjust = {
     downChose,     //下
     addValue,      //左
     decValue       //右
+};
+//人工智能
+Lcd_State ready_go = {
+    hhh_m, //中
+    hhh_u, //上 进入显示
+    hhh_d, //下
+    hhh_l, //左
+    hhh_r  //右
 };
 //显示处理过的图像
 Lcd_State show_dealed_picture = {

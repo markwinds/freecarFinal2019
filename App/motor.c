@@ -127,7 +127,7 @@ void  PIT0_IRQHandler()
         }
         else //出赛道停跑
         {
-            if (!dis_AD_val[0] && !dis_AD_val[1] && !dis_AD_val[2])
+            if (!hamperFlag && !dis_AD_val[0] && !dis_AD_val[1] && !dis_AD_val[2])
             {
 
                 if (runrunrun > 120)
@@ -197,6 +197,10 @@ void GetTargetSpeed(void)
         {
             LSpeedSet = SpeedSet;
             RSpeedSet = SpeedSet;
+        }
+        if (breakLoadFlag && breakLoadCont < 200)
+        {
+            breakLoadCont++;
         }
         LSpeedSet = (LSpeedSet >> 1) * MySpeedSet;
         RSpeedSet = (RSpeedSet >> 1) * MySpeedSet;

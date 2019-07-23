@@ -19,6 +19,7 @@ extern float  KD;     //舵机方向比例系数，影响舵机的打角范围
 extern float  BasicP; //10//7.5//舵机方向微分系数,影响舵机的打角反应
 extern int32  eleSpeed;
 extern uint8  breakLoadFlag;
+extern uint16 breakLoadCont;
 extern uint32 LastSteerSwm;
 extern int    actualSpeed;
 extern int    eleP;
