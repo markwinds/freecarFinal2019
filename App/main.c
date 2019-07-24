@@ -8,7 +8,7 @@ uint32 temx, temy, tem1;
 int32  zbttem;
 float  temf      = 0.23;
 int    stopSpeed = 0, actualSpeed = 8;
-
+int    ADC_updata = 0;
 //函数声明
 void PORTA_IRQHandler();
 void DMA0_IRQHandler();
@@ -43,9 +43,9 @@ Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
     //{ "speed", { .l = &(SpeedSet) }, 0, 1 },ADC_normal_vaule
     { "error", { .f = &(Error) }, 0, 2 },
-    { "adcl", { .i = &(disgy_AD_val[0]) }, 0, 3 },
-    { "adcr", { .i = &(disgy_AD_val[1]) }, 0, 3 },
-    { "adcm", { .i = &(disgy_AD_val[2]) }, 0, 3 },
+    { "adcl", { .i = &(ADC_normal_vaule[1]) }, 0, 3 },
+    { "adcr", { .i = &(ADC_normal_vaule[2]) }, 0, 3 },
+    { "adcm", { .i = &(ADC_normal_vaule[0]) }, 0, 3 },
     { "rslo", { .c = &(rSlope) }, 0, 4 },
     { "lslo", { .c = &(lSlope) }, 0, 4 },
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
@@ -63,7 +63,7 @@ Screen_Data debug_window[] = {
 /**每次循环都要进行的检测，主要是一些标志位的处理*/
 void doThisEveryPeriod()
 {
-    checkBuzzerShouldSpeak();
+    ADC_updata = 0;
     manageTimerFlag();    //处理定时器控制的标志位
     if (uart4_to_do_flag) //串口是否接收到命令
     {

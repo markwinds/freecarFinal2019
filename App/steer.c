@@ -192,19 +192,6 @@ void  CalculateError(void)
         else
             breakcout--;
     }
-    else if (breakLoadFlag) //如果是电磁跑的断路
-    {
-        Error = 1000.0 * (disgy_AD_val[0] - disgy_AD_val[1]) / (disgy_AD_val[0] + disgy_AD_val[1] + 1) / (disgy_AD_val[2] + 20);
-        if (BlackEndM > 30 || (BlackEndM && (dis_AD_val[0] + dis_AD_val[1] + dis_AD_val[2]) < 10)) //如果摄像头得到有用的图像
-        {
-            breakLoadFlag = 0;
-            if (breakLoadCont > 188)
-            {
-                hhhead++;
-            }
-            MySpeedSet = actualSpeed;
-        }
-    }
 
     switch (circluFlag)
     {
@@ -229,18 +216,18 @@ void  CalculateError(void)
             //     circluFlag = 5;
             // }
             break;
-        case 4:
-            if (Error < 1)
-            {
-                Error = 11;
-            }
-            break;
-        case 5:
-            if (Error > -1)
-            {
-                Error = -11;
-            }
-            break;
+        // case 4:
+        //     if (Error < 1)
+        //     {
+        //         Error = 11;
+        //     }
+        //     break;
+        // case 5:
+        //     if (Error > -1)
+        //     {
+        //         Error = -11;
+        //     }
+        //     break;
         case 6:
             // if (Error < -1)
             // {

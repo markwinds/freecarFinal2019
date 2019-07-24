@@ -21,6 +21,7 @@ extern int32  eleSpeed;
 extern uint8  breakLoadFlag;
 extern uint16 breakLoadCont;
 extern uint32 LastSteerSwm;
+extern int    ADC_updata;
 extern int    actualSpeed;
 extern int    eleP;
 void          SteerInit(void); //舵机初始化

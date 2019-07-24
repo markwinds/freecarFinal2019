@@ -1400,13 +1400,17 @@ void  CircluSearch()
 {
     if (circluFlag == 0 && BlackEndM > 35)
     {
-        if (disgy_AD_val[2] > 115 || disgy_AD_val[0] > 115 || disgy_AD_val[1] > 115 || (disgy_AD_val[0] + disgy_AD_val[2]) > 200 || (disgy_AD_val[1] + disgy_AD_val[2]) > 200) //(disgy_AD_val[0] > 120 || disgy_AD_val[1] > 120 || (disgy_AD_val[1] > 95 && disgy_AD_val[0] > 45) || (disgy_AD_val[0] > 95 && disgy_AD_val[1] > 45)) && disgy_AD_val[2] > 115)
+        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2000 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2000)
+        {
+            aMark++;
+        }
+        if (aMark > 4)
         {
             circluFlag              = 1;
             circluTimeOutClearMark1 = 0;
         }
     }
-    else if (circluFlag == 1)
+    else if (circluFlag == 1 && (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2000 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2000))
     {
         int i;
         for (i = 30; i > 20; i--)
@@ -1458,7 +1462,7 @@ void  CircluSearch()
         //     }
         // }
         // aMark = (i - 15) / 2 + 7;
-        if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
+        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] < 1600 && ADC_normal_vaule[0] + ADC_normal_vaule[2] < 1600 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
         {
             circluTimeOutClearMark2++;
             if (circluTimeOutClearMark2 > 2)
@@ -1479,7 +1483,7 @@ void  CircluSearch()
         //     }
         // }
         // aMark = (char)(-((i - 15) / 2 + 6));
-        if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
+        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] < 1600 && ADC_normal_vaule[0] + ADC_normal_vaule[2] < 1600 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
         {
             circluTimeOutClearMark3++;
             if (circluTimeOutClearMark3 > 2)
@@ -1489,31 +1493,31 @@ void  CircluSearch()
             }
         }
     }
-    else if (circluFlag == 4)
-    {
-        if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
-        {
-            circluTimeOutClearMark2++;
-            if (circluTimeOutClearMark2 > 5)
-            {
-                circluTimeOutClearMark4 = 0;
-                circluFlag              = 6;
-            }
-        }
-    }
-    else if (circluFlag == 5)
-    {
-        if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
-        {
-            circluTimeOutClearMark3++;
-            if (circluTimeOutClearMark3 > 5)
-            {
-                circluTimeOutClearMark4 = 0;
-                circluFlag              = 7;
-                MySpeedSet              = actualSpeed;
-            }
-        }
-    }
+    // else if (circluFlag == 4)
+    // {
+    //     if (disgy_AD_val[0] + disgy_AD_val[1] < 60 && BlackEndM < 47 && BlackEndL > BlackEndM && BlackEndM > BlackEndR)
+    //     {
+    //         circluTimeOutClearMark2++;
+    //         if (circluTimeOutClearMark2 > 5)
+    //         {
+    //             circluTimeOutClearMark4 = 0;
+    //             circluFlag              = 6;
+    //         }
+    //     }
+    // }
+    // else if (circluFlag == 5)
+    // {
+    //     if (disgy_AD_val[1] + disgy_AD_val[0] < 60 && BlackEndM < 47 && BlackEndL < BlackEndM && BlackEndM < BlackEndR)
+    //     {
+    //         circluTimeOutClearMark3++;
+    //         if (circluTimeOutClearMark3 > 5)
+    //         {
+    //             circluTimeOutClearMark4 = 0;
+    //             circluFlag              = 7;
+    //             MySpeedSet              = actualSpeed;
+    //         }
+    //     }
+    // }
     else if (circluFlag == 6)
     {
         // if (BlackEndM <= 40 && BlackEndM >= 37 && (BlackEndM - BlackEndR) < 3 && (BlackEndL - BlackEndM) < 3 && BlackEndM > BlackEndR && BlackEndL > BlackEndM)
@@ -1574,18 +1578,21 @@ void  CircluSearch()
     }
     else if (circluFlag == 8 || circluFlag == 9)
     {
-        if (disgy_AD_val[2] > 110 || disgy_AD_val[0] > 110 || disgy_AD_val[1] > 110 || (disgy_AD_val[0] + disgy_AD_val[2]) > 200 || (disgy_AD_val[1] + disgy_AD_val[2]) > 200)
+        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2000 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2000)
         {
             circluFlag += 2;
             MySpeedSet = actualSpeed;
         }
     }
+    else
+        aMark = 0;
+
     if (circluFlag == 1 || circluFlag == 10 || circluFlag == 11)
     {
-        if (disgy_AD_val[2] < 110 && disgy_AD_val[0] < 110 && disgy_AD_val[1] < 110 && (disgy_AD_val[0] + disgy_AD_val[2]) < 200 && (disgy_AD_val[1] + disgy_AD_val[2]) < 200)
+        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] < 2000 && ADC_normal_vaule[0] + ADC_normal_vaule[2] < 2000)
         {
             circluTimeOutClearMark1++;
-            if (circluTimeOutClearMark1 > 15)
+            if (circluTimeOutClearMark1 > 10)
             {
                 MySpeedSet = actualSpeed;
                 circluFlag = 0;
@@ -1688,7 +1695,7 @@ void   HamperSearch()
         {
             hamperFlag = 6;
         }
-        else if (hamperFlag == 6 && dis_AD_val[2])
+        else if (hamperFlag == 6 && ADC_normal_vaule[0] > 10)
         {
             MySpeedSet = actualSpeed;
             hamperFlag = 0;

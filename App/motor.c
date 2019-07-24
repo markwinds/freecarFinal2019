@@ -77,7 +77,7 @@ void SpeedGet(void)
 }
 
 int   LK_jishi_flag, LK_jishi;
-uint8 runrunrun = 0, go;
+uint8 runrunrun = 0, go, gogo = 0;
 int16 ste = 868, dir = 1;
 void  PIT0_IRQHandler()
 {
@@ -117,7 +117,7 @@ void  PIT0_IRQHandler()
             }
             if (LK_jishi == 300) //起步延时1.5秒
             {
-                go = 1; //小车前进
+                gogo = 1; //小车前进
             }
             if (LK_jishi >= 400) //延迟2000*5ms后（10s）检测起跑线
             {
@@ -127,7 +127,7 @@ void  PIT0_IRQHandler()
         }
         else //出赛道停跑
         {
-            if (!hamperFlag && !dis_AD_val[0] && !dis_AD_val[1] && !dis_AD_val[2])
+            if (!hamperFlag && ADC_normal_vaule[0] == 1 && ADC_normal_vaule[1] == 1 && ADC_normal_vaule[1] == 1)
             {
 
                 if (runrunrun > 120)
@@ -204,7 +204,7 @@ void GetTargetSpeed(void)
         }
         LSpeedSet = (LSpeedSet >> 1) * MySpeedSet;
         RSpeedSet = (RSpeedSet >> 1) * MySpeedSet;
-        if (star_lineflag || !go)
+        if (star_lineflag || !go || !gogo)
         {
             LSpeedSet = 0;
             RSpeedSet = 0;
