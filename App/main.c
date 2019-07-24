@@ -21,6 +21,7 @@ void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函�
 Screen_Data mydata[] = { //
     { "speed", { .l = &(actualSpeed) }, 1.0, 1 },
     { "eleSpe", { .l = &(eleSpeed) }, 1.0, 1 },
+    { "sspeed", { .f = &(sspeed) }, 1, 2 },
     { "KP", { .f = &(BasicP) }, 0.1, 2 },
     { "KD", { .f = &(KD) }, 0.1, 2 },
     { "-reSpe", { .f = &(errorspeed) }, 0.1, 2 },
@@ -168,7 +169,21 @@ void main(void)
         /*****************************舵机***************************/
         if (getSwitch(steerSW)) //控制舵机开关
         {
-            SteerControl();
+            if (breakLoadFlag)
+            {
+                newADCError();
+                setSteer((int)ADC_offset);
+                if (BlackEndM > 15 && BlackEndL > 5 && BlackEndR > 5)
+                {
+                    breakLoadFlag = 0;
+                    if (breakLoadCont > 20)
+                    {
+                        hhhead++;
+                    }
+                }
+            }
+            else
+                SteerControl();
         }
         else
         {

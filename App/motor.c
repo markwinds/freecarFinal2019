@@ -154,7 +154,6 @@ void  PIT0_IRQHandler()
 int ees;
 #endif
 
-#if 1
 void GetTargetSpeed(void)
 {
 
@@ -197,10 +196,6 @@ void GetTargetSpeed(void)
         {
             LSpeedSet = SpeedSet;
             RSpeedSet = SpeedSet;
-        }
-        if (breakLoadFlag && breakLoadCont < 200)
-        {
-            breakLoadCont++;
         }
         LSpeedSet = (LSpeedSet >> 1) * MySpeedSet;
         RSpeedSet = (RSpeedSet >> 1) * MySpeedSet;
@@ -270,8 +265,6 @@ void GetTargetSpeed(void)
     }
 }
 
-#endif
-
 //计算速度偏差
 int  sendArray[2];
 void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
@@ -302,12 +295,26 @@ void CalculateMotorSpeedError(float LeftMotorTarget, float RightMotorTarget)
     // }
 }
 
+void zbtGetTargetSpeed()
+{
+    LSpeedSet = (10) * ADC_speed;
+    RSpeedSet = (10) * ADC_speed;
+    if (breakLoadFlag && breakLoadCont < 200 && BlackEndM < 2)
+    {
+        breakLoadCont++;
+    }
+}
+
 //增量式PID控制算法
 float tempid;
 void  MotorControl(void)
 {
-
-    GetTargetSpeed();
+    if (breakLoadFlag)
+    {
+        zbtGetTargetSpeed();
+    }
+    else
+        GetTargetSpeed();
     CalculateMotorSpeedError(LSpeedSet, RSpeedSet); //设定目标速度计算偏差
 
     // if (abs(SpeedErrorR) < 50)

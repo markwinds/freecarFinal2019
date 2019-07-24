@@ -10,6 +10,12 @@ int   steer_offset             = 0;
 int32 temp_vaule               = 400;
 float temp_vaule_f             = 2.4;
 
+float ADC_error     = 0;
+float pre_ADC_error = 0;
+float ADC_offset    = 0;
+float ADC_speed     = 0;
+float sspeed        = 14;
+
 /****************************************flash操作***********************************************/
 void writeADCParamToFlash()
 {
@@ -206,49 +212,6 @@ void initADCUI()
 
 /**********************************************偏差的计算***************************************************/
 
-/**
- * @brief       从ADC采集数据，并计算偏差
-*/
-int32 getErrorFromADC()
-{
-    updateADCVaule();
-    /**丢线的判定*/
-    if (ADC_normal_vaule[0] < 280)
-    {
-        return ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -8000 : 8000;
-    }
-
-    /**得到纵向和横向的差比和*/
-    int32 horizontal_dec_add = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]); //200
-    int32 vertical_dec_add   = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[3], ADC_normal_vaule[4]); //90
-    /**得到权重和补偿值*/
-    //int32 wright     = abs(vertical_dec_add) << 1;
-    int32 compensate = 0;
-    if (ADC_normal_vaule[0] < 700)
-    {
-        compensate = (int32)(300 * 800 / ADC_normal_vaule[0] - 20);
-        compensate = ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -compensate : compensate;
-    }
-    //return ((horizontal_dec_add * abs(200 - wright) + wright * vertical_dec_add) >> 7) + compensate; //20000
-    int32 ans = (horizontal_dec_add * (1500 / 200)) + (vertical_dec_add * abs(vertical_dec_add)) / (8000 / 1500) + compensate;
-    return ans < temp_vaule ? ans / 2 : ans;
-}
-
-int32 getErrorFromADC1()
-{
-    updateADCVaule();
-    /**丢线的判定*/
-    if (ADC_normal_vaule[0] < 280)
-    {
-        return ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -500 : 500;
-    }
-
-    int32 horizontal_dec_add = getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]);
-
-    ADC_normal_vaule[0] = ADC_normal_vaule[0] > 900 ? 900 : ADC_normal_vaule[0];
-    return ADC_normal_vaule[1] > ADC_normal_vaule[2] ? -(900 - ADC_normal_vaule[0]) : (900 - ADC_normal_vaule[0]);
-}
-
 void showTrueError()
 {
     int32 error = 0;
@@ -274,4 +237,30 @@ void showTrueError()
     LCDShowNum(100, 0, getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[1], ADC_normal_vaule[2]), RED, WHITE);
     LCDShowNum(100, 40, getDecAdd(ADC_normal_vaule[0], ADC_normal_vaule[3], ADC_normal_vaule[4]), RED, WHITE);
     LCDShowNum(100, 80, error, RED, WHITE);
+}
+
+void newADCError()
+{
+    pre_ADC_error   = ADC_error;
+    int32 left_sum  = 1000 * (ADC_true_vaule[1] - 10) / (ADC_max_vaule[1] - 10);
+    int32 right_sum = 1000 * (ADC_true_vaule[2] - 10) / (ADC_max_vaule[2] - 10);
+    ADC_error       = 100.0 * (right_sum - left_sum) / (left_sum + right_sum);
+    ADC_error       = ADC_error * (ADC_error * ADC_error / 1250.0 + 2) / 10.0;
+    ADC_error /= 15;
+
+    if (ADC_normal_vaule[0] < 500)
+    {
+        ADC_offset = 7 * ADC_error + 7 * (ADC_error - pre_ADC_error);
+        ADC_speed  = (sspeed / 1.5);
+    }
+    else if (ADC_normal_vaule[0] < 900)
+    {
+        ADC_offset = 4 * ADC_error + 40 * (ADC_error - pre_ADC_error);
+        ADC_speed  = sspeed;
+    }
+    else
+    {
+        ADC_offset = 2.0 * ADC_error + 40.0 * (ADC_error - pre_ADC_error);
+        ADC_speed  = (sspeed * 1.4);
+    }
 }

@@ -30,6 +30,8 @@ int   LeftLoseStart  = 0; //记录左边丢线的开始行
 int   RightLoseStart = 0; //记录右边边丢线的开始行
 int   WhiteStart     = 0;
 
+int32 time_buzzer = 0;
+
 /*********define for GetBlackEndParam**********/
 int BlackEndMR     = 0;
 int BlackEndML     = 0;
@@ -1400,11 +1402,11 @@ void  CircluSearch()
 {
     if (circluFlag == 0 && BlackEndM > 35)
     {
-        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2000 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2000)
+        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2200 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2200)
         {
             aMark++;
         }
-        if (aMark > 4)
+        if (aMark > 6)
         {
             circluFlag              = 1;
             circluTimeOutClearMark1 = 0;
@@ -1610,7 +1612,7 @@ void   HamperSearch()
 {
     if (hhhar[hhhead] && !hamperFlag && !breakLoadFlag)
     {
-        if (!circluFlag && BlackEndM < 42 && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
+        if (!circluFlag && BlackEndM < 43 && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
         {
             int i, j = 68 - BlackEndM;
             for (i = j; i > 57 - BlackEndM; i--)
@@ -1651,11 +1653,12 @@ void   HamperSearch()
     else if (hamperFlag)
     {
         int i, j = 0;
-        if (hamperFlag == 1 && BlackEndR < 5)
+        if (hamperFlag == 1 && ((BlackEndR < 5 && hhhar[hhhead] == 2) || (hhhar[hhhead] == 5 && BlackEndL < 5)))
         {
+            uint8 k = hhhar[hhhead] == 2 ? ColumnMax - 5 : 4;
             for (i = RowMax - 1; i > 50; i--)
             {
-                if (img[i][ColumnMax - 5] == White_Point)
+                if (img[i][k] == White_Point)
                 {
                     return;
                 }
@@ -1666,36 +1669,34 @@ void   HamperSearch()
         else if (hamperFlag == 2)
         {
             int16 temar[3] = { -1, -1, -1 };
-            for (i = ColumnMax - 1; i > 40; i--)
+            if (hhhar[hhhead] == 2)
             {
-                if (temar[0] == -1 && img[45][i] == White_Point && img[45][i - 1] == Black_Point)
+                for (i = ColumnMax - 1; i > 55; i--)
                 {
-                    temar[0] = i;
+                    if (img[40][i] == Black_Point)
+                        return;
                 }
-                if (temar[1] == -1 && img[40][i] == White_Point && img[40][i - 1] == Black_Point)
+                hamperFlag = 4;
+            }
+            else
+            {
+                for (i = 0; i < 25; i++)
                 {
-                    temar[1] = i;
+                    if (img[40][i] == Black_Point)
+                        return;
                 }
-                if (temar[2] == -1 && img[35][i] == White_Point && img[35][i - 1] == Black_Point)
-                {
-                    temar[2] = i;
-                }
-                if (temar[0] > temar[1] && temar[1] > temar[2] && abs(temar[0] + temar[2] - 2 * temar[1]) < 3)
-                {
-                    hamperFlag = 4;
-                    break;
-                }
+                hamperFlag = 4;
             }
         }
         else if (hamperFlag == 3 && BlackEndM < 30)
         {
             hamperFlag = 6;
         }
-        else if ((hamperFlag == 2 || hamperFlag == 4) && BlackEndM > 5)
+        else if ((hamperFlag == 2 || hamperFlag == 4) && ADC_normal_vaule[0] > 10)
         {
             hamperFlag = 6;
         }
-        else if (hamperFlag == 6 && ADC_normal_vaule[0] > 10)
+        else if (hamperFlag == 6 && BlackEndM > 15)
         {
             MySpeedSet = actualSpeed;
             hamperFlag = 0;

@@ -172,7 +172,7 @@ void  CalculateError(void)
     //eError = ((60 - disgy_AD_val[2]) / 8.0) * (dis_AD_val[0] - dis_AD_val[1]);
     //eError = getSteerPwmFromADCError();
     Error = (40 - CenterMeanValue); // 一场图像偏差值
-    if (hhhar[hhhead] == 1 && (LK_jishi_flag || getSwitch(mainShowSW)) && !breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5) && (dis_AD_val[0] + dis_AD_val[1] + dis_AD_val[2]) > 40)
+    if (hhhar[hhhead] == 1 && (LK_jishi_flag || getSwitch(mainShowSW)) && !breakLoadFlag && !circluFlag && (!hamperFlag || hamperFlag == 5))
     {
         if ((BlackEndL < 20 && BlackEndR < 20) || BlackEndM < 10 || (lSlope > 4 && rSlope > 4 && lSlope < 20 && rSlope < 20))
         {
@@ -196,6 +196,12 @@ void  CalculateError(void)
     switch (circluFlag)
     {
         int16 ttem;
+        case 1:
+            if (Error < 8)
+            {
+                Error /= 2;
+            }
+            break;
         case 2:
             // if (Error < aMark)
             // {
@@ -289,7 +295,7 @@ void  CalculateError(void)
             case 3:
                 break;
             case 4:
-                Error = -7;
+                Error = -6;
                 break;
         }
         if (hhhar[hhhead] == 5 && hamperFlag < 5)

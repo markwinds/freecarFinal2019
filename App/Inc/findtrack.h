@@ -41,6 +41,8 @@ extern unsigned char RightInflectionPointFlag;
 extern unsigned char LeftInflectionPointFlag;
 extern uint8         star_lineflag;
 
+extern int32 time_buzzer;
+
 extern char lSlope, rSlope;
 extern char cirin;
 

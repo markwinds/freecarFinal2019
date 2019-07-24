@@ -22,6 +22,12 @@ extern int   steer_offset;
 extern int32 temp_vaule;
 extern float temp_vaule_f;
 
+extern float ADC_error;
+extern float pre_ADC_error;
+extern float ADC_offset;
+extern float ADC_speed;
+extern float sspeed;
+
 extern void  initADC();
 extern int32 getErrorFromADC();
 extern int32 getErrorFromADC1();
@@ -39,5 +45,7 @@ extern void  readADCParamToFlash();
 
 extern int32 getDecAdd(int32 mid, int32 left, int32 right);
 extern void  showTrueError();
+
+extern void newADCError();
 
 #endif //_ADC_H
