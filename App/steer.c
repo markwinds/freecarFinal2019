@@ -18,7 +18,7 @@ uint32 SteerPwm = 0, LastSteerSwm = 0; //舵机的pwm值和上次舵机的pwm值
 
 int judge_road_black_num   = 2;
 int judge_road_black_state = 1;
-int out_road = 0, eleP = 17;
+int out_road = 0, eleP = 85;
 
 uint16 breakLoadCont;
 
@@ -144,7 +144,7 @@ void SteerInit(void) //舵机初始化
 float eError;
 uint8 espped        = 0;
 uint8 breakLoadFlag = 0, breakcout = 0;
-int32 eleSpeed = 15;
+int32 eleSpeed = 17;
 void  CalculateError(void)
 {
     //右是负的，左是正的
@@ -209,16 +209,6 @@ void  CalculateError(void)
     switch (circluFlag)
     {
         int16 ttem;
-        case 1:
-            if (Error > 6)
-            {
-                Error = 6;
-            }
-            else if (Error < -6)
-            {
-                Error = -6;
-            }
-            break;
         case 2:
             // if (Error < aMark)
             // {
@@ -307,15 +297,15 @@ void  CalculateError(void)
 
                 break;
             case 2:
-                Error = -11;
+                Error = -10;
                 break;
             case 3:
                 break;
             case 4:
-                Error = -8.5;
+                Error = -7;
                 break;
         }
-        if (hhhar[hhhead] == 5)
+        if (hhhar[hhhead] == 5 && hamperFlag < 5)
         {
             Error = -Error;
         }

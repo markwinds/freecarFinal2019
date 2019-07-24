@@ -104,7 +104,7 @@ unsigned char BreakStartR                    = 0;
 unsigned char BreakStartRFlag                = 0;
 
 uint8 circlulose;
-char  cirin = 12;
+char  cirin = 11;
 
 char lSlope,
     rSlope;
@@ -1688,7 +1688,7 @@ void   HamperSearch()
         {
             hamperFlag = 6;
         }
-        else if (hamperFlag == 6 && BlackEndM > 30)
+        else if (hamperFlag == 6 && dis_AD_val[2])
         {
             MySpeedSet = actualSpeed;
             hamperFlag = 0;
