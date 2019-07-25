@@ -157,7 +157,7 @@ int ees;
 void GetTargetSpeed(void)
 {
 
-    if (!breakLoadFlag) //二号拨码开关不拨上去,动态速度
+    if (!hamperFlag || (hamperFlag != 1 && (hamperFlag & 1))) //二号拨码开关不拨上去,动态速度
     {
 
         LastSpeedDropRow = SpeedDropRow;
@@ -215,7 +215,7 @@ void GetTargetSpeed(void)
 
     else if (1) //二号拨码开关往上波
     {
-        SpeedSet = (int)(10.0 * (1.0 - (abs(Error) + 1.0) / 100.0));
+        //SpeedSet = (int)(10.0 * (1.0 - (abs(Error) + 1.0) / 100.0));
         // SpeedP   = 40.0;   //50.0;40
         // SpeedI   = 0.0009; //16.0;50,0.0006
         // SpeedD   = 10.0;   //1.3,10.0
@@ -237,31 +237,31 @@ void GetTargetSpeed(void)
         //     if (RSpeedSet >= 300)
         //         RSpeedSet = 300;
         // }
-        ees = 120 - (((int)LastSteerSwm - SteerMidle));
-        if (abs(ees) < 20)
-        {
-            ees /= ees;
-            ees *= 20;
-        }
-        else if (abs(ees) > 100)
-        {
-            ees /= ees;
-            ees *= 100;
-        }
+        // ees = 120 - (((int)LastSteerSwm - SteerMidle));
+        // if (abs(ees) < 20)
+        // {
+        //     ees /= ees;
+        //     ees *= 20;
+        // }
+        // else if (abs(ees) > 100)
+        // {
+        //     ees /= ees;
+        //     ees *= 100;
+        // }
 
         if (1)
         {
-            LSpeedSet = SpeedSet * eleSpeed;
-            RSpeedSet = SpeedSet * eleSpeed;
+            LSpeedSet = 10 * eleSpeed;
+            RSpeedSet = 10 * eleSpeed;
         }
-        if (ees > 0)
-        {
-            LSpeedSet = LSpeedSet * ees / 100;
-        }
-        else
-        {
-            RSpeedSet = -RSpeedSet * ees / 100;
-        }
+        // if (ees > 0)
+        // {
+        //     LSpeedSet = LSpeedSet * ees / 100;
+        // }
+        // else
+        // {
+        //     RSpeedSet = -RSpeedSet * ees / 100;
+        // }
     }
 }
 

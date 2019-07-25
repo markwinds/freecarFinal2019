@@ -290,20 +290,21 @@ void  CalculateError(void)
         {
             case 1:
 
-                Error = 9.9;
+                Error = 10.3;
 
                 break;
             case 2:
-                Error = -10.6;
+                Error = -10.8;
                 break;
             case 3:
                 break;
             case 4:
-                Error = -5;
+                Error = 10;
                 break;
         }
         if (hhhar[hhhead] == 5 && hamperFlag < 5)
         {
+            Error *= 0.95;
             Error = -Error;
         }
     }

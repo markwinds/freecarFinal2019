@@ -1615,7 +1615,7 @@ void   HamperSearch()
 {
     if (hhhar[hhhead] && !hamperFlag && !breakLoadFlag)
     {
-        if (!circluFlag && BlackEndM < 0x2d && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
+        if (!circluFlag && BlackEndM < 0x2b && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
         {
             int i, j = 68 - BlackEndM;
             for (i = j; i > 57 - BlackEndM; i--)
@@ -1637,7 +1637,7 @@ void   HamperSearch()
             if (hhhar[hhhead] == 2 || hhhar[hhhead] == 5)
             {
                 hamperFlag = 1;
-                MySpeedSet = 5;
+                //MySpeedSet = 5;
             }
             else if (hhhar[hhhead] == 4)
             {
@@ -1671,23 +1671,8 @@ void   HamperSearch()
         }
         else if (hamperFlag == 2)
         {
-            int16 temar[3] = { -1, -1, -1 };
-            if (hhhar[hhhead] == 2)
+            if (abs(BlackEndL + BlackEndR - 2 * BlackEndM) < 4 && BlackEndM > 20)
             {
-                for (i = ColumnMax - 1; i > 74; i--)
-                {
-                    if (img[30][i] == Black_Point)
-                        return;
-                }
-                hamperFlag = 4;
-            }
-            else
-            {
-                for (i = 0; i < 5; i++)
-                {
-                    if (img[30][i] == Black_Point)
-                        return;
-                }
                 hamperFlag = 4;
             }
         }
@@ -1697,12 +1682,11 @@ void   HamperSearch()
         }
         else if ((hamperFlag == 2 || hamperFlag == 4) && ADC_normal_vaule[3] + ADC_normal_vaule[4] + ADC_normal_vaule[0] > 20)
         {
-            MySpeedSet = 2;
+            // MySpeedSet = 2;
             hamperFlag = 6;
         }
-        else if (hamperFlag == 6 && BlackEndM > 33 && abs(LastError) < 7)
+        else if (hamperFlag == 6 && BlackEndM > 35 && abs(LastError) < 7)
         {
-            MySpeedSet = actualSpeed;
             hamperFlag = 0;
             hhhead++;
         }
@@ -1747,9 +1731,9 @@ void  star_line_judg() //起跑线检测
 
 uint8 JudgeConnect(uint8 left, uint8 right)
 {
-    float e = (right - left) / ColumnMax, val = left;
+    float e = 1.0 * (right - left) / 40, val = 1.0 * left;
     uint8 i;
-    for (i = 0; i < ColumnMax; i++)
+    for (i = 0; i < 40; i++)
     {
         if (img[(int)val][i] == Black_Point)
         {
