@@ -32,6 +32,8 @@ int   WhiteStart     = 0;
 
 int32 time_buzzer = 0;
 
+int time_pd = 0;
+
 /*********define for GetBlackEndParam**********/
 int BlackEndMR     = 0;
 int BlackEndML     = 0;
@@ -1410,8 +1412,7 @@ void  CircluSearch()
         {
             circluFlag              = 1;
             circluTimeOutClearMark1 = 0;
-            openBuzzer();
-            time_buzzer = sys_time;
+
             MySpeedSet -= actualSpeed / 4;
         }
     }
@@ -1637,18 +1638,24 @@ void   HamperSearch()
             if (hhhar[hhhead] == 2 || hhhar[hhhead] == 5)
             {
                 hamperFlag = 1;
-                //MySpeedSet = 5;
+                MySpeedSet = 10;
             }
-            else if (hhhar[hhhead] == 4)
+            else if (hhhar[hhhead] == 3)
             {
                 hamperFlag = 3;
+                time_pd    = sys_time;
             }
             else if (hhhar[hhhead] == 1)
             {
-                MySpeedSet -= actualSpeed / 3;
+                //MySpeedSet -= actualSpeed / 3;
                 hamperFlag = 5;
             }
             //tellMeRoadType(T1L3);
+        }
+        else if (hhhar[hhhead] == 3 && LastLine < 10 && RightEdge[14] - LeftEdge[14] > 30 && RightEdge[19] - LeftEdge[19] > 40)
+        {
+            hamperFlag = 3;
+            time_pd    = sys_time;
         }
         else
             blocktemp = 0;
@@ -1676,25 +1683,32 @@ void   HamperSearch()
                 hamperFlag = 4;
             }
         }
-        else if (hamperFlag == 3 && BlackEndM < 30)
+        else if (BlackEndM < 20 && hamperFlag == 3)
         {
-            hamperFlag = 6;
+            hamperFlag = 7;
         }
         else if ((hamperFlag == 2 || hamperFlag == 4) && ADC_normal_vaule[3] + ADC_normal_vaule[4] + ADC_normal_vaule[0] > 20)
         {
-            // MySpeedSet = 2;
+            MySpeedSet = 6;
             hamperFlag = 6;
         }
         else if (hamperFlag == 6 && BlackEndM > 35 && abs(LastError) < 7)
         {
+            MySpeedSet = actualSpeed;
             hamperFlag = 0;
             hhhead++;
+            openBuzzer();
+            time_buzzer = sys_time;
         }
         else if (hamperFlag == 5 && BlackEndM < 5)
         {
             breakLoadFlag = 1;
             breakLoadCont = 0;
             hamperFlag    = 0;
+        }
+        else if (hamperFlag == 7 && BlackEndM > 30 && sys_time - time_pd > 800)
+        {
+            hamperFlag = 6;
         }
     }
 }

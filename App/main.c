@@ -45,11 +45,6 @@ Screen_Data debug_window[] = {
     { "    ", NULL, 0, 0 },
     //{ "speed", { .l = &(SpeedSet) }, 0, 1 },ADC_normal_vaule
     { "error", { .f = &(Error) }, 0, 2 },
-    { "adcl", { .i = &(ADC_normal_vaule[1]) }, 0, 3 },
-    { "adcr", { .i = &(ADC_normal_vaule[2]) }, 0, 3 },
-    { "adcm", { .i = &(ADC_normal_vaule[0]) }, 0, 3 },
-    { "rslo", { .c = &(rSlope) }, 0, 4 },
-    { "lslo", { .c = &(lSlope) }, 0, 4 },
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "bll", { .i = &(BlackEndML) }, 0, 3 },
     { "blr", { .i = &(BlackEndMR) }, 0, 3 },
@@ -58,7 +53,8 @@ Screen_Data debug_window[] = {
     { "blm", { .i = &(BlackEndM) }, 0, 3 },
     { "cir", { .c = &(circluFlag) }, 0, 4 },
     { "hamper", { .c = &(hamperFlag) }, 0, 4 },
-    { "ees", { .i = &(ees) }, 0, 3 },
+    { "ees", { .i = &(temx) }, 0, 3 },
+    { "lali", { .i = &(LastLine) }, 0, 3 },
     { "end", NULL, 0, 0 }
 };
 
@@ -182,6 +178,8 @@ void main(void)
                     if (breakLoadCont > 20)
                     {
                         hhhead++;
+                        openBuzzer();
+                        time_buzzer = sys_time;
                     }
                 }
             }

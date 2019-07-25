@@ -70,6 +70,7 @@ Lcd_State* imgbuffShowToWaitMiddle(Lcd_State* pThis) //中
             else
             {
                 setMode(hhhMOD);
+                hhhpi = 4;
                 return &ready_go;
             }
             choseagain = 0;

@@ -43,6 +43,8 @@ extern uint8         star_lineflag;
 
 extern int32 time_buzzer;
 
+extern int time_pd;
+
 extern char lSlope, rSlope;
 extern char cirin;
 
