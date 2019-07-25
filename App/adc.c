@@ -250,12 +250,12 @@ void newADCError()
 
     if (ADC_normal_vaule[0] < 500)
     {
-        ADC_offset = 7 * ADC_error + 7 * (ADC_error - pre_ADC_error);
-        ADC_speed  = (sspeed / 1.5);
+        ADC_offset = 9 * ADC_error + 7 * (ADC_error - pre_ADC_error);
+        ADC_speed  = (sspeed / 1.7);
     }
     else if (ADC_normal_vaule[0] < 900)
     {
-        ADC_offset = 4 * ADC_error + 40 * (ADC_error - pre_ADC_error);
+        ADC_offset = 4 * ADC_error + 30 * (ADC_error - pre_ADC_error);
         ADC_speed  = sspeed;
     }
     else
