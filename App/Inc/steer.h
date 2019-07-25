@@ -24,6 +24,7 @@ extern uint32 LastSteerSwm;
 extern int    ADC_updata;
 extern int    actualSpeed;
 extern int    eleP;
+extern float  hli, hri, hlo, hro;
 void          SteerInit(void); //舵机初始化
 void          CalculateError(void);
 extern void   SteerControl(void);

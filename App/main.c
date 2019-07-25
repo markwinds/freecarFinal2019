@@ -20,7 +20,6 @@ void set_vector_handler(VECTORn_t, void pfunc_handler(void)); //设置中断函�
 //可以调控的ui
 Screen_Data mydata[] = { //
     { "speed", { .l = &(actualSpeed) }, 1.0, 1 },
-    { "eleSpe", { .l = &(eleSpeed) }, 1.0, 1 },
     { "sspeed", { .f = &(sspeed) }, 1, 2 },
     { "KP", { .f = &(BasicP) }, 0.1, 2 },
     { "KD", { .f = &(KD) }, 0.1, 2 },
@@ -31,9 +30,11 @@ Screen_Data mydata[] = { //
     { "tempf", { .f = &(temp_vaule_f) }, 0.1, 2 },
     { "KP+", { .f = &(BasicP) }, 1, 2 },
     { "KD+", { .f = &(KD) }, 1, 2 },
-    { "elep", { .i = &(eleP) }, 1.0, 3 },
-    { "hamsw", { .c = &(hamperFlag) }, 1, 4 },
     { "cirin", { .c = &(cirin) }, 1, 4 },
+    { "|*|OUTl", { .f = &(hlo) }, 0.1, 2 },
+    { "|*|OUTr", { .f = &(hro) }, 0.1, 2 },
+    { "|*|INl", { .f = &(hli) }, 0.1, 2 },
+    { "|*|INr", { .f = &(hri) }, 0.1, 2 },
     { "hhh", { .c = &(hhhar[0]) }, 1, 4 },
     //{ "jxuc", { .c = &(sendFlag) }, 1, 4 },
     { "end", NULL, 0, 0 }
