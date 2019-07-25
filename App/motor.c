@@ -81,7 +81,7 @@ uint8 runrunrun = 0, go, gogo = 0;
 int16 ste = 868, dir = 1;
 void  PIT0_IRQHandler()
 {
-
+    sys_time++;
     static uint16 TimerCnt8ms = 0;
 
     disable_irq(PIT0_IRQn); //关PIT中断

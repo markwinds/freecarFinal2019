@@ -1402,14 +1402,17 @@ void  CircluSearch()
 {
     if (circluFlag == 0 && BlackEndM > 35)
     {
-        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2200 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2200)
+        if (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2100 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2100)
         {
             aMark++;
         }
-        if (aMark > 6)
+        if (aMark > 4)
         {
             circluFlag              = 1;
             circluTimeOutClearMark1 = 0;
+            openBuzzer();
+            time_buzzer = sys_time;
+            MySpeedSet -= actualSpeed / 4;
         }
     }
     else if (circluFlag == 1 && (ADC_normal_vaule[0] + ADC_normal_vaule[1] > 2000 || ADC_normal_vaule[0] + ADC_normal_vaule[2] > 2000))
@@ -1612,7 +1615,7 @@ void   HamperSearch()
 {
     if (hhhar[hhhead] && !hamperFlag && !breakLoadFlag)
     {
-        if (!circluFlag && BlackEndM < 43 && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
+        if (!circluFlag && BlackEndM < 0x2d && BlackEndM > 30 && abs(BlackEndML + BlackEndMR - 2 * BlackEndM) < 3)
         {
             int i, j = 68 - BlackEndM;
             for (i = j; i > 57 - BlackEndM; i--)
@@ -1634,7 +1637,7 @@ void   HamperSearch()
             if (hhhar[hhhead] == 2 || hhhar[hhhead] == 5)
             {
                 hamperFlag = 1;
-                MySpeedSet -= actualSpeed / 3;
+                MySpeedSet = 5;
             }
             else if (hhhar[hhhead] == 4)
             {
@@ -1671,18 +1674,18 @@ void   HamperSearch()
             int16 temar[3] = { -1, -1, -1 };
             if (hhhar[hhhead] == 2)
             {
-                for (i = ColumnMax - 1; i > 55; i--)
+                for (i = ColumnMax - 1; i > 74; i--)
                 {
-                    if (img[40][i] == Black_Point)
+                    if (img[30][i] == Black_Point)
                         return;
                 }
                 hamperFlag = 4;
             }
             else
             {
-                for (i = 0; i < 25; i++)
+                for (i = 0; i < 5; i++)
                 {
-                    if (img[40][i] == Black_Point)
+                    if (img[30][i] == Black_Point)
                         return;
                 }
                 hamperFlag = 4;
@@ -1692,11 +1695,12 @@ void   HamperSearch()
         {
             hamperFlag = 6;
         }
-        else if ((hamperFlag == 2 || hamperFlag == 4) && ADC_normal_vaule[0] > 10)
+        else if ((hamperFlag == 2 || hamperFlag == 4) && ADC_normal_vaule[3] + ADC_normal_vaule[4] + ADC_normal_vaule[0] > 20)
         {
+            MySpeedSet = 2;
             hamperFlag = 6;
         }
-        else if (hamperFlag == 6 && BlackEndM > 15)
+        else if (hamperFlag == 6 && BlackEndM > 33 && abs(LastError) < 7)
         {
             MySpeedSet = actualSpeed;
             hamperFlag = 0;

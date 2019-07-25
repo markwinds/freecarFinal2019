@@ -257,6 +257,8 @@ void  CalculateError(void)
             //     Error = (46 - BlackEndM);
             // }
             ttem = (43 - BlackEndM) * (43 - BlackEndM) / 7;
+            if (ttem < 8)
+                ttem = 8;
             if (Error < ttem)
             {
                 Error = ttem;
@@ -268,6 +270,8 @@ void  CalculateError(void)
             //     Error = BlackEndM - 46;
             // }
             ttem = (43 - BlackEndM) * (43 - BlackEndM) / 7;
+            if (ttem < 8)
+                ttem = 8;
             if (Error > -ttem)
             {
                 Error = -ttem;
@@ -286,16 +290,16 @@ void  CalculateError(void)
         {
             case 1:
 
-                Error = 11;
+                Error = 9.9;
 
                 break;
             case 2:
-                Error = -10;
+                Error = -10.6;
                 break;
             case 3:
                 break;
             case 4:
-                Error = -6;
+                Error = -5;
                 break;
         }
         if (hhhar[hhhead] == 5 && hamperFlag < 5)

@@ -36,29 +36,10 @@ void turnBuzzer()
 
 void tellMeRoadType(SoundType sound_type)
 {
-    if (sound_type == T0L0 || timer_busy)
-    {
-        return;
-    }
 
-    int* p       = buzzer_music[sound_type];
-    sound_choose = sound_type;
-    sound_size   = 0;
-    sound_num    = 0;
-    while (*p++ != 0)
-    {
-        sound_size++;
-    }
-    sound_num = sound_size;
 }
 
 void checkBuzzerShouldSpeak()
 {
-    if (sound_num) //如果一段声音还没放完
-    {
-        if (setFlagInTimerLongCheck(&buzzer_timer_flag, buzzer_music[sound_choose][sound_size - sound_num], (sound_size - sound_num) % 2 == 0 ? 1 : 0))
-        {
-            sound_num--;
-        }
-    }
+
 }

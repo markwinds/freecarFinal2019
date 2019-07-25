@@ -34,6 +34,7 @@ Screen_Data mydata[] = { //
     { "elep", { .i = &(eleP) }, 1.0, 3 },
     { "hamsw", { .c = &(hamperFlag) }, 1, 4 },
     { "cirin", { .c = &(cirin) }, 1, 4 },
+    { "hhh", { .c = &(hhhar[0]) }, 1, 4 },
     //{ "jxuc", { .c = &(sendFlag) }, 1, 4 },
     { "end", NULL, 0, 0 }
 };
@@ -65,11 +66,15 @@ Screen_Data debug_window[] = {
 void doThisEveryPeriod()
 {
     ADC_updata = 0;
-    manageTimerFlag();    //处理定时器控制的标志位
     if (uart4_to_do_flag) //串口是否接收到命令
     {
         uart4_to_do_flag = 0;
         analysisCommand();
+    }
+    if (sys_time - time_buzzer > 500)
+    {
+        closeBuzzer();
+        MySpeedSet = actualSpeed;
     }
 }
 
@@ -139,8 +144,6 @@ void main(void)
     HardWare_Init();
     InitEM();
     /**----------------------------------------------*/
-
-    initTimerForFlag(); //这个必须放在最后初始化 zbt
 
     while (1)
     {
